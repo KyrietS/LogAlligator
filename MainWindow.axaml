@@ -1,0 +1,52 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:controls="clr-namespace:LogAlligator.Controls"
+        mc:Ignorable="d" d:DesignWidth="500" d:DesignHeight="300"
+        x:Class="LogAlligator.MainWindow"
+        Title="LogAlligator App"
+        Width="800"
+        Height="400">
+  <Window.Styles>
+    <Style Selector="TabControl">
+      <Setter Property="Margin" Value="0"/>
+      <Setter Property="Padding" Value="0"/>
+    </Style>
+
+    <Style Selector="TabItem">
+      <Setter Property="Foreground" Value="{DynamicResource ThemeForegroundBrush}"/>
+      <Setter Property="Background" Value="{DynamicResource ThemeBackgroundBrush}" />
+      <Setter Property="FontSize" Value="11"/>
+      <Setter Property="Padding" Value="6 2"/>
+      <Setter Property="Margin" Value="0 0 0 0"/>
+      <Setter Property="BorderThickness" Value="1"/>
+      <Setter Property="BorderBrush" Value="{DynamicResource ThemeControlMidBrush}"/>
+    </Style>
+
+    <Style Selector="MenuItem">
+      <Setter Property="Padding" Value="6 2"/>
+      <Setter Property="FontSize" Value="12"/>
+    </Style>
+  </Window.Styles>
+
+
+  <DockPanel>
+    <Menu DockPanel.Dock="Top" >
+      <MenuItem Header="_File">
+        <MenuItem Header="_Open..." />
+        <Separator />
+        <MenuItem Header="_Exit" Command="{Binding $parent[Window].OnExit}" />
+      </MenuItem>
+      <MenuItem Header="Load data" Command="{Binding $parent[Window].OnLoadData}" />
+    </Menu>
+    <TabControl Padding="0">
+      <TabItem Header="ExampleFile">
+        <controls:TextViewControl Name="TextView" />
+      </TabItem>
+      <TabItem Header="Another">
+        <TextBlock>Hello from another tab!</TextBlock>
+      </TabItem>
+    </TabControl>
+  </DockPanel>
+</Window>

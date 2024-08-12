@@ -1,0 +1,19 @@
+<Application xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             x:Class="LogAlligator.App"
+             RequestedThemeVariant="Light">
+             <!-- "Default" ThemeVariant follows system theme variant. "Dark" or "Light" are other available options. -->
+  <Application.Resources>
+    <x:Double x:Key="FontSizeNormal">11</x:Double>
+
+    <!-- Inter is an open source alternative to Segoe font. -->
+    <FontFamily x:Key="ContentControlThemeFontFamily">
+      <!--fonts:Inter#Inter,-->$Default
+    </FontFamily>
+    
+  </Application.Resources>
+  
+    <Application.Styles>
+        <SimpleTheme />
+    </Application.Styles>
+</Application>

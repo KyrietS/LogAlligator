@@ -1,0 +1,45 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:controls="clr-namespace:LogAlligator.Controls"
+             mc:Ignorable="d" d:DesignWidth="500" d:DesignHeight="250"
+             x:Class="LogAlligator.Controls.TextViewControl" >
+  <Border BorderBrush="{DynamicResource ThemeBorderLowBrush}" BorderThickness="2 2 1 1">
+    <DockPanel>
+      <DockPanel DockPanel.Dock="Bottom">
+        <Panel DockPanel.Dock="Right" Background="{DynamicResource ThemeControlMidBrush}" Width="{Binding #VerticalScrollBar.Bounds.Width}" />
+        <ScrollBar Name="HorizontalScrollBar" 
+                   Orientation="Horizontal" 
+                   AllowAutoHide="False"
+                   SmallChange="10"
+                   LargeChange="100"
+                   Scroll="OnHorizontalScroll" />
+      </DockPanel>
+      <ScrollBar Name="VerticalScrollBar" 
+                 Orientation="Vertical" 
+                 DockPanel.Dock="Right" 
+                 AllowAutoHide="False"
+                 SmallChange="1"
+                 LargeChange="20"
+                 ViewportSize="20"
+                 Scroll="OnVerticalScroll" />
+      <controls:LineNumbersControl Name="LineNumbers"
+                                   DockPanel.Dock="Left" 
+                                   Width="50"
+                                   FontFamily="Arial"
+                                   FontSize="12"/>
+      <Panel DockPanel.Dock="Left"
+             Width="10"
+             Background="{DynamicResource ThemeControlMidBrush}"/>
+      <Panel Name="TextAreaContainer"
+             ClipToBounds="True"
+             Margin="5 0 0 0">
+        <controls:TextAreaControl Name="TextArea"
+                                  Cursor="Ibeam"
+                                  FontFamily="Arial"
+                                  FontSize="12"/>
+      </Panel>
+    </DockPanel>
+  </Border>
+</UserControl>
