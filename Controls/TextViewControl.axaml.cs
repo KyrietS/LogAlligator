@@ -40,7 +40,6 @@ public partial class TextViewControl : UserControl
     private void LoadData()
     {
         numberOfLines = Math.Min(lines.Length, TextArea.NumberOfLinesThatCanFit);
-        Debug.WriteLine(numberOfLines);
         TextArea.Clear();
         for (int i = 0; i < numberOfLines; i++)
         {
@@ -87,6 +86,7 @@ public partial class TextViewControl : UserControl
         }
 
         VerticalScrollBar.Value = topLineIndex;
+        HorizontalScrollBar.Value -= e.Delta.X * 10;
 
         LoadData();
     }
