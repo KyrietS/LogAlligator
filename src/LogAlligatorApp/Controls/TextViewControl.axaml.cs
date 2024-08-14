@@ -3,7 +3,9 @@ using Avalonia.Controls;
 using Avalonia.Controls.Primitives;
 using Avalonia.Input;
 using Avalonia.Markup.Xaml;
+using Avalonia.Media;
 using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 
 namespace LogAlligator.Controls;
@@ -49,6 +51,13 @@ public partial class TextViewControl : UserControl
                 break;
 
             TextArea.AppendLine(lines[lineIndex]);
+            if (i == 0)
+            {
+                //TextArea.AppendFormattingToLastLine(3, 3, background: new SolidColorBrush(Colors.Yellow));
+                TextArea.AppendFormattingToLastLine(7, 4, background: new SolidColorBrush(Colors.GreenYellow));
+                TextArea.AppendFormattingToLastLine(5, 3, background: new SolidColorBrush(Colors.Magenta));
+            }
+
             maxLineWidth = Math.Max(maxLineWidth, TextArea.MaxLineWidth);
         }
         LineNumbers.FirstLineNumber = topLineIndex + 1;
