@@ -2,10 +2,12 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-             xmlns:controls="clr-namespace:LogAlligator.Controls"
+             xmlns:controls="clr-namespace:LogAlligator.App.Controls"
              mc:Ignorable="d" d:DesignWidth="500" d:DesignHeight="250"
-             x:Class="LogAlligator.Controls.TextViewControl" >
-  <Border BorderBrush="{DynamicResource ThemeBorderLowBrush}" BorderThickness="2 2 1 1">
+             x:Class="LogAlligator.App.Controls.TextViewControl">
+  <Border BorderBrush="{DynamicResource ThemeBorderLowBrush}" 
+          BorderThickness="2 2 1 1"
+          Background="{DynamicResource ThemeBackgroundBrush}">
     <DockPanel>
       <DockPanel DockPanel.Dock="Bottom">
         <Panel DockPanel.Dock="Right" Background="{DynamicResource ThemeControlMidBrush}" Width="{Binding #VerticalScrollBar.Bounds.Width}" />
@@ -28,7 +30,9 @@
                                    DockPanel.Dock="Left" 
                                    Width="50"
                                    FontFamily="Arial"
-                                   FontSize="12"/>
+                                   FontSize="12"
+                                   Background="{DynamicResource ThemeControlMidBrush}"
+                                   Foreground="{DynamicResource ThemeForegroundBrush}"/>
       <Panel DockPanel.Dock="Left"
              Width="10"
              Background="{DynamicResource ThemeControlMidBrush}"/>
@@ -38,7 +42,9 @@
         <controls:TextAreaControl Name="TextArea"
                                   Cursor="Ibeam"
                                   FontFamily="Arial"
-                                  FontSize="12"/>
+                                  FontSize="12"
+                                  Background="{DynamicResource ThemeBackgroundBrush}"
+                                  Foreground="{DynamicResource ThemeForegroundBrush}"/>
       </Panel>
     </DockPanel>
   </Border>

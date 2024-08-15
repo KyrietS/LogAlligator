@@ -1,7 +1,7 @@
 ﻿using Avalonia;
 using System;
 
-namespace LogAlligator
+namespace LogAlligator.App
 {
     internal class Program
     {
@@ -14,7 +14,7 @@ namespace LogAlligator
 
         // Avalonia configuration, don't remove; also used by visual designer.
         public static AppBuilder BuildAvaloniaApp()
-            => AppBuilder.Configure<App>()
+            => AppBuilder.Configure<LogAlligator.App.App>()
                 .UsePlatformDetect()
                 .WithInterFont()
                 .LogToTrace();

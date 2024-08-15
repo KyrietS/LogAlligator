@@ -3,7 +3,9 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.10.35013.160
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "LogAlligatorApp", "src\LogAlligatorApp\LogAlligatorApp.csproj", "{5C60EF31-9C90-4609-9C14-591F569EBA52}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "LogAlligator.App", "src\LogAlligator.App\LogAlligator.App.csproj", "{BC9A8651-F3CE-4891-80A6-ED3CA4A00219}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "LogAlligator.Tests", "tests\LogAlligator.Tests\LogAlligator.Tests.csproj", "{F1D3F750-0E2C-4F09-A4A6-CC93A15E65F2}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -11,10 +13,14 @@ Global
 		Release|Any CPU = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{5C60EF31-9C90-4609-9C14-591F569EBA52}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{5C60EF31-9C90-4609-9C14-591F569EBA52}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{5C60EF31-9C90-4609-9C14-591F569EBA52}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{5C60EF31-9C90-4609-9C14-591F569EBA52}.Release|Any CPU.Build.0 = Release|Any CPU
+		{BC9A8651-F3CE-4891-80A6-ED3CA4A00219}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{BC9A8651-F3CE-4891-80A6-ED3CA4A00219}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{BC9A8651-F3CE-4891-80A6-ED3CA4A00219}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{BC9A8651-F3CE-4891-80A6-ED3CA4A00219}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F1D3F750-0E2C-4F09-A4A6-CC93A15E65F2}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F1D3F750-0E2C-4F09-A4A6-CC93A15E65F2}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F1D3F750-0E2C-4F09-A4A6-CC93A15E65F2}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F1D3F750-0E2C-4F09-A4A6-CC93A15E65F2}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

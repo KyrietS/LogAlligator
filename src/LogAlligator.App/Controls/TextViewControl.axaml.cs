@@ -3,12 +3,13 @@ using Avalonia.Controls;
 using Avalonia.Controls.Primitives;
 using Avalonia.Input;
 using Avalonia.Markup.Xaml;
+using Avalonia.Markup.Xaml.MarkupExtensions;
 using Avalonia.Media;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 
-namespace LogAlligator.Controls;
+namespace LogAlligator.App.Controls;
 
 public partial class TextViewControl : UserControl
 {
@@ -16,11 +17,30 @@ public partial class TextViewControl : UserControl
     private int topLineIndex = 0;
     private int numberOfLines = 10;
     private double maxLineWidth = 0;
+    private (int LineIndex, int CharIndex, int Length) selection = (10, 4, 3);
+    private bool selectionInProgress = false;
+
+    public static readonly StyledProperty<IBrush> HighlightBackgroundProperty =
+    AvaloniaProperty.Register<TextViewControl, IBrush>(nameof(HighlightBackground), new SolidColorBrush(Color.FromRgb(0, 120, 215)));
+    public IBrush HighlightBackground
+    {
+        get => GetValue(HighlightBackgroundProperty);
+        set => SetValue(HighlightBackgroundProperty, value);
+    }
+
+    public static readonly StyledProperty<IBrush> HighlightForegroundProperty =
+    AvaloniaProperty.Register<TextViewControl, IBrush>(nameof(HighlightForeground), new SolidColorBrush(Colors.Black));
+    public IBrush HighlightForeground
+    {
+        get => GetValue(HighlightForegroundProperty);
+        set => SetValue(HighlightForegroundProperty, value);
+    }
 
     public TextViewControl()
     {
         InitializeComponent();
         LineNumbers.NumberOfLines = numberOfLines;
+        Application.Current!.ActualThemeVariantChanged += (_, _) => LoadData();
 
         if (Design.IsDesignMode)
         {
@@ -30,6 +50,7 @@ public partial class TextViewControl : UserControl
                 lines[i] = "Sample text in line " + (i+1).ToString();
             }
         }
+
     }
 
     public void SetText(string[] lines)
@@ -56,6 +77,12 @@ public partial class TextViewControl : UserControl
                 //TextArea.AppendFormattingToLastLine(3, 3, background: new SolidColorBrush(Colors.Yellow));
                 TextArea.AppendFormattingToLastLine(7, 4, background: new SolidColorBrush(Colors.GreenYellow));
                 TextArea.AppendFormattingToLastLine(5, 3, background: new SolidColorBrush(Colors.Magenta));
+                TextArea.AppendFormattingToLastLine(20, 15, background: HighlightBackground, foreground: HighlightForeground);
+            }
+
+            if (lineIndex == selection.LineIndex)
+            {
+                TextArea.AppendFormattingToLastLine(selection.CharIndex, selection.Length, HighlightForeground, HighlightBackground);
             }
 
             maxLineWidth = Math.Max(maxLineWidth, TextArea.MaxLineWidth);
@@ -103,10 +130,63 @@ public partial class TextViewControl : UserControl
     protected override void OnPointerPressed(PointerPressedEventArgs e)
     {
         base.OnPointerPressed(e);
-        lines = new string[1];
-        lines[0] = "Mouse clicked!";
+        if (e.Handled || lines.Length == 0)
+            return;
+
+        var pointer = e.GetCurrentPoint(TextArea);
+        if (pointer.Properties.IsLeftButtonPressed)
+            selectionInProgress = true;
+        else
+            return;
+
+        var cursor = pointer.Position;
+        var (lineIndex, charIndex) = TextArea.GetCharIndexAtPosition(cursor);
+
+        lineIndex += topLineIndex;
+
+        if (charIndex >= 0 && charIndex < lines[lineIndex].Length)
+        {
+            selection = (lineIndex, charIndex, 0);
+        }
+        else if (charIndex < 0) // Clicked before line
+        {
+            selection = (lineIndex, 0, 0);
+        }
+        else // Clicked after line
+        {
+            selection = (lineIndex, charIndex, 0);
+        }
+
         LoadData();
-        InvalidateVisual();
+    }
+
+    protected override void OnPointerReleased(PointerReleasedEventArgs e)
+    {
+        base.OnPointerReleased(e);
+
+        if (e.InitialPressMouseButton == MouseButton.Left)
+        {
+            selectionInProgress = false;
+        }
+    }
+
+    protected override void OnPointerMoved(PointerEventArgs e)
+    {
+        base.OnPointerMoved(e);
+        if (e.Handled) 
+            return;
+
+        if (!selectionInProgress)
+            return;
+
+        var pointer = e.GetCurrentPoint(TextArea);
+        var cursor = pointer.Position;
+        var (lineIndex, charIndex) = TextArea.GetCharIndexAtPosition(cursor);
+        if (pointer.Properties.IsLeftButtonPressed)
+        {
+            selection.Length = Math.Abs(charIndex - selection.CharIndex);
+            LoadData();
+        }
     }
 
     private void OnVerticalScroll(object sender, ScrollEventArgs args)

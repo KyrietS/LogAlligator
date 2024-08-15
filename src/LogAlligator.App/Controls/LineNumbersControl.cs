@@ -10,12 +10,27 @@ using Avalonia.Controls;
 using Avalonia.Media;
 using Avalonia.Styling;
 
-namespace LogAlligator.Controls
+namespace LogAlligator.App.Controls
 {
     class LineNumbersControl : Control
     {
-        public IBrush Foreground { get; set; }
-        public IBrush Background { get; set; }
+
+        public static readonly StyledProperty<IBrush> BackgroundProperty =
+            AvaloniaProperty.Register<LineNumbersControl, IBrush>(nameof(Background), new SolidColorBrush(Colors.Transparent));
+        public IBrush Background
+        {
+            get => GetValue(BackgroundProperty);
+            set => SetValue(BackgroundProperty, value);
+        }        
+        
+        public static readonly StyledProperty<IBrush> ForegroundProperty =
+            AvaloniaProperty.Register<LineNumbersControl, IBrush>(nameof(Foreground), new SolidColorBrush(Colors.Black));
+        public IBrush Foreground
+        {
+            get => GetValue(ForegroundProperty);
+            set => SetValue(ForegroundProperty, value);
+        }
+
         public FontFamily FontFamily { get; set; } = FontFamily.Default;
         public double FontSize { get; set; }
         public int NumberOfLines { get; set; } = 20;
@@ -23,18 +38,10 @@ namespace LogAlligator.Controls
 
         public LineNumbersControl() : base()
         {
-            var theme = Application.Current!.RequestedThemeVariant;
-            Background = Application.Current!.FindResource(theme, "ThemeControlMidBrush") as IBrush
-                ?? throw new ApplicationException("Resource not found");
-
-            Foreground = Application.Current!.FindResource(theme, "ThemeForegroundBrush") as IBrush
-                ?? throw new ApplicationException("Resource not found");
-
-            FontSize = Application.Current!.FindResource(theme, "FontSizeNormal") as double?
-                ?? throw new ApplicationException("Reource not found");
-
             ClipToBounds = true;
+            Application.Current!.ActualThemeVariantChanged += (_, _) => InvalidateVisual();
         }
+
 
         public override void Render(DrawingContext dc)
         {

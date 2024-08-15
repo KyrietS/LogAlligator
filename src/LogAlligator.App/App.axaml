@@ -1,0 +1,28 @@
+<Application xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             x:Class="LogAlligator.App.App"
+             RequestedThemeVariant="Light">
+             <!-- "Default" ThemeVariant follows system theme variant. "Dark" or "Light" are other available options. -->
+  <Application.Resources>
+    <ResourceDictionary>
+      <ResourceDictionary.MergedDictionaries>
+        <!--<ResourceInclude Source="/ThemeCustomizations.axaml" />-->
+      </ResourceDictionary.MergedDictionaries>
+    </ResourceDictionary>
+  </Application.Resources> 
+  
+    <Application.Styles>
+      <SimpleTheme />
+      
+      <Styles>
+        <Styles.Resources>
+          <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+              <MergeResourceInclude Source="/ThemeCustomizations.axaml" />
+            </ResourceDictionary.MergedDictionaries>
+          </ResourceDictionary>
+        </Styles.Resources>
+      </Styles>
+    </Application.Styles>
+
+  </Application>

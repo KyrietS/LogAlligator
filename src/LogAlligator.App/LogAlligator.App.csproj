@@ -5,7 +5,8 @@
     <Nullable>enable</Nullable>
     <BuiltInComInteropSupport>true</BuiltInComInteropSupport>
     <ApplicationManifest>app.manifest</ApplicationManifest>
-    <RootNamespace>LogAlligator</RootNamespace>
+    <RootNamespace>LogAlligator.App</RootNamespace>
+    <AssemblyName>LogAlligator</AssemblyName>
   </PropertyGroup>
 
   <ItemGroup>
@@ -15,5 +16,9 @@
     <PackageReference Include="Avalonia.Fonts.Inter" Version="11.0.10" />
     <!--Condition below is needed to remove Avalonia.Diagnostics package from build output in Release configuration.-->
     <PackageReference Condition="'$(Configuration)' == 'Debug'" Include="Avalonia.Diagnostics" Version="11.0.10" />
+  </ItemGroup>
+  
+  <ItemGroup>
+    <InternalsVisibleTo Include="LogAlligator.Tests" />
   </ItemGroup>
 </Project>
