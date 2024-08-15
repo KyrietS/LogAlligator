@@ -1,76 +1,67 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.Globalization;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Globalization;
 using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Media;
-using Avalonia.Styling;
 
-namespace LogAlligator.App.Controls
+namespace LogAlligator.App.Controls;
+
+class LineNumbersControl : Control
 {
-    class LineNumbersControl : Control
+
+    public static readonly StyledProperty<IBrush> BackgroundProperty =
+        AvaloniaProperty.Register<LineNumbersControl, IBrush>(nameof(Background), new SolidColorBrush(Colors.Transparent));
+    public IBrush Background
     {
+        get => GetValue(BackgroundProperty);
+        set => SetValue(BackgroundProperty, value);
+    }        
+    
+    public static readonly StyledProperty<IBrush> ForegroundProperty =
+        AvaloniaProperty.Register<LineNumbersControl, IBrush>(nameof(Foreground), new SolidColorBrush(Colors.Black));
+    public IBrush Foreground
+    {
+        get => GetValue(ForegroundProperty);
+        set => SetValue(ForegroundProperty, value);
+    }
 
-        public static readonly StyledProperty<IBrush> BackgroundProperty =
-            AvaloniaProperty.Register<LineNumbersControl, IBrush>(nameof(Background), new SolidColorBrush(Colors.Transparent));
-        public IBrush Background
+    public FontFamily FontFamily { get; set; } = FontFamily.Default;
+    public double FontSize { get; set; }
+    public int NumberOfLines { get; set; } = 20;
+    public int FirstLineNumber { get; set; } = 1;
+
+    public LineNumbersControl() : base()
+    {
+        ClipToBounds = true;
+        Application.Current!.ActualThemeVariantChanged += (_, _) => InvalidateVisual();
+    }
+
+
+    public override void Render(DrawingContext dc)
+    {
+        dc.FillRectangle(Background, new Rect(0, 0, Bounds.Width, Bounds.Height));
+
+        double lineHeight = GetLineHeight();
+        var cursor = new Point(0, 0);
+
+        for (int i = 0; i < NumberOfLines; i++)
         {
-            get => GetValue(BackgroundProperty);
-            set => SetValue(BackgroundProperty, value);
-        }        
-        
-        public static readonly StyledProperty<IBrush> ForegroundProperty =
-            AvaloniaProperty.Register<LineNumbersControl, IBrush>(nameof(Foreground), new SolidColorBrush(Colors.Black));
-        public IBrush Foreground
-        {
-            get => GetValue(ForegroundProperty);
-            set => SetValue(ForegroundProperty, value);
+            int lineNumber = FirstLineNumber + i;
+            var lineNumberText = FormatText(lineNumber.ToString());
+            var xOffset = Width - lineNumberText.Width;
+
+            dc.DrawText(lineNumberText, cursor.WithX(xOffset));
+            cursor = new Point(cursor.X, cursor.Y + lineHeight);
         }
+    }
 
-        public FontFamily FontFamily { get; set; } = FontFamily.Default;
-        public double FontSize { get; set; }
-        public int NumberOfLines { get; set; } = 20;
-        public int FirstLineNumber { get; set; } = 1;
+    private double GetLineHeight()
+    {
+        return FormatText(".").Height;
+    }
 
-        public LineNumbersControl() : base()
-        {
-            ClipToBounds = true;
-            Application.Current!.ActualThemeVariantChanged += (_, _) => InvalidateVisual();
-        }
-
-
-        public override void Render(DrawingContext dc)
-        {
-            dc.FillRectangle(Background, new Rect(0, 0, Bounds.Width, Bounds.Height));
-
-            double lineHeight = GetLineHeight();
-            var cursor = new Point(0, 0);
-
-            for (int i = 0; i < NumberOfLines; i++)
-            {
-                int lineNumber = FirstLineNumber + i;
-                var lineNumberText = FormatText(lineNumber.ToString());
-                var xOffset = Width - lineNumberText.Width;
-
-                dc.DrawText(lineNumberText, cursor.WithX(xOffset));
-                cursor = new Point(cursor.X, cursor.Y + lineHeight);
-            }
-        }
-
-        private double GetLineHeight()
-        {
-            return FormatText(".").Height;
-        }
-
-        private FormattedText FormatText(string text)
-        {
-            var typeface = new Typeface(FontFamily);
-            return new FormattedText(text, CultureInfo.CurrentCulture, FlowDirection.LeftToRight, typeface, FontSize, Foreground);
-        }
-
+    private FormattedText FormatText(string text)
+    {
+        var typeface = new Typeface(FontFamily);
+        return new FormattedText(text, CultureInfo.CurrentCulture, FlowDirection.LeftToRight, typeface, FontSize, Foreground);
     }
 }
