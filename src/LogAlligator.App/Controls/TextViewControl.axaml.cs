@@ -5,6 +5,7 @@ using Avalonia.Input;
 using Avalonia.Media;
 using LogAlligator.App.Utils;
 using System;
+using System.Diagnostics;
 
 namespace LogAlligator.App.Controls;
 
@@ -16,7 +17,6 @@ public partial class TextViewControl : UserControl
     private double maxLineWidth = 0;
 
     private TextSelection selection = new();
-    private bool selectionInProgress = false;
 
 
     public static readonly StyledProperty<IBrush> HighlightBackgroundProperty =
@@ -39,6 +39,12 @@ public partial class TextViewControl : UserControl
     {
         InitializeComponent();
         LineNumbers.NumberOfLines = numberOfLines;
+        LineNumbers.PointerPressed += LineNumbers_PointerPressed;
+        LineNumbers.PointerMoved += LineNumbers_PointerMoved;
+
+        TextArea.PointerPressed += TextArea_PointerPressed;
+        TextArea.PointerMoved += TextArea_PointerMoved;
+
         Application.Current!.ActualThemeVariantChanged += (_, _) => LoadData();
 
         if (Design.IsDesignMode)
@@ -128,16 +134,14 @@ public partial class TextViewControl : UserControl
         LoadData();
     }
 
-    protected override void OnPointerPressed(PointerPressedEventArgs e)
+    private void TextArea_PointerPressed(object? sender, PointerPressedEventArgs e)
     {
-        base.OnPointerPressed(e);
         if (e.Handled || lines.Length == 0)
             return;
 
         var pointer = e.GetCurrentPoint(TextArea);
         if (pointer.Properties.IsLeftButtonPressed)
         {
-            selectionInProgress = true;
             var cursor = pointer.Position;
             var (lineIndex, charIndex) = TextArea.GetCharIndexAtPosition(cursor);
             lineIndex += topLineIndex;
@@ -146,43 +150,18 @@ public partial class TextViewControl : UserControl
         }
     }
 
-    protected override void OnPointerReleased(PointerReleasedEventArgs e)
+    private void TextArea_PointerMoved(object? sender,PointerEventArgs e)
     {
-        base.OnPointerReleased(e);
-
-        if (e.InitialPressMouseButton == MouseButton.Left)
-        {
-            selectionInProgress = false;
-        }
-    }
-
-    protected override void OnPointerMoved(PointerEventArgs e)
-    {
-        base.OnPointerMoved(e);
-        if (e.Handled) 
+        if (e.Handled)
             return;
 
         var pointer = e.GetCurrentPoint(TextArea);
-
-        if (selectionInProgress && pointer.Properties.IsLeftButtonPressed)
+        if (pointer.Properties.IsLeftButtonPressed)
         {
             var cursor = pointer.Position;
             var (lineIndex, charIndex) = TextArea.GetCharIndexAtPosition(cursor);
             lineIndex += topLineIndex;
             selection.SetEnd(lineIndex, charIndex);
-            LoadData();
-        }
-    }
-
-    private void OnLinesSelected(object? sender, (int First, int Last) selectedLine)
-    {
-        int firstLineIndex = selectedLine.First - 1;
-        int lastLineIndex = selectedLine.Last - 1;
-        if (firstLineIndex >= 0 && firstLineIndex < lines.Length &&
-            lastLineIndex >= 0 && lastLineIndex < lines.Length)
-        {
-            selection.SetBegin(firstLineIndex, 0);
-            selection.SetEnd(lastLineIndex + 1, 0);
             LoadData();
         }
     }
@@ -216,5 +195,33 @@ public partial class TextViewControl : UserControl
 
         double offset = HorizontalScrollBar.Value;
         TextArea.Margin = new Thickness(-offset, TextArea.Margin.Top, TextArea.Margin.Right, TextArea.Margin.Bottom);
+    }
+
+    private void LineNumbers_PointerPressed(object? sender, PointerPressedEventArgs e)
+    {
+        var pointer = e.GetCurrentPoint(LineNumbers);
+        if (pointer.Properties.IsLeftButtonPressed)
+        {
+            var cursor = pointer.Position;
+            int lineNumber = LineNumbers.GetLineNumberAtPosition(cursor);
+            int lineIndex = lineNumber - 1;
+            selection.SetBeginLine(lineIndex);
+            LoadData();
+            e.Handled = true;
+        }
+    }
+
+    private void LineNumbers_PointerMoved(object? sender, PointerEventArgs e)
+    {
+        var pointer = e.GetCurrentPoint(LineNumbers);
+        if (pointer.Properties.IsLeftButtonPressed)
+        {
+            var cursor = pointer.Position;
+            int lineNumber = LineNumbers.GetLineNumberAtPosition(cursor);
+            int lineIndex = lineNumber - 1;
+            selection.SetEndLine(lineIndex);
+            LoadData();
+            e.Handled = true;
+        }
     }
 }

@@ -169,6 +169,61 @@ public class TextSelectionTests
     }
 
     [Fact]
+    public void SetBeginLine_ShouldSelectWholeLine()
+    {
+        sut.SetBeginLine(1);
+
+        Assert.Null(sut.GetSelectionAtLine(0));
+        Assert.Equal((0, null), sut.GetSelectionAtLine(1));
+        Assert.Equal((null, 0), sut.GetSelectionAtLine(2));
+        Assert.Null(sut.GetSelectionAtLine(3));
+    }
+
+    [Fact]
+    public void SetEndLine_BeforeSetBeginLine_ShouldThrowAnException()
+    {
+        Assert.Throws<InvalidOperationException>(() => sut.SetEndLine(1));
+    }
+
+    [Fact]
+    public void SetEndLine_BelowBeginLine_ShouldGiveValidRange()
+    {
+        sut.SetBeginLine(1);
+        sut.SetEndLine(2);
+
+        Assert.Null(sut[0]);
+        Assert.Equal((0, null), sut[1]);
+        Assert.Equal((null, null), sut[2]);
+        Assert.Equal((null, 0), sut[3]);
+        Assert.Null(sut[4]);
+    }
+
+    [Fact]
+    public void SetEndLine_AboveBeginLine_ShouldGiveValidRange()
+    {
+        sut.SetBeginLine(2);
+        sut.SetEndLine(1);
+
+        Assert.Null(sut[0]);
+        Assert.Equal((0, null), sut[1]);
+        Assert.Equal((null, null), sut[2]);
+        Assert.Equal((null, 0), sut[3]);
+        Assert.Null(sut[4]);
+    }
+
+    [Fact]
+    public void SetEndLine_ToSameLineAsBegin_ShouldGiveValidRange()
+    {
+        sut.SetBeginLine(1);
+        sut.SetEndLine(1);
+
+        Assert.Null(sut[0]);
+        Assert.Equal((0, null), sut[1]);
+        Assert.Equal((null, 0), sut[2]);
+        Assert.Null(sut[3]);
+    }
+
+    [Fact]
     public void Clear_ShouldClearSelection()
     {
         sut.SetBegin(lineIndex: 1, charIndex: 2);

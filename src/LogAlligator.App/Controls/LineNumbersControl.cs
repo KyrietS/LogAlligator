@@ -9,8 +9,6 @@ namespace LogAlligator.App.Controls;
 
 class LineNumbersControl : Control
 {
-    private int? selectedLineIndex = null;
-
     public static readonly StyledProperty<IBrush> BackgroundProperty =
         AvaloniaProperty.Register<LineNumbersControl, IBrush>(nameof(Background), new SolidColorBrush(Colors.Transparent));
     public IBrush Background
@@ -56,50 +54,10 @@ class LineNumbersControl : Control
         }
     }
 
-
-    public event EventHandler<(int First, int Last)>? LinesSelected;
-
-    protected override void OnPointerPressed(PointerPressedEventArgs e)
+    public int GetLineNumberAtPosition(Point position)
     {
-        var pointer = e.GetCurrentPoint(this);
-        if (pointer.Properties.IsLeftButtonPressed)
-        {
-            var cursor = pointer.Position;
-            int lineIndex = (int)(cursor.Y / GetLineHeight());
-            if (lineIndex >= 0 && lineIndex < NumberOfLines)
-            {
-                int lineNumber = GetLineNumber(lineIndex);
-                selectedLineIndex = lineIndex;
-                LinesSelected?.Invoke(this, (lineNumber, lineNumber));
-                e.Handled = true;
-            }
-        }
-    }
-
-    protected override void OnPointerReleased(PointerReleasedEventArgs e)
-    {
-        if (e.InitialPressMouseButton == MouseButton.Left)
-        {
-            selectedLineIndex = null;
-        }
-    }
-
-    protected override void OnPointerMoved(PointerEventArgs e)
-    {
-        var pointer = e.GetCurrentPoint(this);
-        var cursor = pointer.Position;
-        int pointedLineIndex = (int)(cursor.Y / GetLineHeight());
-        pointedLineIndex = Math.Clamp(pointedLineIndex, 0, NumberOfLines - 1);
-        if (selectedLineIndex != null)
-        {
-            int selectedLineNumber = GetLineNumber(selectedLineIndex.Value);
-            int pointedLineNumber = GetLineNumber(pointedLineIndex);
-            int firstSelectedLine = Math.Min(selectedLineNumber, pointedLineNumber);
-            int lastSelectedLine = Math.Max(selectedLineNumber, pointedLineNumber);
-            LinesSelected?.Invoke(this, (firstSelectedLine, lastSelectedLine));
-            e.Handled = true;
-        }
-
+        int lineIndex = (int)(position.Y / GetLineHeight());
+        return GetLineNumber(lineIndex);
     }
 
     private int GetLineNumber(int index)

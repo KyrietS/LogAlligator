@@ -26,6 +26,7 @@ internal struct TextSelection
     }
     private TextPosition begin = new();
     private TextPosition end = new();
+    private int? beginLine = null;
 
     private TextPosition SelectionStart => end < begin ? end : begin;
     private TextPosition SelectionStop => begin > end ? begin : end;
@@ -33,6 +34,9 @@ internal struct TextSelection
     public TextSelection()
     {
     }
+
+    public (int LineIndex, int CharIndex) Begin => (begin.LineIndex, begin.CharIndex);
+    public (int LineIndex, int CharIndex) End => (end.LineIndex, end.CharIndex);
 
     /// <summary>
     /// Sets the starting point of a selection. This will also set the ending point.
@@ -52,12 +56,39 @@ internal struct TextSelection
     }
 
     /// <summary>
+    /// Selects whole line. This function starts seletion of multiple lines, see <see cref="SetEndLine"/>.
+    /// </summary>
+    /// <remarks>After <see cref="Clear"/> is called you should call <c>SetBeginLine</c> again before selecting lines.</remarks>
+    public void SetBeginLine(int lineIndex)
+    {
+        SetBegin(lineIndex, 0);
+        SetEnd(lineIndex + 1, 0);
+        beginLine = lineIndex;
+    }
+
+    /// <summary>
+    /// Sets end to multi-line selection. Prior to this function you should call <see cref="SetBeginLine"/>.
+    /// </summary>
+    /// <exception cref="InvalidOperationException">Raised when you call this function before calling <see cref="SetBeginLine"/></exception>
+    public void SetEndLine(int lineIndex)
+    {
+        if (beginLine == null)
+            throw new InvalidOperationException("You should call SetBeginLine first!");
+
+        var firstLine = Math.Min(lineIndex, beginLine.Value);
+        var lastLine = Math.Max(lineIndex, beginLine.Value);
+        SetBegin(firstLine, 0);
+        SetEnd(lastLine + 1, 0);
+    }
+
+    /// <summary>
     /// Clears the selection.
     /// </summary>
     public void Clear()
     {
         begin = new();
         end = new();
+        beginLine = null;
     }
 
     /// <summary>
@@ -104,4 +135,6 @@ internal struct TextSelection
         }
         return null;
     }
+
+    public (int? Begin, int? End)? this[int lineIndex] => GetSelectionAtLine(lineIndex);
 }

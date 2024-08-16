@@ -36,7 +36,5 @@ public class MainWindowTests
         window.KeyPressQwerty(PhysicalKey.E, RawInputModifiers.None);
 
         Assert.True(isClosed);
-
-        var x = new LogAlligator.App.Controls.TextViewControl.SelectionHandler();
     }
 }
