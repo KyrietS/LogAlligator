@@ -69,11 +69,10 @@ internal struct TextSelection
     /// <summary>
     /// Sets end to multi-line selection. Prior to this function you should call <see cref="SetBeginLine"/>.
     /// </summary>
-    /// <exception cref="InvalidOperationException">Raised when you call this function before calling <see cref="SetBeginLine"/></exception>
     public void SetEndLine(int lineIndex)
     {
         if (beginLine == null)
-            throw new InvalidOperationException("You should call SetBeginLine first!");
+            beginLine = lineIndex;
 
         var firstLine = Math.Min(lineIndex, beginLine.Value);
         var lastLine = Math.Max(lineIndex, beginLine.Value);

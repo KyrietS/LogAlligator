@@ -180,9 +180,14 @@ public class TextSelectionTests
     }
 
     [Fact]
-    public void SetEndLine_BeforeSetBeginLine_ShouldThrowAnException()
+    public void SetEndLine_BeforeSetBeginLine_ShouldSelectWholeLine()
     {
-        Assert.Throws<InvalidOperationException>(() => sut.SetEndLine(1));
+        sut.SetEndLine(1);
+
+        Assert.Null(sut.GetSelectionAtLine(0));
+        Assert.Equal((0, null), sut.GetSelectionAtLine(1));
+        Assert.Equal((null, 0), sut.GetSelectionAtLine(2));
+        Assert.Null(sut.GetSelectionAtLine(3));
     }
 
     [Fact]
