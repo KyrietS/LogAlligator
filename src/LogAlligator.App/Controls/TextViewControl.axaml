@@ -32,7 +32,8 @@
                                    FontFamily="Arial"
                                    FontSize="12"
                                    Background="{DynamicResource ThemeControlMidBrush}"
-                                   Foreground="{DynamicResource ThemeForegroundBrush}"/>
+                                   Foreground="{DynamicResource ThemeForegroundBrush}"
+                                   LinesSelected="OnLinesSelected"/>
       <Panel DockPanel.Dock="Left"
              Width="10"
              Background="{DynamicResource ThemeControlMidBrush}"/>

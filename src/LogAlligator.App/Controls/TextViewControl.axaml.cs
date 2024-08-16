@@ -174,6 +174,19 @@ public partial class TextViewControl : UserControl
         }
     }
 
+    private void OnLinesSelected(object? sender, (int First, int Last) selectedLine)
+    {
+        int firstLineIndex = selectedLine.First - 1;
+        int lastLineIndex = selectedLine.Last - 1;
+        if (firstLineIndex >= 0 && firstLineIndex < lines.Length &&
+            lastLineIndex >= 0 && lastLineIndex < lines.Length)
+        {
+            selection.SetBegin(firstLineIndex, 0);
+            selection.SetEnd(lastLineIndex + 1, 0);
+            LoadData();
+        }
+    }
+
     private void OnVerticalScroll(object sender, ScrollEventArgs args)
     {
         UpdateVerticalScroll();
