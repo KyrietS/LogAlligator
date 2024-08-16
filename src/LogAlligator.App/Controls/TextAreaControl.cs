@@ -82,11 +82,32 @@ class TextAreaControl : Control
         line.AddFormatting(charIndex, length, foreground, background);
     }
 
+    /// <summary>
+    /// Gets position of the character in the text pointed by <paramref name="position"/> (usually mouse cursor)
+    /// </summary>
+    /// <param name="position">Position (X,Y) relative to <see cref="TextAreaControl"/>.</param>
+    /// <returns>
+    /// <para>A tuple containing the index of pointed line and index of pointer character in that line.</para>
+    /// <para>If <paramref name="position"/> points above the first line, then <c>(0, 0)</c> is returned.</para>
+    /// <para>If <paramref name="position"/> points below the last line, then <c>(lastL, lastC)</c> is returned,
+    /// where <c>lastL</c> is the index of the last line and <c>lastC</c> is the index of the last character of this line.</para>
+    /// <para>If <paramref name="position"/> points before first character of the line, then <c>(L, 0)</c> is returned.</para>
+    /// <para>If <paramref name="position"/> points after the last character of the line, then <c>(L, lastC)</c> is returned,
+    /// where <c>lastC</c> is the index of the last character of this line.</para>
+    /// </returns>
+    /// <remarks>
+    /// Given a <paramref name="position"/> this function finds a character before which a caret should be placed. 
+    /// Let's take two letters: <c>AB</c>. Each letter is split in half. Now, if you point at:
+    /// <list type="bullet">
+    /// <item>Left side of <c>A</c> or before <c>A</c>, the index <c>0</c> will be returned</item>
+    /// <item>Right side of <c>A</c> or left side of <c>B</c>, the index <c>1</c> will be returned</item>
+    /// <item>Right side of <c>B</c> or after <c>B</c>, the index <c>3</c> will be returned</item>
+    /// </list>
+    /// </remarks>
     public (int LineIndex, int CharIndex) GetCharIndexAtPosition(Point position)
     {
         var lineIndex = (int)(position.Y / GetLineHeight());
 
-        // TODO: Check if lineIndex is out of bounds
         if (lineIndex < 0 || lines.Count == 0)
             return (0, 0);
         if (lineIndex >= lines.Count)
@@ -97,7 +118,7 @@ class TextAreaControl : Control
         int charIndex = 0;
         double previousWidth = 0;
 
-        while (position.X > cursor)
+        do
         {
             charIndex++;
 
@@ -112,7 +133,7 @@ class TextAreaControl : Control
             var letterWidth = textWidth - previousWidth;
             cursor = textWidth - letterWidth / 2;
             previousWidth = textWidth;
-        }
+        } while (position.X > cursor);
 
         return (lineIndex, charIndex - 1);
     }
@@ -162,8 +183,8 @@ class TextAreaControl : Control
 
         if (formatting.Foreground != null)
             formattedText.SetForegroundBrush(formatting.Foreground);
-        if (formatting.Background != null)
-            dc.FillRectangle(formatting.Background, new Rect(cursor, new Size(textWidth, formattedText.Height)));
+        if (formatting.Background != null) // TODO: Instead of 0.5px padding try snapping the Rect to the middle of px
+            dc.FillRectangle(formatting.Background, new Rect(cursor - new Point(0.5, 0.5), new Size(textWidth + 1, formattedText.Height + 1)));
 
         dc.DrawText(formattedText, cursor);
 

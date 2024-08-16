@@ -2,12 +2,9 @@ using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Controls.Primitives;
 using Avalonia.Input;
-using Avalonia.Markup.Xaml;
-using Avalonia.Markup.Xaml.MarkupExtensions;
 using Avalonia.Media;
+using LogAlligator.App.Utils;
 using System;
-using System.Collections.Generic;
-using System.Diagnostics;
 
 namespace LogAlligator.App.Controls;
 
@@ -17,8 +14,10 @@ public partial class TextViewControl : UserControl
     private int topLineIndex = 0;
     private int numberOfLines = 10;
     private double maxLineWidth = 0;
-    private (int LineIndex, int CharIndex, int Length) selection = (10, 4, 3);
+
+    private TextSelection selection = new();
     private bool selectionInProgress = false;
+
 
     public static readonly StyledProperty<IBrush> HighlightBackgroundProperty =
     AvaloniaProperty.Register<TextViewControl, IBrush>(nameof(HighlightBackground), new SolidColorBrush(Color.FromRgb(0, 120, 215)));
@@ -74,15 +73,17 @@ public partial class TextViewControl : UserControl
             TextArea.AppendLine(lines[lineIndex]);
             if (i == 0)
             {
-                //TextArea.AppendFormattingToLastLine(3, 3, background: new SolidColorBrush(Colors.Yellow));
                 TextArea.AppendFormattingToLastLine(7, 4, background: new SolidColorBrush(Colors.GreenYellow));
                 TextArea.AppendFormattingToLastLine(5, 3, background: new SolidColorBrush(Colors.Magenta));
                 TextArea.AppendFormattingToLastLine(20, 15, background: HighlightBackground, foreground: HighlightForeground);
             }
 
-            if (lineIndex == selection.LineIndex)
+            if (selection.GetSelectionAtLine(lineIndex) is var (begin, end))
             {
-                TextArea.AppendFormattingToLastLine(selection.CharIndex, selection.Length, HighlightForeground, HighlightBackground);
+                int selectionBegin = begin ?? 0;
+                int selectionEnd = end ?? lines[lineIndex].Length;
+                int selectionLength = selectionEnd - selectionBegin;
+                TextArea.AppendFormattingToLastLine(selectionBegin, selectionLength, HighlightForeground, HighlightBackground);
             }
 
             maxLineWidth = Math.Max(maxLineWidth, TextArea.MaxLineWidth);
@@ -135,29 +136,14 @@ public partial class TextViewControl : UserControl
 
         var pointer = e.GetCurrentPoint(TextArea);
         if (pointer.Properties.IsLeftButtonPressed)
+        {
             selectionInProgress = true;
-        else
-            return;
-
-        var cursor = pointer.Position;
-        var (lineIndex, charIndex) = TextArea.GetCharIndexAtPosition(cursor);
-
-        lineIndex += topLineIndex;
-
-        if (charIndex >= 0 && charIndex < lines[lineIndex].Length)
-        {
-            selection = (lineIndex, charIndex, 0);
+            var cursor = pointer.Position;
+            var (lineIndex, charIndex) = TextArea.GetCharIndexAtPosition(cursor);
+            lineIndex += topLineIndex;
+            selection.SetBegin(lineIndex, charIndex);
+            LoadData();
         }
-        else if (charIndex < 0) // Clicked before line
-        {
-            selection = (lineIndex, 0, 0);
-        }
-        else // Clicked after line
-        {
-            selection = (lineIndex, charIndex, 0);
-        }
-
-        LoadData();
     }
 
     protected override void OnPointerReleased(PointerReleasedEventArgs e)
@@ -176,15 +162,14 @@ public partial class TextViewControl : UserControl
         if (e.Handled) 
             return;
 
-        if (!selectionInProgress)
-            return;
-
         var pointer = e.GetCurrentPoint(TextArea);
-        var cursor = pointer.Position;
-        var (lineIndex, charIndex) = TextArea.GetCharIndexAtPosition(cursor);
-        if (pointer.Properties.IsLeftButtonPressed)
+
+        if (selectionInProgress && pointer.Properties.IsLeftButtonPressed)
         {
-            selection.Length = Math.Abs(charIndex - selection.CharIndex);
+            var cursor = pointer.Position;
+            var (lineIndex, charIndex) = TextArea.GetCharIndexAtPosition(cursor);
+            lineIndex += topLineIndex;
+            selection.SetEnd(lineIndex, charIndex);
             LoadData();
         }
     }
