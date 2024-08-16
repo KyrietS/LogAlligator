@@ -17,6 +17,7 @@ public partial class TextViewControl : UserControl
     private double maxLineWidth = 0;
 
     private TextSelection selection = new();
+    private bool selectionOngoing = false;
 
 
     public static readonly StyledProperty<IBrush> HighlightBackgroundProperty =
@@ -40,9 +41,11 @@ public partial class TextViewControl : UserControl
         InitializeComponent();
         LineNumbers.NumberOfLines = numberOfLines;
         LineNumbers.PointerPressed += LineNumbers_PointerPressed;
+        LineNumbers.PointerReleased += LineNumbers_PointerReleased;
         LineNumbers.PointerMoved += LineNumbers_PointerMoved;
 
         TextArea.PointerPressed += TextArea_PointerPressed;
+        TextArea.PointerReleased += TextArea_PointerReleased;
         TextArea.PointerMoved += TextArea_PointerMoved;
 
         Application.Current!.ActualThemeVariantChanged += (_, _) => LoadData();
@@ -142,6 +145,7 @@ public partial class TextViewControl : UserControl
         var pointer = e.GetCurrentPoint(TextArea);
         if (pointer.Properties.IsLeftButtonPressed)
         {
+            selectionOngoing = true;
             var cursor = pointer.Position;
             var (lineIndex, charIndex) = TextArea.GetCharIndexAtPosition(cursor);
             lineIndex += topLineIndex;
@@ -156,13 +160,20 @@ public partial class TextViewControl : UserControl
         }
     }
 
+    private void TextArea_PointerReleased(object? sender, PointerReleasedEventArgs e)
+    {
+        if (e.InitialPressMouseButton == MouseButton.Left)
+        {
+            selectionOngoing = false;
+        }
+    }
     private void TextArea_PointerMoved(object? sender,PointerEventArgs e)
     {
         if (e.Handled)
             return;
 
         var pointer = e.GetCurrentPoint(TextArea);
-        if (pointer.Properties.IsLeftButtonPressed)
+        if (pointer.Properties.IsLeftButtonPressed && selectionOngoing)
         {
             var cursor = pointer.Position;
             var (lineIndex, charIndex) = TextArea.GetCharIndexAtPosition(cursor);
@@ -244,6 +255,7 @@ public partial class TextViewControl : UserControl
         var pointer = e.GetCurrentPoint(LineNumbers);
         if (pointer.Properties.IsLeftButtonPressed)
         {
+            selectionOngoing = true;
             var cursor = pointer.Position;
             int lineNumber = LineNumbers.GetLineNumberAtPosition(cursor);
             int lineIndex = lineNumber - 1;
@@ -253,10 +265,18 @@ public partial class TextViewControl : UserControl
         }
     }
 
+    private void LineNumbers_PointerReleased(object? sender, PointerReleasedEventArgs e)
+    {
+        if (e.InitialPressMouseButton == MouseButton.Left)
+        {
+            selectionOngoing = false;
+        }
+    }
+
     private void LineNumbers_PointerMoved(object? sender, PointerEventArgs e)
     {
         var pointer = e.GetCurrentPoint(LineNumbers);
-        if (pointer.Properties.IsLeftButtonPressed)
+        if (pointer.Properties.IsLeftButtonPressed && selectionOngoing)
         {
             var cursor = pointer.Position;
             int lineNumber = LineNumbers.GetLineNumberAtPosition(cursor);
