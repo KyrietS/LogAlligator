@@ -145,7 +145,13 @@ public partial class TextViewControl : UserControl
             var cursor = pointer.Position;
             var (lineIndex, charIndex) = TextArea.GetCharIndexAtPosition(cursor);
             lineIndex += topLineIndex;
-            selection.SetBegin(lineIndex, charIndex);
+            if (e.ClickCount == 1)
+                selection.SetBegin(lineIndex, charIndex);
+            else if (e.ClickCount == 2)
+                SelectWord(lineIndex, charIndex);
+            else if (e.ClickCount == 3)
+                SelectLine(lineIndex);
+
             LoadData();
         }
     }
@@ -163,6 +169,42 @@ public partial class TextViewControl : UserControl
             lineIndex += topLineIndex;
             selection.SetEnd(lineIndex, charIndex);
             LoadData();
+        }
+    }
+
+    private void SelectLine(int lineIndex)
+    {
+        selection.SetBeginLine(lineIndex);
+    }
+
+    private void SelectWord(int lineIndex, int charIndex)
+    {
+        if (lines[lineIndex].Length == 0)
+            return;
+
+        var line = lines[lineIndex];
+        int begin = charIndex;
+        int end = charIndex;
+        char originChar = line[charIndex];
+
+        while (begin > 0 && IsSameWord(originChar, line[begin - 1]))
+            begin--;
+
+        while (end < line.Length - 1 && IsSameWord(originChar, line[end + 1]))
+            end++;
+
+        selection.SetBegin(lineIndex, begin);
+        selection.SetEnd(lineIndex, end + 1);
+
+        bool IsSameWord(char origin, char c)
+        {
+            return IsWordChar(c) == IsWordChar(origin) &&
+                char.IsWhiteSpace(origin) == char.IsWhiteSpace(c);
+        }
+
+        bool IsWordChar(char c)
+        {
+            return char.IsLetterOrDigit(c) || c == '_';
         }
     }
 
