@@ -9,12 +9,14 @@ using System.Globalization;
 using System.Linq;
 
 namespace LogAlligator.App.Controls;
-class TextAreaControl : Control
+
+internal class TextAreaControl : Control
 {
-    private List<Line> lines = new();
+    private readonly List<Line> _lines = [];
 
     public static readonly StyledProperty<IBrush> BackgroundProperty =
         AvaloniaProperty.Register<TextAreaControl, IBrush>(nameof(Background), new SolidColorBrush(Colors.Transparent));
+
     public IBrush Background
     {
         get => GetValue(BackgroundProperty);
@@ -23,6 +25,7 @@ class TextAreaControl : Control
 
     public static readonly StyledProperty<IBrush> ForegroundProperty =
         AvaloniaProperty.Register<TextAreaControl, IBrush>(nameof(Foreground), new SolidColorBrush(Colors.Black));
+
     public IBrush Foreground
     {
         get => GetValue(ForegroundProperty);
@@ -31,6 +34,7 @@ class TextAreaControl : Control
 
     public static readonly StyledProperty<double> FontSizeProperty =
         AvaloniaProperty.Register<TextAreaControl, double>(nameof(FontSize), 12);
+
     public double FontSize
     {
         get => GetValue(FontSizeProperty);
@@ -40,22 +44,16 @@ class TextAreaControl : Control
     public FontFamily FontFamily { get; set; } = FontFamily.Default;
 
     public double MaxLineWidth { get; private set; }
-    public int NumberOfLinesThatCanFit
-    {
-        get
-        {
-            return (int)Math.Ceiling(Bounds.Height / GetLineHeight());
-        }
-    }
+    public int NumberOfLinesThatCanFit => (int)Math.Ceiling(Bounds.Height / GetLineHeight());
 
-    public TextAreaControl() : base()
+    public TextAreaControl()
     {
         ClipToBounds = true;
         Application.Current!.ActualThemeVariantChanged += (_, _) => InvalidateVisual();
 
         if (Design.IsDesignMode)
         {
-            lines.Add(new Line("Sample text"));
+            _lines.Add(new Line("Sample text"));
         }
     }
 
@@ -66,15 +64,16 @@ class TextAreaControl : Control
 
     public void AppendLine(string line)
     {
-        lines.Add(new Line(line));
+        _lines.Add(new Line(line));
         MaxLineWidth = Math.Max(MaxLineWidth, GetLineWidth(line));
     }
 
-    public void AppendFormattingToLastLine(int charIndex, int length, IBrush? foreground = null, IBrush? background = null)
+    public void AppendFormattingToLastLine(int charIndex, int length, IBrush? foreground = null,
+        IBrush? background = null)
     {
-        Debug.Assert(lines.Count > 0);
+        Debug.Assert(_lines.Count > 0);
 
-        var line = lines.Last();
+        var line = _lines.Last();
         length = Math.Min(length, line.Text.Length - charIndex);
         if (length <= 0)
             return;
@@ -108,14 +107,14 @@ class TextAreaControl : Control
     {
         var lineIndex = (int)(position.Y / GetLineHeight());
 
-        if (lineIndex < 0 || lines.Count == 0)
+        if (lineIndex < 0 || _lines.Count == 0)
             return (0, 0);
-        if (lineIndex >= lines.Count)
-            return (lines.Count - 1, lines.Last().Text.Length);
+        if (lineIndex >= _lines.Count)
+            return (_lines.Count - 1, _lines.Last().Text.Length);
 
-        var line = lines[lineIndex].Text;
+        var line = _lines[lineIndex].Text;
         double cursor = 0;
-        int charIndex = 0;
+        var charIndex = 0;
         double previousWidth = 0;
 
         do
@@ -140,7 +139,7 @@ class TextAreaControl : Control
 
     public void Clear()
     {
-        lines.Clear();
+        _lines.Clear();
         MaxLineWidth = 0;
     }
 
@@ -158,7 +157,7 @@ class TextAreaControl : Control
     {
         var lineHeight = GetLineHeight();
         var cursor = new Point(0, 0);
-        for (int lineIndex = 0; lineIndex < lines.Count; lineIndex++)
+        for (int lineIndex = 0; lineIndex < _lines.Count; lineIndex++)
         {
             RenderLine(dc, lineIndex, cursor);
             cursor = new Point(cursor.X, cursor.Y + lineHeight);
@@ -167,7 +166,7 @@ class TextAreaControl : Control
 
     private void RenderLine(DrawingContext dc, int lineIndex, Point cursor)
     {
-        var line = lines[lineIndex];
+        var line = _lines[lineIndex];
         for (int formattingIndex = 0; formattingIndex < line.Formattings.Count; formattingIndex++)
         {
             var (text, formatting) = line.GetTextSpan(formattingIndex);
@@ -184,7 +183,8 @@ class TextAreaControl : Control
         if (formatting.Foreground != null)
             formattedText.SetForegroundBrush(formatting.Foreground);
         if (formatting.Background != null) // TODO: Instead of 0.5px padding try snapping the Rect to the middle of px
-            dc.FillRectangle(formatting.Background, new Rect(cursor - new Point(0.5, 0.5), new Size(textWidth + 1, formattedText.Height + 1)));
+            dc.FillRectangle(formatting.Background,
+                new Rect(cursor - new Point(0.5, 0.5), new Size(textWidth + 1, formattedText.Height + 1)));
 
         dc.DrawText(formattedText, cursor);
 
@@ -204,13 +204,14 @@ class TextAreaControl : Control
     private FormattedText FormatText(string text)
     {
         var typeface = new Typeface(FontFamily);
-        return new FormattedText(text, CultureInfo.CurrentCulture, FlowDirection.LeftToRight, typeface, FontSize, Foreground);
+        return new FormattedText(text, CultureInfo.CurrentCulture, FlowDirection.LeftToRight, typeface, FontSize,
+            Foreground);
     }
 
-    private struct Line
+    private readonly struct Line
     {
-        public string Text;
-        public RangeList<Formatting> Formattings = new();
+        public readonly string Text;
+        public readonly RangeList<Formatting> Formattings = new();
 
         public Line(string text)
         {
@@ -251,7 +252,6 @@ class TextAreaControl : Control
 
             public IBrush? Foreground;
             public IBrush? Background;
-
         }
     }
 }

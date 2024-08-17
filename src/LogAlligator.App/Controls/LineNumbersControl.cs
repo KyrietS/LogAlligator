@@ -1,24 +1,25 @@
-﻿using System;
-using System.Globalization;
+﻿using System.Globalization;
 using Avalonia;
 using Avalonia.Controls;
-using Avalonia.Input;
 using Avalonia.Media;
 
 namespace LogAlligator.App.Controls;
 
-class LineNumbersControl : Control
+internal class LineNumbersControl : Control
 {
     public static readonly StyledProperty<IBrush> BackgroundProperty =
-        AvaloniaProperty.Register<LineNumbersControl, IBrush>(nameof(Background), new SolidColorBrush(Colors.Transparent));
+        AvaloniaProperty.Register<LineNumbersControl, IBrush>(nameof(Background),
+            new SolidColorBrush(Colors.Transparent));
+
     public IBrush Background
     {
         get => GetValue(BackgroundProperty);
         set => SetValue(BackgroundProperty, value);
-    }        
-    
+    }
+
     public static readonly StyledProperty<IBrush> ForegroundProperty =
         AvaloniaProperty.Register<LineNumbersControl, IBrush>(nameof(Foreground), new SolidColorBrush(Colors.Black));
+
     public IBrush Foreground
     {
         get => GetValue(ForegroundProperty);
@@ -30,7 +31,7 @@ class LineNumbersControl : Control
     public int NumberOfLines { get; set; } = 20;
     public int FirstLineNumber { get; set; } = 1;
 
-    public LineNumbersControl() : base()
+    public LineNumbersControl()
     {
         ClipToBounds = true;
         Application.Current!.ActualThemeVariantChanged += (_, _) => InvalidateVisual();
@@ -73,6 +74,7 @@ class LineNumbersControl : Control
     private FormattedText FormatText(string text)
     {
         var typeface = new Typeface(FontFamily);
-        return new FormattedText(text, CultureInfo.CurrentCulture, FlowDirection.LeftToRight, typeface, FontSize, Foreground);
+        return new FormattedText(text, CultureInfo.CurrentCulture, FlowDirection.LeftToRight, typeface, FontSize,
+            Foreground);
     }
 }

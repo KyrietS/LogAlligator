@@ -7,115 +7,22 @@ using System.Linq;
 namespace LogAlligator.App.Utils;
 
 /// <summary>
-/// A data structure where you can assign ValueType to a integer range.
-/// 
-/// Ranges cannot have any gaps. So for example if you add 2 disjoint
-/// ranges in the following order: (1, 3, 'a') and (5, 7, 'b') you will
-/// get 3 ranges: (1, 3, 'a'), (3, 7, 'a'), (5, 7, 'b')
+///     A data structure where you can assign ValueType to an integer range.
+///     Ranges cannot have any gaps. So for example if you add 2 disjoint
+///     ranges in the following order: (1, 3, 'a') and (5, 7, 'b') you will
+///     get 3 ranges: (1, 3, 'a'), (3, 7, 'a'), (5, 7, 'b')
 /// </summary>
-/// <typeparam name="ValueType"></typeparam>
-internal class RangeList<ValueType> : IEnumerable<(int Begin, int End, ValueType Value)>
+internal class RangeList<TValueType> : IEnumerable<(int Begin, int End, TValueType Value)>
 {
-    private SortedList<int, ValueType> ranges = new();
+    private readonly SortedList<int, TValueType> _ranges = new();
 
-    public int Count => Math.Max(0, ranges.Count - 1);
+    public int Count => Math.Max(0, _ranges.Count - 1);
 
-    public (int Begin, int End, ValueType Value) this[int index]
+    public (int Begin, int End, TValueType Value) this[int index] => GetRangeAtIndex(index);
+
+    public IEnumerator<(int Begin, int End, TValueType Value)> GetEnumerator()
     {
-        get { return GetRangeAtIndex(index); }
-    }
-
-    public void AddRange(int start, int end, ValueType value)
-    {
-        Debug.Assert(start <= end);
-
-        if (ranges.Count == 0)
-        {
-            ranges[start] = value;
-            ranges[end] = value;
-            return;
-        }
-
-        ValueType currVal = ranges.First().Value;
-
-        // Insert begin
-        for (int i = 0; i <= ranges.Count; i++)
-        {
-            if (i == ranges.Count)
-            {
-                ranges[start] = value;
-                break;
-            }
-
-            var rangeBegin = ranges.GetKeyAtIndex(i);
-            currVal = ranges.GetValueAtIndex(i);
-
-            if (start <= rangeBegin)
-            {
-                ranges[start] = value;
-                break;
-            }
-        }
-
-        // Insert end
-        for (int i = ranges.IndexOfKey(start) + 1; i <= ranges.Count; i++)
-        {
-            if (i == ranges.Count)
-            {
-                ranges[end] = currVal;
-                break;
-            }
-
-            var rangeBegin = ranges.GetKeyAtIndex(i);
-
-            if (end < rangeBegin)
-            {
-                ranges[end] = currVal;
-                break;
-            }
-
-            if (end == rangeBegin)
-            {
-                break;
-            }
-
-            // Remove ranges between (start, end)
-            if (rangeBegin < end)
-            {
-                currVal = ranges.GetValueAtIndex(i);
-                ranges.RemoveAt(i);
-                i--;
-            }
-        }
-    }
-
-    public void Clear()
-    {
-        ranges.Clear();
-    }
-
-    public (int Begin, int End, ValueType Value) GetRangeAtIndex(int index)
-    {
-        if (index < 0 || index >= ranges.Count - 1)
-            throw new ArgumentOutOfRangeException();
-
-        return (ranges.GetKeyAtIndex(index), ranges.GetKeyAtIndex(index + 1), ranges.GetValueAtIndex(index));
-    }
-
-    public List<(int Begin, int End, ValueType Value)> GetAllRanges()
-    {
-        List<(int, int, ValueType)> result = new();
-        for (int i = 0; i < ranges.Count - 1; i++)
-        {
-            result.Add((ranges.GetKeyAtIndex(i), ranges.GetKeyAtIndex(i + 1), ranges.GetValueAtIndex(i)));
-        }
-
-        return result;
-    }
-
-    public IEnumerator<(int Begin, int End, ValueType Value)> GetEnumerator()
-    {
-        return new RangeListEnumerator(ranges);
+        return new RangeListEnumerator(_ranges);
     }
 
     IEnumerator IEnumerable.GetEnumerator()
@@ -123,35 +30,108 @@ internal class RangeList<ValueType> : IEnumerable<(int Begin, int End, ValueType
         return GetEnumerator();
     }
 
-    private class RangeListEnumerator : IEnumerator<(int Begin, int End, ValueType Value)>
+    public void AddRange(int start, int end, TValueType value)
     {
-        private readonly SortedList<int, ValueType> ranges;
-        private int index = -1;
+        Debug.Assert(start <= end);
 
-        public RangeListEnumerator(SortedList<int, ValueType> ranges)
+        if (_ranges.Count == 0)
         {
-            this.ranges = ranges;
+            _ranges[start] = value;
+            _ranges[end] = value;
+            return;
         }
 
-        public (int Begin, int End, ValueType Value) Current
+        var currVal = _ranges.First().Value;
+
+        // Insert begin
+        for (var i = 0; i <= _ranges.Count; i++)
         {
-            get
+            if (i == _ranges.Count)
             {
-                return (ranges.GetKeyAtIndex(index), ranges.GetKeyAtIndex(index + 1), ranges.GetValueAtIndex(index));
+                _ranges[start] = value;
+                break;
+            }
+
+            var rangeBegin = _ranges.GetKeyAtIndex(i);
+            currVal = _ranges.GetValueAtIndex(i);
+
+            if (start <= rangeBegin)
+            {
+                _ranges[start] = value;
+                break;
             }
         }
+
+        // Insert end
+        for (var i = _ranges.IndexOfKey(start) + 1; i <= _ranges.Count; i++)
+        {
+            if (i == _ranges.Count)
+            {
+                _ranges[end] = currVal;
+                break;
+            }
+
+            var rangeBegin = _ranges.GetKeyAtIndex(i);
+
+            if (end < rangeBegin)
+            {
+                _ranges[end] = currVal;
+                break;
+            }
+
+            if (end == rangeBegin) break;
+
+            // Remove ranges between (start, end)
+            if (rangeBegin < end)
+            {
+                currVal = _ranges.GetValueAtIndex(i);
+                _ranges.RemoveAt(i);
+                i--;
+            }
+        }
+    }
+
+    public void Clear()
+    {
+        _ranges.Clear();
+    }
+
+    public (int Begin, int End, TValueType Value) GetRangeAtIndex(int index)
+    {
+        if (index < 0 || index >= _ranges.Count - 1)
+            throw new ArgumentOutOfRangeException();
+
+        return (_ranges.GetKeyAtIndex(index), _ranges.GetKeyAtIndex(index + 1), _ranges.GetValueAtIndex(index));
+    }
+
+    public List<(int Begin, int End, TValueType Value)> GetAllRanges()
+    {
+        List<(int, int, TValueType)> result = new();
+        for (var i = 0; i < _ranges.Count - 1; i++)
+            result.Add((_ranges.GetKeyAtIndex(i), _ranges.GetKeyAtIndex(i + 1), _ranges.GetValueAtIndex(i)));
+
+        return result;
+    }
+
+    private class RangeListEnumerator(SortedList<int, TValueType> ranges)
+        : IEnumerator<(int Begin, int End, TValueType Value)>
+    {
+        private int _index = -1;
+
+        public (int Begin, int End, TValueType Value) Current => (ranges.GetKeyAtIndex(_index),
+            ranges.GetKeyAtIndex(_index + 1), ranges.GetValueAtIndex(_index));
 
         object IEnumerator.Current => Current;
 
         public bool MoveNext()
         {
-            index++;
-            return index < ranges.Count - 1;
+            _index++;
+            return _index < ranges.Count - 1;
         }
 
         public void Reset()
         {
-            index = -1;
+            _index = -1;
         }
 
         public void Dispose()

@@ -5,19 +5,18 @@ using Avalonia.Input;
 using Avalonia.Media;
 using LogAlligator.App.Utils;
 using System;
-using System.Diagnostics;
 
 namespace LogAlligator.App.Controls;
 
 public partial class TextViewControl : UserControl
 {
-    private string[] lines = Array.Empty<string>();
-    private int topLineIndex = 0;
-    private int numberOfLines = 10;
-    private double maxLineWidth = 0;
+    private string[] _lines = [];
+    private int _topLineIndex = 0;
+    private int _numberOfLines = 10;
+    private double _maxLineWidth = 0;
 
-    private TextSelection selection = new();
-    private bool selectionOngoing = false;
+    private TextSelection _selection = new();
+    private bool _selectionOngoing = false;
 
 
     public static readonly StyledProperty<IBrush> HighlightBackgroundProperty =
@@ -39,7 +38,7 @@ public partial class TextViewControl : UserControl
     public TextViewControl()
     {
         InitializeComponent();
-        LineNumbers.NumberOfLines = numberOfLines;
+        LineNumbers.NumberOfLines = _numberOfLines;
         LineNumbers.PointerPressed += LineNumbers_PointerPressed;
         LineNumbers.PointerReleased += LineNumbers_PointerReleased;
         LineNumbers.PointerMoved += LineNumbers_PointerMoved;
@@ -52,34 +51,33 @@ public partial class TextViewControl : UserControl
 
         if (Design.IsDesignMode)
         {
-            lines = new string[numberOfLines];
-            for (int i = 0; i < numberOfLines; i++)
+            _lines = new string[_numberOfLines];
+            for (int i = 0; i < _numberOfLines; i++)
             {
-                lines[i] = "Sample text in line " + (i+1).ToString();
+                _lines[i] = "Sample text in line " + (i+1).ToString();
             }
         }
-
     }
 
     public void SetText(string[] lines)
     {
-        this.lines = lines;
-        topLineIndex = 0;
+        this._lines = lines;
+        _topLineIndex = 0;
         LoadData();
     }
 
     private void LoadData()
     {
-        numberOfLines = Math.Min(lines.Length, TextArea.NumberOfLinesThatCanFit);
+        _numberOfLines = Math.Min(_lines.Length, TextArea.NumberOfLinesThatCanFit);
         TextArea.Clear();
-        for (int i = 0; i < numberOfLines; i++)
+        for (int i = 0; i < _numberOfLines; i++)
         {
-            int lineIndex = topLineIndex + i;
+            int lineIndex = _topLineIndex + i;
 
-            if (lineIndex >= lines.Length)
+            if (lineIndex >= _lines.Length)
                 break;
 
-            TextArea.AppendLine(lines[lineIndex]);
+            TextArea.AppendLine(_lines[lineIndex]);
             if (i == 0)
             {
                 TextArea.AppendFormattingToLastLine(7, 4, background: new SolidColorBrush(Colors.GreenYellow));
@@ -87,18 +85,18 @@ public partial class TextViewControl : UserControl
                 TextArea.AppendFormattingToLastLine(20, 15, background: HighlightBackground, foreground: HighlightForeground);
             }
 
-            if (selection.GetSelectionAtLine(lineIndex) is var (begin, end))
+            if (_selection.GetSelectionAtLine(lineIndex) is var (begin, end))
             {
                 int selectionBegin = begin ?? 0;
-                int selectionEnd = end ?? lines[lineIndex].Length;
+                int selectionEnd = end ?? _lines[lineIndex].Length;
                 int selectionLength = selectionEnd - selectionBegin;
                 TextArea.AppendFormattingToLastLine(selectionBegin, selectionLength, HighlightForeground, HighlightBackground);
             }
 
-            maxLineWidth = Math.Max(maxLineWidth, TextArea.MaxLineWidth);
+            _maxLineWidth = Math.Max(_maxLineWidth, TextArea.MaxLineWidth);
         }
-        LineNumbers.FirstLineNumber = topLineIndex + 1;
-        LineNumbers.NumberOfLines = numberOfLines;
+        LineNumbers.FirstLineNumber = _topLineIndex + 1;
+        LineNumbers.NumberOfLines = _numberOfLines;
 
         UpdateVerticalScroll();
         UpdateHorizontalScroll();
@@ -106,7 +104,7 @@ public partial class TextViewControl : UserControl
         LineNumbers.InvalidateVisual();
         TextArea.InvalidateVisual();
 
-        maxLineWidth = Math.Max(maxLineWidth, TextArea.MaxLineWidth);
+        _maxLineWidth = Math.Max(_maxLineWidth, TextArea.MaxLineWidth);
     }
 
     protected override void OnSizeChanged(SizeChangedEventArgs e)
@@ -121,17 +119,17 @@ public partial class TextViewControl : UserControl
 
         if (e.Delta.Y < 0)
         {
-            topLineIndex += 3;
-            topLineIndex = Math.Min(topLineIndex, lines.Length - 1);
-            topLineIndex = Math.Max(topLineIndex, 0);
+            _topLineIndex += 3;
+            _topLineIndex = Math.Min(_topLineIndex, _lines.Length - 1);
+            _topLineIndex = Math.Max(_topLineIndex, 0);
         }
         if (e.Delta.Y > 0)
         {
-            topLineIndex -= 3;
-            topLineIndex = Math.Max(topLineIndex, 0);
+            _topLineIndex -= 3;
+            _topLineIndex = Math.Max(_topLineIndex, 0);
         }
 
-        VerticalScrollBar.Value = topLineIndex;
+        VerticalScrollBar.Value = _topLineIndex;
         HorizontalScrollBar.Value -= e.Delta.X * 10;
 
         LoadData();
@@ -139,18 +137,18 @@ public partial class TextViewControl : UserControl
 
     private void TextArea_PointerPressed(object? sender, PointerPressedEventArgs e)
     {
-        if (e.Handled || lines.Length == 0)
+        if (e.Handled || _lines.Length == 0)
             return;
 
         var pointer = e.GetCurrentPoint(TextArea);
         if (pointer.Properties.IsLeftButtonPressed)
         {
-            selectionOngoing = true;
+            _selectionOngoing = true;
             var cursor = pointer.Position;
             var (lineIndex, charIndex) = TextArea.GetCharIndexAtPosition(cursor);
-            lineIndex += topLineIndex;
+            lineIndex += _topLineIndex;
             if (e.ClickCount == 1)
-                selection.SetBegin(lineIndex, charIndex);
+                _selection.SetBegin(lineIndex, charIndex);
             else if (e.ClickCount == 2)
                 SelectWord(lineIndex, charIndex);
             else if (e.ClickCount == 3)
@@ -164,7 +162,7 @@ public partial class TextViewControl : UserControl
     {
         if (e.InitialPressMouseButton == MouseButton.Left)
         {
-            selectionOngoing = false;
+            _selectionOngoing = false;
         }
     }
     private void TextArea_PointerMoved(object? sender,PointerEventArgs e)
@@ -173,27 +171,27 @@ public partial class TextViewControl : UserControl
             return;
 
         var pointer = e.GetCurrentPoint(TextArea);
-        if (pointer.Properties.IsLeftButtonPressed && selectionOngoing)
+        if (pointer.Properties.IsLeftButtonPressed && _selectionOngoing)
         {
             var cursor = pointer.Position;
             var (lineIndex, charIndex) = TextArea.GetCharIndexAtPosition(cursor);
-            lineIndex += topLineIndex;
-            selection.SetEnd(lineIndex, charIndex);
+            lineIndex += _topLineIndex;
+            _selection.SetEnd(lineIndex, charIndex);
             LoadData();
         }
     }
 
     private void SelectLine(int lineIndex)
     {
-        selection.SetBeginLine(lineIndex);
+        _selection.SetBeginLine(lineIndex);
     }
 
     private void SelectWord(int lineIndex, int charIndex)
     {
-        if (lines[lineIndex].Length == 0)
+        if (_lines[lineIndex].Length == 0)
             return;
 
-        var line = lines[lineIndex];
+        var line = _lines[lineIndex];
         int begin = charIndex;
         int end = charIndex;
         char originChar = line[charIndex];
@@ -204,8 +202,8 @@ public partial class TextViewControl : UserControl
         while (end < line.Length - 1 && IsSameWord(originChar, line[end + 1]))
             end++;
 
-        selection.SetBegin(lineIndex, begin);
-        selection.SetEnd(lineIndex, end + 1);
+        _selection.SetBegin(lineIndex, begin);
+        _selection.SetEnd(lineIndex, end + 1);
 
         bool IsSameWord(char origin, char c)
         {
@@ -233,16 +231,16 @@ public partial class TextViewControl : UserControl
     private void UpdateVerticalScroll()
     {
         VerticalScrollBar.Minimum = 0;
-        VerticalScrollBar.Maximum = lines.Length - 1;
-        VerticalScrollBar.ViewportSize = numberOfLines;
+        VerticalScrollBar.Maximum = _lines.Length - 1;
+        VerticalScrollBar.ViewportSize = _numberOfLines;
 
-        topLineIndex = (int)VerticalScrollBar.Value;
+        _topLineIndex = (int)VerticalScrollBar.Value;
     }
 
     private void UpdateHorizontalScroll()
     {
         HorizontalScrollBar.Minimum = 0;
-        HorizontalScrollBar.Maximum = maxLineWidth - TextAreaContainer.Bounds.Width + 5;
+        HorizontalScrollBar.Maximum = _maxLineWidth - TextAreaContainer.Bounds.Width + 5;
         HorizontalScrollBar.ViewportSize = TextAreaContainer.Bounds.Width;
         HorizontalScrollBar.Value = Math.Clamp(HorizontalScrollBar.Value, HorizontalScrollBar.Minimum, HorizontalScrollBar.Maximum);
 
@@ -255,11 +253,11 @@ public partial class TextViewControl : UserControl
         var pointer = e.GetCurrentPoint(LineNumbers);
         if (pointer.Properties.IsLeftButtonPressed)
         {
-            selectionOngoing = true;
+            _selectionOngoing = true;
             var cursor = pointer.Position;
             int lineNumber = LineNumbers.GetLineNumberAtPosition(cursor);
             int lineIndex = lineNumber - 1;
-            selection.SetBeginLine(lineIndex);
+            _selection.SetBeginLine(lineIndex);
             LoadData();
             e.Handled = true;
         }
@@ -269,19 +267,19 @@ public partial class TextViewControl : UserControl
     {
         if (e.InitialPressMouseButton == MouseButton.Left)
         {
-            selectionOngoing = false;
+            _selectionOngoing = false;
         }
     }
 
     private void LineNumbers_PointerMoved(object? sender, PointerEventArgs e)
     {
         var pointer = e.GetCurrentPoint(LineNumbers);
-        if (pointer.Properties.IsLeftButtonPressed && selectionOngoing)
+        if (pointer.Properties.IsLeftButtonPressed && _selectionOngoing)
         {
             var cursor = pointer.Position;
             int lineNumber = LineNumbers.GetLineNumberAtPosition(cursor);
             int lineIndex = lineNumber - 1;
-            selection.SetEndLine(lineIndex);
+            _selection.SetEndLine(lineIndex);
             LoadData();
             e.Handled = true;
         }
