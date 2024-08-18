@@ -17,7 +17,7 @@ public partial class MainWindow : Window
         if (Design.IsDesignMode) return;
         var lines = File.ReadAllLines("wide.txt");
         //var lines = File.ReadAllLines("pan-tadeusz.txt");
-        TextView.SetText(lines);
+        // TextView.SetText(lines);
     }
 
     public void OnSwitchTheme()

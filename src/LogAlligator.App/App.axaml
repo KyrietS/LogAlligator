@@ -22,6 +22,7 @@
             </ResourceDictionary.MergedDictionaries>
           </ResourceDictionary>
         </Styles.Resources>
+          <StyleInclude Source="StyleCustomizations.axaml" />
       </Styles>
     </Application.Styles>
 

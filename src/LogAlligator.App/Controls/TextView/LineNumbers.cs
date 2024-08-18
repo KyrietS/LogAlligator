@@ -5,10 +5,10 @@ using Avalonia.Media;
 
 namespace LogAlligator.App.Controls;
 
-internal class LineNumbersControl : Control
+internal class LineNumbers : Control
 {
     public static readonly StyledProperty<IBrush> BackgroundProperty =
-        AvaloniaProperty.Register<LineNumbersControl, IBrush>(nameof(Background),
+        AvaloniaProperty.Register<LineNumbers, IBrush>(nameof(Background),
             new SolidColorBrush(Colors.Transparent));
 
     public IBrush Background
@@ -18,7 +18,7 @@ internal class LineNumbersControl : Control
     }
 
     public static readonly StyledProperty<IBrush> ForegroundProperty =
-        AvaloniaProperty.Register<LineNumbersControl, IBrush>(nameof(Foreground), new SolidColorBrush(Colors.Black));
+        AvaloniaProperty.Register<LineNumbers, IBrush>(nameof(Foreground), new SolidColorBrush(Colors.Black));
 
     public IBrush Foreground
     {
@@ -31,7 +31,7 @@ internal class LineNumbersControl : Control
     public int NumberOfLines { get; set; } = 20;
     public int FirstLineNumber { get; set; } = 1;
 
-    public LineNumbersControl()
+    public LineNumbers()
     {
         ClipToBounds = true;
         Application.Current!.ActualThemeVariantChanged += (_, _) => InvalidateVisual();

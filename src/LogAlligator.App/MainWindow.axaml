@@ -6,30 +6,8 @@
         mc:Ignorable="d" d:DesignWidth="700" d:DesignHeight="300"
         x:Class="LogAlligator.App.MainWindow"
         Title="LogAlligator App"
-        Width="800"
+        Width="850"
         Height="400">
-  <Window.Styles>
-    <Style Selector="TabControl">
-      <Setter Property="Margin" Value="0"/>
-      <Setter Property="Padding" Value="0"/>
-    </Style>
-    
-    <Style Selector="TabItem">
-      <Setter Property="Foreground" Value="{DynamicResource ThemeForegroundBrush}"/>
-      <Setter Property="Background" Value="{DynamicResource ThemeBackgroundBrush}" />
-      <Setter Property="FontSize" Value="11"/>
-      <Setter Property="Padding" Value="6 2"/>
-      <Setter Property="Margin" Value="0 0 0 0"/>
-      <Setter Property="BorderThickness" Value="1"/>
-      <Setter Property="BorderBrush" Value="{DynamicResource ThemeControlMidBrush}"/>
-    </Style>
-
-    <Style Selector="MenuItem">
-      <Setter Property="Padding" Value="6 2"/>
-      <Setter Property="FontSize" Value="12"/>
-    </Style>
-    
-  </Window.Styles>
 
   <DockPanel>
     <Menu DockPanel.Dock="Top" >
@@ -43,38 +21,9 @@
     </Menu>
     
     <TabControl Padding="0">
-      <TabItem Header="ExampleFile">
-        <Border BorderThickness="0 0 0 0"
-                BorderBrush="{DynamicResource ThemeControlMidBrush}">
-          <Grid>
-            <Grid.ColumnDefinitions>
-              <ColumnDefinition Width="200" MinWidth="100" />
-              <ColumnDefinition Width="4" />
-              <ColumnDefinition Width="*" MinWidth="100"/>
-            </Grid.ColumnDefinitions>
-            <Border Grid.Column="0"
-                    BorderBrush="{DynamicResource ThemeControlMidBrush}"
-                    BorderThickness="1">
-              <TabControl Padding="0 1 0 0">
-                <TabItem Header="Bookmarks"></TabItem>
-                <TabItem Header="Highlights"></TabItem>
-                <TabItem Header="Plugins"></TabItem>
-              </TabControl>
-            </Border>
-            <GridSplitter Grid.Column="1" 
-                          Background="{DynamicResource ThemeBackgroundBrush}"/>
-            <Border Grid.Column="2"
-                    BorderBrush="{DynamicResource ThemeControlMidBrush}"
-                    BorderThickness="1">
-              <TabControl Padding="0" >
-                <TabItem Header="Base" Width="100">
-                  <controls:TextViewControl Name="TextView"/>
-                </TabItem>
-              </TabControl>
-            </Border>
-          </Grid>
-        </Border>
-      </TabItem>
+        <TabItem Header="Example file">
+        <controls:FileView /> 
+        </TabItem>
       <TabItem Header="Another">
         <StackPanel>
           <TextBlock>Hello from another tab!</TextBlock>

@@ -1,0 +1,50 @@
+﻿<Styles xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+    <Design.PreviewWith>
+        <Border Width="400"
+            Height="400">
+            <TabControl>
+                <TabItem Header="Panel1">
+                    <StackPanel>
+                        <TextBlock>Hello world!</TextBlock>
+                        <Button>Normal button</Button>
+                        <ToggleButton>Some text</ToggleButton>                        
+                    </StackPanel>
+                </TabItem>
+                <TabItem Header="Panel2"></TabItem>
+                <TabItem Header="Panel3"></TabItem>
+            </TabControl>
+        </Border>
+    </Design.PreviewWith>
+
+    <!-- Add Styles Here -->
+    <Style Selector="TabControl">
+        <Setter Property="Margin" Value="0" />
+        <Setter Property="Padding" Value="0" />
+    </Style>
+
+    <Style Selector="TabItem">
+        <Setter Property="Foreground" Value="{DynamicResource ThemeForegroundBrush}" />
+        <Setter Property="Background" Value="{DynamicResource ThemeBackgroundBrush}" />
+        <Setter Property="FontSize" Value="{StaticResource FontSizeNormal}" />
+        <Setter Property="Padding" Value="6 2" />
+        <Setter Property="Margin" Value="0 0 0 0" />
+        <Setter Property="BorderThickness" Value="1" />
+        <Setter Property="BorderBrush" Value="{DynamicResource ThemeControlMidBrush}" />
+    </Style>
+
+    <Style Selector="MenuItem">
+        <Setter Property="Padding" Value="6 2" />
+        <Setter Property="FontSize" Value="12" />
+    </Style>
+    
+    <Style Selector="ToggleButton:pointerover /template/ ContentPresenter#PART_ContentPresenter">
+        <Setter Property="Background" Value="{DynamicResource ThemeControlHighlightMidBrush}" />
+    </Style>
+    <Style Selector="ToggleButton:checked /template/ ContentPresenter#PART_ContentPresenter">
+        <Setter Property="Background" Value="{DynamicResource ThemeAccentBrush4}" />
+    </Style>
+    <Style Selector="ToggleButton:pressed /template/ ContentPresenter#PART_ContentPresenter">
+        <Setter Property="Background" Value="{DynamicResource ThemeAccentBrush3}" />
+    </Style>
+</Styles>

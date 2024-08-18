@@ -9,7 +9,7 @@ using LogAlligator.App.Utils;
 
 namespace LogAlligator.App.Controls;
 
-public partial class TextViewControl : UserControl
+public partial class TextView : UserControl
 {
     private string[] _lines = [];
     private int _topLineIndex = 0;
@@ -21,7 +21,7 @@ public partial class TextViewControl : UserControl
 
 
     private static readonly StyledProperty<IBrush> HighlightBackgroundProperty =
-    AvaloniaProperty.Register<TextViewControl, IBrush>(nameof(HighlightBackground), new SolidColorBrush(Color.FromRgb(0, 120, 215)));
+    AvaloniaProperty.Register<TextView, IBrush>(nameof(HighlightBackground), new SolidColorBrush(Color.FromRgb(0, 120, 215)));
     public IBrush HighlightBackground
     {
         get => GetValue(HighlightBackgroundProperty);
@@ -29,17 +29,18 @@ public partial class TextViewControl : UserControl
     }
 
     private static readonly StyledProperty<IBrush> HighlightForegroundProperty =
-    AvaloniaProperty.Register<TextViewControl, IBrush>(nameof(HighlightForeground), new SolidColorBrush(Colors.Black));
+    AvaloniaProperty.Register<TextView, IBrush>(nameof(HighlightForeground), new SolidColorBrush(Colors.Black));
     public IBrush HighlightForeground
     {
         get => GetValue(HighlightForegroundProperty);
         set => SetValue(HighlightForegroundProperty, value);
     }
 
-    public TextViewControl()
+    public TextView()
     {
         InitializeComponent();
 
+        this.Focusable = true;
         this[!HighlightBackgroundProperty] = new DynamicResourceExtension("HighlightBrush");
         this[!HighlightForegroundProperty] = new DynamicResourceExtension("ThemeBackgroundBrush");
 

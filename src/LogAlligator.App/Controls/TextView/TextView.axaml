@@ -1,0 +1,61 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:controls="clr-namespace:LogAlligator.App.Controls"
+             mc:Ignorable="d" d:DesignWidth="500" d:DesignHeight="250"
+             x:Class="LogAlligator.App.Controls.TextView">
+    <UserControl.Styles>
+        <Style Selector="Border#TextViewBorder">
+            <Setter Property="BorderBrush" Value="{DynamicResource ThemeBorderLowBrush}" />
+        </Style>
+        <Style Selector="controls|TextView:focus Border#TextViewBorder">
+            <Setter Property="BorderBrush" Value="{DynamicResource HighlightBrush2}" />
+        </Style>
+    </UserControl.Styles>
+
+    <Border Name="TextViewBorder"
+            BorderThickness="2 2 1 1"
+            Background="{DynamicResource ThemeBackgroundBrush}">
+        <DockPanel>
+            <DockPanel DockPanel.Dock="Bottom">
+                <Panel DockPanel.Dock="Right" Background="{DynamicResource ThemeControlMidBrush}"
+                       Width="{Binding #VerticalScrollBar.Bounds.Width}" />
+                <ScrollBar Name="HorizontalScrollBar"
+                           Orientation="Horizontal"
+                           AllowAutoHide="False"
+                           SmallChange="10"
+                           LargeChange="100"
+                           Scroll="OnHorizontalScroll" />
+            </DockPanel>
+            <ScrollBar Name="VerticalScrollBar"
+                       Orientation="Vertical"
+                       DockPanel.Dock="Right"
+                       AllowAutoHide="False"
+                       SmallChange="1"
+                       LargeChange="20"
+                       ViewportSize="20"
+                       Scroll="OnVerticalScroll" />
+            <controls:LineNumbers Name="LineNumbers"
+                                  DockPanel.Dock="Left"
+                                  Width="50"
+                                  FontFamily="Arial"
+                                  FontSize="12"
+                                  Background="{DynamicResource ThemeControlMidBrush}"
+                                  Foreground="{DynamicResource ThemeForegroundBrush}" />
+            <Panel DockPanel.Dock="Left"
+                   Width="10"
+                   Background="{DynamicResource ThemeControlMidBrush}" />
+            <Panel Name="TextAreaContainer"
+                   ClipToBounds="True"
+                   Margin="5 0 0 0">
+                <controls:TextArea Name="TextArea"
+                                   Cursor="Ibeam"
+                                   FontFamily="Arial"
+                                   FontSize="12"
+                                   Background="{DynamicResource ThemeBackgroundBrush}"
+                                   Foreground="{DynamicResource ThemeForegroundBrush}" />
+            </Panel>
+        </DockPanel>
+    </Border>
+</UserControl>

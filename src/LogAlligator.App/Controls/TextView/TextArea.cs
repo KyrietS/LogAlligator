@@ -10,12 +10,12 @@ using LogAlligator.App.Utils;
 
 namespace LogAlligator.App.Controls;
 
-internal class TextAreaControl : Control
+internal class TextArea : Control
 {
     private readonly List<Line> _lines = [];
 
     public static readonly StyledProperty<IBrush> BackgroundProperty =
-        AvaloniaProperty.Register<TextAreaControl, IBrush>(nameof(Background), new SolidColorBrush(Colors.Transparent));
+        AvaloniaProperty.Register<TextArea, IBrush>(nameof(Background), new SolidColorBrush(Colors.Transparent));
 
     public IBrush Background
     {
@@ -24,7 +24,7 @@ internal class TextAreaControl : Control
     }
 
     public static readonly StyledProperty<IBrush> ForegroundProperty =
-        AvaloniaProperty.Register<TextAreaControl, IBrush>(nameof(Foreground), new SolidColorBrush(Colors.Black));
+        AvaloniaProperty.Register<TextArea, IBrush>(nameof(Foreground), new SolidColorBrush(Colors.Black));
 
     public IBrush Foreground
     {
@@ -33,7 +33,7 @@ internal class TextAreaControl : Control
     }
 
     public static readonly StyledProperty<double> FontSizeProperty =
-        AvaloniaProperty.Register<TextAreaControl, double>(nameof(FontSize), 12);
+        AvaloniaProperty.Register<TextArea, double>(nameof(FontSize), 12);
 
     public double FontSize
     {
@@ -46,7 +46,7 @@ internal class TextAreaControl : Control
     public double MaxLineWidth { get; private set; }
     public int NumberOfLinesThatCanFit => (int)Math.Ceiling(Bounds.Height / GetLineHeight());
 
-    public TextAreaControl()
+    public TextArea()
     {
         ClipToBounds = true;
         Application.Current!.ActualThemeVariantChanged += (_, _) => InvalidateVisual();
@@ -57,9 +57,9 @@ internal class TextAreaControl : Control
         }
     }
 
-    static TextAreaControl()
+    static TextArea()
     {
-        FontSizeProperty.Changed.AddClassHandler<TextAreaControl>((o, _) => o.InvalidateVisual());
+        FontSizeProperty.Changed.AddClassHandler<TextArea>((o, _) => o.InvalidateVisual());
     }
 
     public void AppendLine(string line)
@@ -84,7 +84,7 @@ internal class TextAreaControl : Control
     /// <summary>
     /// Gets position of the character in the text pointed by <paramref name="position"/> (usually mouse cursor)
     /// </summary>
-    /// <param name="position">Position (X,Y) relative to <see cref="TextAreaControl"/>.</param>
+    /// <param name="position">Position (X,Y) relative to <see cref="TextArea"/>.</param>
     /// <returns>
     /// <para>A tuple containing the index of pointed line and index of pointer character in that line.</para>
     /// <para>If <paramref name="position"/> points above the first line, then <c>(0, 0)</c> is returned.</para>
