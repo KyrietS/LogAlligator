@@ -9,26 +9,28 @@
         Width="850"
         Height="400">
 
-  <DockPanel>
-    <Menu DockPanel.Dock="Top" >
-      <MenuItem Header="_File">
-        <MenuItem Header="_Open..." />
-        <Separator />
-        <MenuItem Header="_Exit" Command="{Binding $parent[Window].OnExit}" />
-      </MenuItem>
-      <MenuItem Header="Load data" Command="{Binding $parent[Window].OnLoadData}" />
-      <MenuItem Header="Switch theme" Command="{Binding $parent[Window].OnSwitchTheme}"/>
-    </Menu>
-    
-    <TabControl Padding="0">
-        <TabItem Header="Example file">
-        <controls:FileView /> 
-        </TabItem>
-      <TabItem Header="Another">
-        <StackPanel>
-          <TextBlock>Hello from another tab!</TextBlock>
-        </StackPanel>
-      </TabItem>
-    </TabControl>
-  </DockPanel>
+    <DockPanel>
+        <Menu DockPanel.Dock="Top">
+            <MenuItem Header="_File">
+                <MenuItem Header="_Open..." />
+                <Separator />
+                <MenuItem Header="_Exit" Command="{Binding $parent[Window].OnExit}" />
+            </MenuItem>
+            <MenuItem Header="Load data" Command="{Binding $parent[Window].OnLoadData}" />
+            <MenuItem Header="Switch theme" Command="{Binding $parent[Window].OnSwitchTheme}" />
+        </Menu>
+
+        <controls:StatusBar DockPanel.Dock="Bottom" />
+
+        <TabControl Padding="0">
+            <TabItem Header="Example file">
+                <controls:FileView />
+            </TabItem>
+            <TabItem Header="Another">
+                <StackPanel>
+                    <TextBlock>Hello from another tab!</TextBlock>
+                </StackPanel>
+            </TabItem>
+        </TabControl>
+    </DockPanel>
 </Window>
