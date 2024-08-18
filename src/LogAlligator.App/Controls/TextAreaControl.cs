@@ -1,12 +1,12 @@
-using Avalonia;
-using Avalonia.Controls;
-using Avalonia.Media;
-using LogAlligator.App.Utils;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Globalization;
 using System.Linq;
+using Avalonia;
+using Avalonia.Controls;
+using Avalonia.Media;
+using LogAlligator.App.Utils;
 
 namespace LogAlligator.App.Controls;
 

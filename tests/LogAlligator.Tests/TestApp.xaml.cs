@@ -1,4 +1,4 @@
-﻿using Avalonia;
+using Avalonia;
 using Avalonia.Headless;
 using Avalonia.Markup.Xaml;
 

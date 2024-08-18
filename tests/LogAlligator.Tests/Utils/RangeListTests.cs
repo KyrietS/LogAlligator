@@ -1,4 +1,4 @@
-﻿using LogAlligator.App.Utils;
+using LogAlligator.App.Utils;
 
 namespace LogAlligator.Tests.Utils;
 

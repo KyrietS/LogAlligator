@@ -1,10 +1,11 @@
+using System;
 using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Controls.Primitives;
 using Avalonia.Input;
+using Avalonia.Markup.Xaml.MarkupExtensions;
 using Avalonia.Media;
 using LogAlligator.App.Utils;
-using System;
 
 namespace LogAlligator.App.Controls;
 
@@ -19,7 +20,7 @@ public partial class TextViewControl : UserControl
     private bool _selectionOngoing = false;
 
 
-    public static readonly StyledProperty<IBrush> HighlightBackgroundProperty =
+    private static readonly StyledProperty<IBrush> HighlightBackgroundProperty =
     AvaloniaProperty.Register<TextViewControl, IBrush>(nameof(HighlightBackground), new SolidColorBrush(Color.FromRgb(0, 120, 215)));
     public IBrush HighlightBackground
     {
@@ -27,7 +28,7 @@ public partial class TextViewControl : UserControl
         set => SetValue(HighlightBackgroundProperty, value);
     }
 
-    public static readonly StyledProperty<IBrush> HighlightForegroundProperty =
+    private static readonly StyledProperty<IBrush> HighlightForegroundProperty =
     AvaloniaProperty.Register<TextViewControl, IBrush>(nameof(HighlightForeground), new SolidColorBrush(Colors.Black));
     public IBrush HighlightForeground
     {
@@ -38,6 +39,10 @@ public partial class TextViewControl : UserControl
     public TextViewControl()
     {
         InitializeComponent();
+
+        this[!HighlightBackgroundProperty] = new DynamicResourceExtension("HighlightBrush");
+        this[!HighlightForegroundProperty] = new DynamicResourceExtension("ThemeBackgroundBrush");
+
         LineNumbers.NumberOfLines = _numberOfLines;
         LineNumbers.PointerPressed += LineNumbers_PointerPressed;
         LineNumbers.PointerReleased += LineNumbers_PointerReleased;
@@ -54,7 +59,7 @@ public partial class TextViewControl : UserControl
             _lines = new string[_numberOfLines];
             for (int i = 0; i < _numberOfLines; i++)
             {
-                _lines[i] = "Sample text in line " + (i+1).ToString();
+                _lines[i] = "Sample text in line " + (i + 1).ToString();
             }
         }
     }
@@ -165,7 +170,7 @@ public partial class TextViewControl : UserControl
             _selectionOngoing = false;
         }
     }
-    private void TextArea_PointerMoved(object? sender,PointerEventArgs e)
+    private void TextArea_PointerMoved(object? sender, PointerEventArgs e)
     {
         if (e.Handled)
             return;
