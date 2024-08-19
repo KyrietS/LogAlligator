@@ -1,5 +1,5 @@
 ﻿using System;
-using System.Diagnostics;
+using System.IO;
 using Avalonia.Controls;
 using Avalonia.Threading;
 using MsBox.Avalonia;
@@ -10,7 +10,7 @@ namespace LogAlligator.App.Controls;
 
 public partial class FileView : UserControl
 {
-    public string FilePath { get; private set; } = "";
+    private string FilePath { get; set; } = "";
 
     public FileView()
     {
@@ -21,8 +21,8 @@ public partial class FileView : UserControl
     {
         try
         {
-            LoadData(filePath);
             FilePath = filePath;
+            LoadData();
         }
         catch (Exception e)
         {
@@ -31,13 +31,13 @@ public partial class FileView : UserControl
             Log.Warning("Exception: {Exception}", e);
             ShowMessageBoxFileCouldNotBeLoaded();
         }
-
     }
 
-    private void LoadData(string filePath)
+    private void LoadData()
     {
-        // var lines = File.ReadAllLines(FilePath);
-        throw new Exception("Not implemented");
+        var lines = File.ReadAllLines(FilePath);
+        Log.Debug("Loaded {Lines} lines from {FilePath}", lines.Length, FilePath);
+        LogView.SetData(lines);
     }
 
     private void ShowMessageBoxFileCouldNotBeLoaded()

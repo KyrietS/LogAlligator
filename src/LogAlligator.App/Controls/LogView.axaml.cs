@@ -8,4 +8,9 @@ public partial class LogView : UserControl
     {
         InitializeComponent();
     }
+
+    public void SetData(string[] data)
+    {
+        TextView.SetText(data);
+    }
 }
