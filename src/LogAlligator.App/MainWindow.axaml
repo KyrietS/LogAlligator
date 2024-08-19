@@ -12,7 +12,7 @@
     <DockPanel>
         <Menu DockPanel.Dock="Top">
             <MenuItem Header="_File">
-                <MenuItem Header="_Open..." />
+                <MenuItem Header="_Open..." Click="MenuBar_Open_OnClick"/>
                 <Separator />
                 <MenuItem Header="_Exit" Command="{Binding $parent[Window].OnExit}" />
             </MenuItem>
@@ -22,7 +22,7 @@
 
         <controls:StatusBar DockPanel.Dock="Bottom" />
 
-        <TabControl Padding="0">
+        <TabControl Padding="0" Name="FileTabs">
             <TabItem Header="Example file">
                 <controls:FileView Name="FileView"/>
             </TabItem>
