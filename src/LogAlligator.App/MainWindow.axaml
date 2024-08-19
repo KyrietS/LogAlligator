@@ -24,7 +24,7 @@
 
         <TabControl Padding="0">
             <TabItem Header="Example file">
-                <controls:FileView />
+                <controls:FileView Name="FileView"/>
             </TabItem>
             <TabItem Header="Another">
                 <StackPanel>

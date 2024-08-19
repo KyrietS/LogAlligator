@@ -1,4 +1,3 @@
-using System.IO;
 using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Styling;
@@ -15,9 +14,8 @@ public partial class MainWindow : Window
     public void OnLoadData()
     {
         if (Design.IsDesignMode) return;
-        var lines = File.ReadAllLines("wide.txt");
-        //var lines = File.ReadAllLines("pan-tadeusz.txt");
-        // TextView.SetText(lines);
+
+        FileView.LoadFile("wide.txt");
     }
 
     public void OnSwitchTheme()

@@ -29,7 +29,7 @@
                         ToolTip.Tip="Search down" ToolTip.Placement="Top" ToolTip.VerticalOffset="0">
                     <Image Source="/Assets/Icons/arrow-270.png" Stretch="Fill" />
                 </Button>
-                <Button Width="21" Height="20" 
+                <Button Width="21" Height="20"
                         ToolTip.Tip="Search up" ToolTip.Placement="Top" ToolTip.VerticalOffset="0">
                     <Image Source="/Assets/Icons/arrow-090.png" Stretch="Fill" />
                 </Button>
