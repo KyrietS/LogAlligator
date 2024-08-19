@@ -3,7 +3,7 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:controls="clr-namespace:LogAlligator.App.Controls"
-        mc:Ignorable="d" d:DesignWidth="700" d:DesignHeight="300"
+        mc:Ignorable="d" d:DesignWidth="850" d:DesignHeight="300"
         x:Class="LogAlligator.App.MainWindow"
         Title="LogAlligator App"
         Width="850"

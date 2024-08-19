@@ -37,7 +37,7 @@
                 <ToggleButton Content="_Case sensitive"/>
                 <ToggleButton Content="_RegExp"/>
                 <ToggleButton Content="_Highlight"/>
-                <ToggleButton Content="_All occurrences" />
+                <ToggleButton Content="_All occurrences" IsEnabled="False"/>
             </StackPanel>
         </Border>
 

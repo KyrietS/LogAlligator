@@ -19,7 +19,7 @@
                 <TabControl Padding="0 1 0 0">
                     <TabItem Header="Bookmarks"></TabItem>
                     <TabItem Header="Highlights"></TabItem>
-                    <TabItem Header="Plugins"></TabItem>
+                    <TabItem Header="Plugins" IsEnabled="False"></TabItem>
                 </TabControl>
             </Border>
             <GridSplitter Grid.Column="1"
