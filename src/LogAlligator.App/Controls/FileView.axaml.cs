@@ -4,6 +4,7 @@ using Avalonia.Controls;
 using Avalonia.Threading;
 using MsBox.Avalonia;
 using MsBox.Avalonia.Enums;
+using Serilog;
 
 namespace LogAlligator.App.Controls;
 
@@ -26,8 +27,8 @@ public partial class FileView : UserControl
         catch (Exception e)
         {
             FilePath = "";
-            Debug.WriteLine("Error when tried to load a file: " + filePath);
-            Debug.WriteLine(e);
+            Log.Warning("Error when tried to load a file: {FilePath}", filePath);
+            Log.Warning("Exception: {Exception}", e);
             ShowMessageBoxFileCouldNotBeLoaded();
         }
 
