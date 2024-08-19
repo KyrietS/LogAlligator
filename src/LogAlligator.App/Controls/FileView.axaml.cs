@@ -1,5 +1,6 @@
 ﻿using System;
 using System.IO;
+using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Threading;
 using MsBox.Avalonia;
@@ -10,24 +11,36 @@ namespace LogAlligator.App.Controls;
 
 public partial class FileView : UserControl
 {
-    private string FilePath { get; set; } = "";
+    private bool _isLoaded = false;
+    public string FilePath { get; }
 
-    public FileView()
+    // TODO: Instead of constructor with string, use a property
+    public FileView(string filePath)
     {
+        FilePath = filePath;
         InitializeComponent();
     }
+    public FileView() : this(string.Empty) { }
 
-    public void LoadFile(string filePath)
+    protected override void OnAttachedToVisualTree(VisualTreeAttachmentEventArgs e)
+    {
+        base.OnAttachedToVisualTree(e);
+        if (FilePath != "" && !_isLoaded)
+        {
+            LoadFile();
+            _isLoaded = true;
+        }
+    }
+
+    private void LoadFile()
     {
         try
         {
-            FilePath = filePath;
             LoadData();
         }
         catch (Exception e)
         {
-            FilePath = "";
-            Log.Warning("Error when tried to load a file: {FilePath}", filePath);
+            Log.Warning("Error when tried to load a file: {FilePath}", FilePath);
             Log.Warning("Exception: {Exception}", e);
             ShowMessageBoxFileCouldNotBeLoaded();
         }

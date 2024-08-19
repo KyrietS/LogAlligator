@@ -22,14 +22,12 @@ public partial class MainWindow : Window
         }
 
         var file = files[0];
-        var fileView = new FileView();
         var fileTab = new TabItem
         {
             Header = file.Name,
-            Content = fileView
+            Content = new FileView(file.Path.AbsolutePath)
         };
         FileTabs.SelectedIndex = FileTabs.Items.Add(fileTab);
-        fileView.LoadFile(file.Path.AbsolutePath);
     }
 
     public MainWindow()
@@ -41,7 +39,12 @@ public partial class MainWindow : Window
     {
         if (Design.IsDesignMode) return;
 
-        FileView.LoadFile("wide.txt");
+        FileTabs.Items.Insert(0, new TabItem
+        {
+            Header = "Sample data",
+            Content = new FileView("wide.txt")
+        });
+        FileTabs.SelectedIndex = 0;
     }
 
     public void OnSwitchTheme()
