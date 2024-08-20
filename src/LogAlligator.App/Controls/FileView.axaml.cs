@@ -19,7 +19,7 @@ public partial class FileView : UserControl
         init
         {
             if (!value.IsAbsoluteUri)
-                throw new ArgumentException("File path must be absolute URI", nameof(FilePath));
+                value = new Uri(Path.GetFullPath(value.OriginalString));
             _filePath = value;
         }
     }
@@ -32,6 +32,8 @@ public partial class FileView : UserControl
     protected override void OnAttachedToVisualTree(VisualTreeAttachmentEventArgs e)
     {
         base.OnAttachedToVisualTree(e);
+        if (Design.IsDesignMode) return;
+        
         if (FilePath.IsFile && !_isLoaded)
         {
             LoadFile();

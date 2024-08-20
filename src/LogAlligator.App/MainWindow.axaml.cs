@@ -51,14 +51,20 @@ public partial class MainWindow : Window
         return files[0] as IStorageFile;
     }
     
-    public void OnLoadData()
+    public async void OnLoadData()
     {
         if (Design.IsDesignMode) return;
 
-        // Load wide.txt file
+        // Load wide.txt file (for testing)
         Uri filePath = new Uri(Path.GetFullPath("wide.txt"));
-        FileTabs.Items.Insert(0, new TabItem { Header = "Sample data", Content = new FileView{FilePath = filePath} });
-        FileTabs.SelectedIndex = 0;
+        var file = await StorageProvider.TryGetFileFromPathAsync(filePath);
+
+        if (file == null)
+        {
+            Log.Warning("File {FilePath} not found", filePath);
+            return;
+        }
+        AddFileTab(file);
     }
 
     public void OnSwitchTheme()
@@ -95,6 +101,7 @@ public partial class MainWindow : Window
     private void AddFileTab(IStorageFile file)
     {
         var fileTab = new TabItem { Header = file.Name, Content = new FileView{FilePath = file.Path} };
+        ToolTip.SetTip(fileTab, file.Path.AbsolutePath);
         FileTabs.SelectedIndex = FileTabs.Items.Add(fileTab);
     }
 }
