@@ -57,7 +57,7 @@ public partial class MainWindow : Window
 
         // Load wide.txt file
         Uri filePath = new Uri(Path.GetFullPath("wide.txt"));
-        FileTabs.Items.Insert(0, new TabItem { Header = "Sample data", Content = new FileView(filePath) });
+        FileTabs.Items.Insert(0, new TabItem { Header = "Sample data", Content = new FileView{FilePath = filePath} });
         FileTabs.SelectedIndex = 0;
     }
 
@@ -94,7 +94,7 @@ public partial class MainWindow : Window
 
     private void AddFileTab(IStorageFile file)
     {
-        var fileTab = new TabItem { Header = file.Name, Content = new FileView(file.Path) };
+        var fileTab = new TabItem { Header = file.Name, Content = new FileView{FilePath = file.Path} };
         FileTabs.SelectedIndex = FileTabs.Items.Add(fileTab);
     }
 }

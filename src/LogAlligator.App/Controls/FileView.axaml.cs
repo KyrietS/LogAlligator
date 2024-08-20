@@ -12,17 +12,22 @@ namespace LogAlligator.App.Controls;
 public partial class FileView : UserControl
 {
     private bool _isLoaded = false;
-    private Uri FilePath { get; }
-
-    // TODO: Instead of constructor with string, use a property
-    public FileView(Uri filePath)
+    private readonly Uri? _filePath;
+    public Uri FilePath
     {
-        if (!filePath.IsAbsoluteUri)
-            throw new ArgumentException("File path must be absolute URI", nameof(filePath));        
-        FilePath = filePath;
+        get => _filePath ?? throw new InvalidOperationException("File path is not set");
+        init
+        {
+            if (!value.IsAbsoluteUri)
+                throw new ArgumentException("File path must be absolute URI", nameof(FilePath));
+            _filePath = value;
+        }
+    }
+
+    public FileView()
+    {
         InitializeComponent();
     }
-    // public FileView() : this(null) { }
 
     protected override void OnAttachedToVisualTree(VisualTreeAttachmentEventArgs e)
     {
