@@ -12,20 +12,22 @@ namespace LogAlligator.App.Controls;
 public partial class FileView : UserControl
 {
     private bool _isLoaded = false;
-    public string FilePath { get; }
+    private Uri FilePath { get; }
 
     // TODO: Instead of constructor with string, use a property
-    public FileView(string filePath)
+    public FileView(Uri filePath)
     {
+        if (!filePath.IsAbsoluteUri)
+            throw new ArgumentException("File path must be absolute URI", nameof(filePath));        
         FilePath = filePath;
         InitializeComponent();
     }
-    public FileView() : this(string.Empty) { }
+    // public FileView() : this(null) { }
 
     protected override void OnAttachedToVisualTree(VisualTreeAttachmentEventArgs e)
     {
         base.OnAttachedToVisualTree(e);
-        if (FilePath != "" && !_isLoaded)
+        if (FilePath.IsFile && !_isLoaded)
         {
             LoadFile();
             _isLoaded = true;
@@ -48,7 +50,7 @@ public partial class FileView : UserControl
 
     private void LoadData()
     {
-        var lines = File.ReadAllLines(FilePath);
+        var lines = File.ReadAllLines(FilePath.AbsolutePath);
         Log.Debug("Loaded {Lines} lines from {FilePath}", lines.Length, FilePath);
         LogView.SetData(lines);
     }
