@@ -23,14 +23,9 @@
         <controls:StatusBar DockPanel.Dock="Bottom" />
 
         <TabControl Padding="0" Name="FileTabs">
-            <TabItem Header="Example file">
-                <controls:FileView Name="FileView"/>
-            </TabItem>
-            <TabItem Header="Another">
-                <StackPanel>
-                    <TextBlock>Hello from another tab!</TextBlock>
-                </StackPanel>
-            </TabItem>
+            <!-- <TabItem Header="File name"> -->
+            <!--     <controls:FileView /> -->
+            <!-- </TabItem> -->
         </TabControl>
     </DockPanel>
 </Window>
