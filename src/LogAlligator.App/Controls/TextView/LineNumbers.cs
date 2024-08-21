@@ -34,7 +34,6 @@ internal class LineNumbers : Control
     public LineNumbers()
     {
         ClipToBounds = true;
-        Application.Current!.ActualThemeVariantChanged += (_, _) => InvalidateVisual();
     }
 
 

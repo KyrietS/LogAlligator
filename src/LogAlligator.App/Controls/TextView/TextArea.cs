@@ -49,7 +49,6 @@ internal class TextArea : Control
     public TextArea()
     {
         ClipToBounds = true;
-        Application.Current!.ActualThemeVariantChanged += (_, _) => InvalidateVisual();
 
         if (Design.IsDesignMode)
         {
