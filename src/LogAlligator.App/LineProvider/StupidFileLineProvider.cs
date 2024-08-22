@@ -1,8 +1,5 @@
 ﻿using System;
-using System.Diagnostics;
 using System.IO;
-using System.Threading.Tasks;
-using Avalonia.Platform.Storage;
 
 namespace LogAlligator.App.LineProvider;
 
@@ -29,7 +26,7 @@ public class StupidFileLineProvider(Uri path) : ILineProvider
     public int GetLineLength(int index)
     {
         if (index < 0 || index >= _lines.Length)
-            throw new System.ArgumentOutOfRangeException(nameof(index));
+            throw new ArgumentOutOfRangeException(nameof(index));
         
         return _lines[index].Length;
     }

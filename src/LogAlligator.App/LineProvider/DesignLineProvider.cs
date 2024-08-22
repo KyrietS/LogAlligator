@@ -12,22 +12,9 @@ public class DesignLineProvider : ILineProvider
         if (!Design.IsDesignMode)
             throw new System.InvalidOperationException("DesignLineProvider should be used only in design mode");
     }
-    public void AddLine(string line)
-    {
-        _lines.Add(line);
-    }
-    
-    public int LoadData()
-    {
-        return _lines.Count;
-    }
-
+    public void AddLine(string line) => _lines.Add(line);
+    public int LoadData() => _lines.Count;
     public int Count => _lines.Count;
-
     public string this[int index] => _lines[index];
-
-    public int GetLineLength(int index)
-    {
-        return _lines[index].Length;
-    }
+    public int GetLineLength(int index) => _lines[index].Length;
 }

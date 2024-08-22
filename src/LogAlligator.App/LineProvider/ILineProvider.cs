@@ -1,6 +1,4 @@
-﻿using System.Threading.Tasks;
-
-namespace LogAlligator.App.LineProvider;
+﻿namespace LogAlligator.App.LineProvider;
 
 public interface ILineProvider
 {
