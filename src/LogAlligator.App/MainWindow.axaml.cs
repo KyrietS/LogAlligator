@@ -63,7 +63,6 @@ public partial class MainWindow : Window
         // Load wide.txt file (for testing)
         Uri filePath = new Uri(Path.GetFullPath("wide.txt"));
         var file = await StorageProvider.TryGetFileFromPathAsync(filePath);
-
         if (file == null)
         {
             Log.Warning("File {FilePath} not found", filePath);

@@ -5,13 +5,14 @@ using Avalonia.Controls.Primitives;
 using Avalonia.Input;
 using Avalonia.Markup.Xaml.MarkupExtensions;
 using Avalonia.Media;
+using LogAlligator.App.LineProvider;
 using LogAlligator.App.Utils;
 
 namespace LogAlligator.App.Controls;
 
 public partial class TextView : UserControl
 {
-    private string[] _lines = [];
+    private ILineProvider _lines = new EmptyLineProvider();
     private int _topLineIndex = 0;
     private int _numberOfLines = 10;
     private double _maxLineWidth = 0;
@@ -57,15 +58,17 @@ public partial class TextView : UserControl
 
         if (Design.IsDesignMode)
         {
-            _lines = new string[_numberOfLines];
+            var designLineProvider = new DesignLineProvider();
             for (int i = 0; i < _numberOfLines; i++)
             {
-                _lines[i] = "Sample text in line " + (i + 1).ToString();
+                designLineProvider.AddLine($"Sample text in line {i+1}");
             }
+
+            _lines = designLineProvider;
         }
     }
 
-    public void SetText(string[] lines)
+    public void SetLineProvider(ILineProvider lines)
     {
         this._lines = lines;
         _topLineIndex = 0;
@@ -74,13 +77,13 @@ public partial class TextView : UserControl
 
     private void LoadData()
     {
-        _numberOfLines = Math.Min(_lines.Length, TextArea.NumberOfLinesThatCanFit);
+        _numberOfLines = Math.Min(_lines.Count, TextArea.NumberOfLinesThatCanFit);
         TextArea.Clear();
         for (int i = 0; i < _numberOfLines; i++)
         {
             int lineIndex = _topLineIndex + i;
 
-            if (lineIndex >= _lines.Length)
+            if (lineIndex >= _lines.Count)
                 break;
 
             TextArea.AppendLine(_lines[lineIndex]);
@@ -126,7 +129,7 @@ public partial class TextView : UserControl
         if (e.Delta.Y < 0)
         {
             _topLineIndex += 3;
-            _topLineIndex = Math.Min(_topLineIndex, _lines.Length - 1);
+            _topLineIndex = Math.Min(_topLineIndex, _lines.Count - 1);
             _topLineIndex = Math.Max(_topLineIndex, 0);
         }
         if (e.Delta.Y > 0)
@@ -143,7 +146,7 @@ public partial class TextView : UserControl
 
     private void TextArea_PointerPressed(object? sender, PointerPressedEventArgs e)
     {
-        if (e.Handled || _lines.Length == 0)
+        if (e.Handled || _lines.Count == 0)
             return;
 
         var pointer = e.GetCurrentPoint(TextArea);
@@ -237,7 +240,7 @@ public partial class TextView : UserControl
     private void UpdateVerticalScroll()
     {
         VerticalScrollBar.Minimum = 0;
-        VerticalScrollBar.Maximum = _lines.Length - 1;
+        VerticalScrollBar.Maximum = _lines.Count - 1;
         VerticalScrollBar.ViewportSize = _numberOfLines;
 
         _topLineIndex = (int)VerticalScrollBar.Value;

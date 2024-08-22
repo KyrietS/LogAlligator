@@ -3,6 +3,7 @@ using System.IO;
 using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Threading;
+using LogAlligator.App.LineProvider;
 using MsBox.Avalonia;
 using MsBox.Avalonia.Enums;
 using Serilog;
@@ -57,9 +58,10 @@ public partial class FileView : UserControl
 
     private void LoadData()
     {
-        var lines = File.ReadAllLines(FilePath.AbsolutePath);
-        Log.Debug("Loaded {Lines} lines from {FilePath}", lines.Length, FilePath);
-        LogView.SetData(lines);
+        var lineProvider = new StupidFileLineProvider(FilePath);
+        lineProvider.LoadData(); // TODO: Do this in a background thread
+        Log.Debug("Loaded {Lines} lines from {FilePath}", lineProvider.Count, FilePath);
+        LogView.SetLineProvider(lineProvider);
     }
 
     private void ShowMessageBoxFileCouldNotBeLoaded()

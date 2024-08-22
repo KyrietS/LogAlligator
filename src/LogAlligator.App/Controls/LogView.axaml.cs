@@ -1,4 +1,5 @@
 ﻿using Avalonia.Controls;
+using LogAlligator.App.LineProvider;
 
 namespace LogAlligator.App.Controls;
 
@@ -9,8 +10,8 @@ public partial class LogView : UserControl
         InitializeComponent();
     }
 
-    public void SetData(string[] data)
+    public void SetLineProvider(ILineProvider lineProvider)
     {
-        TextView.SetText(data);
+        TextView.SetLineProvider(lineProvider);
     }
 }
