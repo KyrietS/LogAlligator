@@ -106,7 +106,7 @@ internal struct TextSelection
     /// Result tuple <c>(begin end)</c> represents a range from <c>begin</c> inclusive to <c>end</c> exclusive.
     /// If both <c>begin</c> and <c>end</c> are not <c>null</c> it is guaranteed that <c>begin &lt;= end</c>
     /// </remarks>
-    public (int? Begin, int? End)? GetSelectionAtLine(int lineIndex)
+    public (int? Begin, int? End)? GetSelectionAtLine(int lineIndex) // TODO: Maybe use Range struct instead of tuple
     {
         var start = SelectionStart;
         var stop = SelectionStop;

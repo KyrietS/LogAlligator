@@ -1,16 +1,16 @@
 ﻿using System;
 using System.IO;
+using System.Threading.Tasks;
 
 namespace LogAlligator.App.LineProvider;
 
 public class StupidFileLineProvider(Uri path) : ILineProvider
 {
     private string[] _lines = [];
-
-    public int LoadData()
+    
+    public async Task LoadData()
     {
-        _lines = File.ReadAllLines(path.AbsolutePath);
-        return _lines.Length;
+        _lines = await File.ReadAllLinesAsync(path.AbsolutePath);
     }
     
     public int Count => _lines.Length;

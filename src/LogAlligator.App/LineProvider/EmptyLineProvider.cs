@@ -1,10 +1,11 @@
 ﻿using System;
+using System.Threading.Tasks;
 
 namespace LogAlligator.App.LineProvider;
 
 public class EmptyLineProvider : ILineProvider
 {
-    public int LoadData() => 0;
+    public Task LoadData() => Task.CompletedTask;
     public int Count => 0;
     public string this[int index] => throw new IndexOutOfRangeException();
     public int GetLineLength(int index) => throw new IndexOutOfRangeException();

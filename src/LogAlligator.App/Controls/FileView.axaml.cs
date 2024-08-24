@@ -1,5 +1,6 @@
 ﻿using System;
 using System.IO;
+using System.Threading.Tasks;
 using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Threading;
@@ -12,7 +13,7 @@ namespace LogAlligator.App.Controls;
 
 public partial class FileView : UserControl
 {
-    private bool _isLoaded = false;
+    private Task? _loadTask = null;
     private readonly Uri? _filePath;
     public Uri FilePath
     {
@@ -35,18 +36,17 @@ public partial class FileView : UserControl
         base.OnAttachedToVisualTree(e);
         if (Design.IsDesignMode) return;
         
-        if (FilePath.IsFile && !_isLoaded)
+        if (FilePath.IsFile && _loadTask == null)
         {
-            LoadFile();
-            _isLoaded = true;
+            _loadTask = LoadFile();
         }
     }
 
-    private void LoadFile()
+    private async Task LoadFile()
     {
         try
         {
-            LoadData();
+            await LoadData();
         }
         catch (Exception e)
         {
@@ -56,10 +56,10 @@ public partial class FileView : UserControl
         }
     }
 
-    private void LoadData()
+    private async Task LoadData()
     {
         var lineProvider = new StupidFileLineProvider(FilePath);
-        lineProvider.LoadData(); // TODO: Do this in a background thread
+        await lineProvider.LoadData();
         Log.Debug("Loaded {Lines} lines from {FilePath}", lineProvider.Count, FilePath);
         LogView.SetLineProvider(lineProvider);
     }

@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Threading.Tasks;
 using Avalonia.Controls;
 
 namespace LogAlligator.App.LineProvider;
@@ -13,7 +14,7 @@ public class DesignLineProvider : ILineProvider
             throw new System.InvalidOperationException("DesignLineProvider should be used only in design mode");
     }
     public void AddLine(string line) => _lines.Add(line);
-    public int LoadData() => _lines.Count;
+    public Task LoadData() => Task.CompletedTask;
     public int Count => _lines.Count;
     public string this[int index] => _lines[index];
     public int GetLineLength(int index) => _lines[index].Length;
