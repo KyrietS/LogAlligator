@@ -1,4 +1,6 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
+using System.Threading;
 using System.Threading.Tasks;
 using Avalonia.Controls;
 
@@ -14,7 +16,7 @@ public class DesignLineProvider : ILineProvider
             throw new System.InvalidOperationException("DesignLineProvider should be used only in design mode");
     }
     public void AddLine(string line) => _lines.Add(line);
-    public Task LoadData() => Task.CompletedTask;
+    public Task LoadData(Action<int> _1, CancellationToken _2) => Task.CompletedTask;
     public int Count => _lines.Count;
     public string this[int index] => _lines[index];
     public int GetLineLength(int index) => _lines[index].Length;

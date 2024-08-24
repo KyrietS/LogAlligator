@@ -1,5 +1,6 @@
 ﻿using System;
 using System.IO;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace LogAlligator.App.LineProvider;
@@ -8,9 +9,14 @@ public class StupidFileLineProvider(Uri path) : ILineProvider
 {
     private string[] _lines = [];
     
-    public async Task LoadData()
+    public async Task LoadData(Action<int> progressCallback, CancellationToken token)
     {
-        _lines = await File.ReadAllLinesAsync(path.AbsolutePath);
+        await Task.Delay(1000, token);
+        progressCallback(100);
+        await Task.Delay(1000, token);
+        progressCallback(200);
+        
+        _lines = await File.ReadAllLinesAsync(path.AbsolutePath, token);
     }
     
     public int Count => _lines.Length;

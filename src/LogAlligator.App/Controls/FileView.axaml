@@ -27,7 +27,7 @@
             <Border Grid.Column="2"
                     BorderBrush="{DynamicResource ThemeControlMidBrush}"
                     BorderThickness="1">
-                <controls:LogView Name="LogView"/>
+                <controls:LogView Name="LogView" />
             </Border>
         </Grid>
     </Border>

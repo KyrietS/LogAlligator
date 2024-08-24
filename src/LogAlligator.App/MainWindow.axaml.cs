@@ -36,6 +36,7 @@ public partial class MainWindow : Window
         if (file == null)
             return;
         
+        this.Activate(); // Bring window to front
         Log.Debug("Dropped file: {FileName}", file.Name);
         AddFileTab(file);
     }
@@ -104,8 +105,19 @@ public partial class MainWindow : Window
 
     private void AddFileTab(IStorageFile file)
     {
-        var fileTab = new TabItem { Header = file.Name, Content = new FileView{FilePath = file.Path} };
+        var fileView = new FileView { FilePath = file.Path };
+        var fileTab = new TabItem { Header = file.Name, Content = fileView };
+        
+        fileView.RemovalRequested += (_, _) => OnTabRequestedRemoval(fileTab);
+        
         ToolTip.SetTip(fileTab, file.Path.AbsolutePath);
         FileTabs.SelectedIndex = FileTabs.Items.Add(fileTab);
+    }
+    
+    private void OnTabRequestedRemoval(TabItem tab)
+    {
+        Log.Debug($"Removing tab {tab.Header}");
+
+        FileTabs.Items.Remove(tab);
     }
 }
