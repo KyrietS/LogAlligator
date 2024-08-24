@@ -109,9 +109,19 @@ public partial class MainWindow : Window
         var fileTab = new TabItem { Header = file.Name, Content = fileView };
         
         fileView.RemovalRequested += (_, _) => OnTabRequestedRemoval(fileTab);
+        fileTab.ContextMenu = CreateFileTabContextMenu(fileTab);
         
         ToolTip.SetTip(fileTab, file.Path.AbsolutePath);
         FileTabs.SelectedIndex = FileTabs.Items.Add(fileTab);
+    }
+
+    private ContextMenu CreateFileTabContextMenu(TabItem tab)
+    {
+        var ctxMenu = new ContextMenu();
+        var closeMenuItem = new MenuItem { Header = "Close file view" };
+        closeMenuItem.Click += (_, _) => OnTabRequestedRemoval(tab);
+        ctxMenu.Items.Add(closeMenuItem);
+        return ctxMenu;
     }
     
     private void OnTabRequestedRemoval(TabItem tab)

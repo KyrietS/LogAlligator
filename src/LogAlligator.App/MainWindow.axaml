@@ -11,7 +11,7 @@
         ShowActivated="True">
 
     <DockPanel>
-        <Menu DockPanel.Dock="Top">
+        <Menu DockPanel.Dock="Top" Name="MainMenuBar">
             <MenuItem Header="_File">
                 <MenuItem Header="_Open..." Click="MenuBar_Open_OnClick"/>
                 <Separator />
