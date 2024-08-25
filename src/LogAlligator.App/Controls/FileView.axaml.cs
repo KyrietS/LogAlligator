@@ -87,9 +87,15 @@ public partial class FileView : UserControl
     private async Task LoadData()
     {
         _loadTaskCancellationToken = new CancellationTokenSource();
-        var lineProvider = new StupidFileLineProvider(FilePath);
+        var lineProvider = new BufferedFileLineProvider(FilePath);
+        
+        var watch = System.Diagnostics.Stopwatch.StartNew();
         await lineProvider.LoadData(OnLoadProgress, _loadTaskCancellationToken.Token);
-        Log.Debug("Loaded {Lines} lines from {FilePath}", lineProvider.Count, FilePath);
+        watch.Stop();
+        var elapsedMs = watch.ElapsedMilliseconds;
+        
+        Log.Debug("Loaded {Lines} lines from {FilePath}. It took {ElapsedMs} ms", lineProvider.Count, FilePath, elapsedMs);
+        
         LogView.SetLineProvider(lineProvider);
     }
 
