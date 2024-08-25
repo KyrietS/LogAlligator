@@ -110,7 +110,7 @@ public partial class MainWindow : Window
         
         fileView.RemovalRequested += (_, _) => OnTabRequestedRemoval(fileTab);
         fileTab.ContextMenu = CreateFileTabContextMenu(fileTab);
-        
+
         ToolTip.SetTip(fileTab, file.Path.AbsolutePath);
         FileTabs.SelectedIndex = FileTabs.Items.Add(fileTab);
     }

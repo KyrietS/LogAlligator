@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
@@ -17,7 +17,7 @@ public partial class FileView : UserControl
     private Task? _loadTask = null;
     private CancellationTokenSource? _loadTaskCancellationToken = null;
     private readonly Uri? _filePath;
-    private readonly LoadingDataDialog _loadingDialog = new();
+    private LoadingDataDialog? _loadingDialog = null;
     
     public event EventHandler? RemovalRequested;
     public Uri FilePath
@@ -30,13 +30,12 @@ public partial class FileView : UserControl
             _filePath = value;
         }
     }
-
+    
     public FileView()
     {
         InitializeComponent();
-        _loadingDialog.CancelButton.Click += OnLoadDataCancel;
     }
-
+    
     private void OnLoadDataCancel(object? sender, RoutedEventArgs e)
     {
         if (_loadTask == null)
@@ -62,25 +61,25 @@ public partial class FileView : UserControl
     {
         try
         {
-            _ = _loadingDialog.ShowDialog((this.VisualRoot as Window)!);
+            ShowLoadingDialog();
             await LoadData();
         }
         catch (TaskCanceledException)
         {
             Log.Information("Loading data was canceled");
-            OnRemovalRequested();
+            RequestRemovalFromView();
         }
         catch (Exception e)
         {
             Log.Warning("Error when tried to load a file: {FilePath}", FilePath);
             Log.Warning("Exception: {Exception}", e);
             await ShowMessageBoxFileCouldNotBeLoaded();
-            OnRemovalRequested();
+            RequestRemovalFromView();
         }
         finally
         {
-            _loadingDialog.Owner?.Activate();
-            _loadingDialog.Hide();
+            _loadingDialog?.Owner?.Activate();
+            _loadingDialog?.Close();
         }
     }
 
@@ -101,7 +100,15 @@ public partial class FileView : UserControl
 
     private void OnLoadProgress(int progress)
     {
-        _loadingDialog.Info.Text = $"Loaded {progress} lines";
+        if (_loadingDialog != null)
+            _loadingDialog.Info.Text = $"Loaded {progress} lines";
+    }
+
+    private void ShowLoadingDialog()
+    {
+        _loadingDialog = new LoadingDataDialog();
+        _loadingDialog.CancelButton.Click += OnLoadDataCancel;
+        _ = _loadingDialog.ShowDialog((this.VisualRoot as Window)!);
     }
     
     private async Task ShowMessageBoxFileCouldNotBeLoaded()
@@ -112,7 +119,7 @@ public partial class FileView : UserControl
         await box.ShowWindowDialogAsync(this.VisualRoot as Window);
     }
 
-    private void OnRemovalRequested()
+    private void RequestRemovalFromView()
     {
         (this.VisualRoot as Window)?.Activate();
         RemovalRequested?.Invoke(this, EventArgs.Empty);
