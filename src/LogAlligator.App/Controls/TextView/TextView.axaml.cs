@@ -5,6 +5,7 @@ using Avalonia.Controls.Primitives;
 using Avalonia.Input;
 using Avalonia.Markup.Xaml.MarkupExtensions;
 using Avalonia.Media;
+using Avalonia.Utilities;
 using LogAlligator.App.LineProvider;
 using LogAlligator.App.Utils;
 
@@ -54,8 +55,9 @@ public partial class TextView : UserControl
         TextArea.PointerReleased += TextArea_PointerReleased;
         TextArea.PointerMoved += TextArea_PointerMoved;
 
-        Application.Current!.ActualThemeVariantChanged += (_, _) => LoadData();
-
+        WeakEventHandlerManager.Subscribe<Application, EventArgs, TextView>(
+            Application.Current!, nameof(Application.ActualThemeVariantChanged), OnActualThemeVariantChanged);
+        
         if (Design.IsDesignMode)
         {
             var designLineProvider = new DesignLineProvider();
@@ -292,5 +294,10 @@ public partial class TextView : UserControl
             LoadData();
             e.Handled = true;
         }
+    }
+    
+    private void OnActualThemeVariantChanged(object? sender, EventArgs e)
+    {
+        LoadData();
     }
 }

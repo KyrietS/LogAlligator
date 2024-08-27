@@ -129,5 +129,6 @@ public partial class MainWindow : Window
         Log.Debug($"Removing tab {tab.Header}");
 
         FileTabs.Items.Remove(tab);
+        GC.Collect(GC.MaxGeneration);
     }
 }
