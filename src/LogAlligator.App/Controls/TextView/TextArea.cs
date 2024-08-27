@@ -7,6 +7,7 @@ using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Media;
 using LogAlligator.App.Utils;
+using Serilog;
 
 namespace LogAlligator.App.Controls;
 
@@ -41,6 +42,15 @@ internal class TextArea : Control
         set => SetValue(FontSizeProperty, value);
     }
 
+    public static readonly StyledProperty<Thickness> PaddingProperty =
+        Decorator.PaddingProperty.AddOwner<TextArea>();
+    
+    public Thickness Padding
+    {
+        get => GetValue(PaddingProperty);
+        set => SetValue(PaddingProperty, value);
+    }
+    
     public FontFamily FontFamily { get; set; } = FontFamily.Default;
 
     public double MaxLineWidth { get; private set; }
@@ -67,19 +77,33 @@ internal class TextArea : Control
         MaxLineWidth = Math.Max(MaxLineWidth, GetLineWidth(line));
     }
 
-    public void AppendFormattingToLastLine(int charIndex, int length, IBrush? foreground = null,
-        IBrush? background = null)
+    public void AppendFormattingToLastLine(Range range, IBrush? foreground = null, IBrush? background = null)
     {
         Debug.Assert(_lines.Count > 0);
 
         var line = _lines.Last();
-        length = Math.Min(length, line.Text.Length - charIndex);
-        if (length <= 0)
-            return;
-
-        line.AddFormatting(charIndex, length, foreground, background);
+        try
+        {
+            var (begin, length) = range.GetOffsetAndLength(line.Text.Length);
+            
+            if (length > 0)
+                line.AddFormatting(begin, length, foreground, background);
+        }
+        catch (ArgumentOutOfRangeException ex)
+        {
+            Log.Warning(ex, "Applied invalid range to formatting line: {Range}", range);
+        }
     }
 
+    public void SetBackgroundToLastLine(IBrush? background)
+    {
+        Debug.Assert(_lines.Count > 0);
+
+        var line = _lines.Last();
+        line.Background = background;
+        _lines[^1] = line;
+    }
+    
     /// <summary>
     /// Gets position of the character in the text pointed by <paramref name="position"/> (usually mouse cursor)
     /// </summary>
@@ -155,7 +179,7 @@ internal class TextArea : Control
     private void RenderAllLines(DrawingContext dc)
     {
         var lineHeight = GetLineHeight();
-        var cursor = new Point(0, 0);
+        var cursor = new Point(Padding.Left, Padding.Top);
         for (int lineIndex = 0; lineIndex < _lines.Count; lineIndex++)
         {
             RenderLine(dc, lineIndex, cursor);
@@ -166,6 +190,9 @@ internal class TextArea : Control
     private void RenderLine(DrawingContext dc, int lineIndex, Point cursor)
     {
         var line = _lines[lineIndex];
+        RenderLineBackground(dc, cursor, line.Background);
+        using var _ = ClipTextAreaToPadding(dc);
+        
         for (int formattingIndex = 0; formattingIndex < line.Formattings.Count; formattingIndex++)
         {
             var (text, formatting) = line.GetTextSpan(formattingIndex);
@@ -174,6 +201,14 @@ internal class TextArea : Control
         }
     }
 
+    private IDisposable ClipTextAreaToPadding(DrawingContext dc)
+    {
+        Rect clipRect = new(
+            Padding.Left, Padding.Top,
+            Bounds.Width - Padding.Left - Padding.Right,
+            Bounds.Height - Padding.Top - Padding.Bottom);
+        return dc.PushClip(clipRect);
+    }
     private double RenderTextWithFormatting(DrawingContext dc, string text, Line.Formatting formatting, Point cursor)
     {
         var formattedText = FormatText(text);
@@ -188,6 +223,14 @@ internal class TextArea : Control
         dc.DrawText(formattedText, cursor);
 
         return textWidth;
+    }
+
+    private void RenderLineBackground(DrawingContext dc, Point cursor, IBrush? background)
+    {
+        if (background == null)
+            return;
+        
+        dc.FillRectangle(background, new Rect(0, cursor.Y, Bounds.Width, GetLineHeight()));
     }
 
     private double GetLineWidth(string line)
@@ -207,11 +250,12 @@ internal class TextArea : Control
             Foreground);
     }
 
-    private readonly struct Line
+    private struct Line
     {
         public readonly string Text;
         public readonly RangeList<Formatting> Formattings = new();
-
+        public IBrush? Background { get; set; }
+        
         public Line(string text)
         {
             Text = text;

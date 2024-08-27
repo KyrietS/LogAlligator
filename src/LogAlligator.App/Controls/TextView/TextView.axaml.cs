@@ -20,6 +20,7 @@ public partial class TextView : UserControl
 
     private TextSelection _selection = new();
     private bool _selectionOngoing = false;
+    private (int Line, int Char)? _caretPosition = null;
 
 
     private static readonly StyledProperty<IBrush> HighlightBackgroundProperty =
@@ -81,33 +82,35 @@ public partial class TextView : UserControl
     {
         _numberOfLines = Math.Min(_lines.Count, TextArea.NumberOfLinesThatCanFit);
         TextArea.Clear();
+        LineNumbers.NumberOfLines = _numberOfLines;
+        
         for (int i = 0; i < _numberOfLines; i++)
         {
             int lineIndex = _topLineIndex + i;
-
             if (lineIndex >= _lines.Count)
                 break;
 
-            TextArea.AppendLine(_lines[lineIndex]);
-            if (i == 0)
-            {
-                TextArea.AppendFormattingToLastLine(7, 4, background: new SolidColorBrush(Colors.GreenYellow));
-                TextArea.AppendFormattingToLastLine(5, 3, background: new SolidColorBrush(Colors.Magenta));
-                TextArea.AppendFormattingToLastLine(20, 15, background: HighlightBackground, foreground: HighlightForeground);
-            }
+            LineNumbers[i] = lineIndex + 1;
+            
+            var line = _lines[lineIndex];
+            TextArea.AppendLine(line);
 
+            if (lineIndex == _caretPosition?.Line)
+            {
+                var textAreaFontColor = TextArea.Foreground as SolidColorBrush;
+                TextArea.SetBackgroundToLastLine(new SolidColorBrush(textAreaFontColor!.Color, 0.1));
+                LineNumbers.SetLineBackground(i, new SolidColorBrush(textAreaFontColor!.Color, 0.1));
+            }
+            
             if (_selection.GetSelectionAtLine(lineIndex) is var (begin, end))
             {
                 int selectionBegin = begin ?? 0;
-                int selectionEnd = end ?? _lines[lineIndex].Length;
-                int selectionLength = selectionEnd - selectionBegin;
-                TextArea.AppendFormattingToLastLine(selectionBegin, selectionLength, HighlightForeground, HighlightBackground);
+                int selectionEnd = end ?? line.Length;
+                TextArea.AppendFormattingToLastLine((selectionBegin .. selectionEnd), HighlightForeground, HighlightBackground);
             }
 
             _maxLineWidth = Math.Max(_maxLineWidth, TextArea.MaxLineWidth);
         }
-        LineNumbers.FirstLineNumber = _topLineIndex + 1;
-        LineNumbers.NumberOfLines = _numberOfLines;
 
         UpdateVerticalScroll();
         UpdateHorizontalScroll();
@@ -158,6 +161,8 @@ public partial class TextView : UserControl
             var cursor = pointer.Position;
             var (lineIndex, charIndex) = TextArea.GetCharIndexAtPosition(cursor);
             lineIndex += _topLineIndex;
+            _caretPosition = (lineIndex, charIndex);
+            
             if (e.ClickCount == 1)
                 _selection.SetBegin(lineIndex, charIndex);
             else if (e.ClickCount == 2)
@@ -187,6 +192,8 @@ public partial class TextView : UserControl
             var cursor = pointer.Position;
             var (lineIndex, charIndex) = TextArea.GetCharIndexAtPosition(cursor);
             lineIndex += _topLineIndex;
+            _caretPosition = (lineIndex, charIndex);
+            
             _selection.SetEnd(lineIndex, charIndex);
             LoadData();
         }
@@ -251,7 +258,7 @@ public partial class TextView : UserControl
     private void UpdateHorizontalScroll()
     {
         HorizontalScrollBar.Minimum = 0;
-        HorizontalScrollBar.Maximum = _maxLineWidth - TextAreaContainer.Bounds.Width + 5;
+        HorizontalScrollBar.Maximum = _maxLineWidth - TextAreaContainer.Bounds.Width + TextArea.Padding.Left + TextArea.Padding.Right;
         HorizontalScrollBar.ViewportSize = TextAreaContainer.Bounds.Width;
         HorizontalScrollBar.Value = Math.Clamp(HorizontalScrollBar.Value, HorizontalScrollBar.Minimum, HorizontalScrollBar.Maximum);
 
@@ -268,6 +275,7 @@ public partial class TextView : UserControl
             var cursor = pointer.Position;
             int lineNumber = LineNumbers.GetLineNumberAtPosition(cursor);
             int lineIndex = lineNumber - 1;
+            _caretPosition = (lineIndex, 0);
             _selection.SetBeginLine(lineIndex);
             LoadData();
             e.Handled = true;
@@ -290,6 +298,7 @@ public partial class TextView : UserControl
             var cursor = pointer.Position;
             int lineNumber = LineNumbers.GetLineNumberAtPosition(cursor);
             int lineIndex = lineNumber - 1;
+            _caretPosition = (lineIndex, 0);
             _selection.SetEndLine(lineIndex);
             LoadData();
             e.Handled = true;
