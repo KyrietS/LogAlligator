@@ -80,25 +80,22 @@ public partial class TextView : UserControl
 
     private void LoadData()
     {
-        _numberOfLines = Math.Min(_lines.Count, TextArea.NumberOfLinesThatCanFit);
-        TextArea.Clear();
+        _numberOfLines = Math.Min(_lines.Count - _topLineIndex, TextArea.NumberOfLinesThatCanFit);
+        TextArea.NumberOfLines = _numberOfLines;
         LineNumbers.NumberOfLines = _numberOfLines;
         
         for (int i = 0; i < _numberOfLines; i++)
         {
             int lineIndex = _topLineIndex + i;
-            if (lineIndex >= _lines.Count)
-                break;
+            var line = _lines[lineIndex];
 
             LineNumbers[i] = lineIndex + 1;
-            
-            var line = _lines[lineIndex];
-            TextArea.AppendLine(line);
+            TextArea[i] = line;
 
             if (lineIndex == _caretPosition?.Line)
             {
                 var textAreaFontColor = TextArea.Foreground as SolidColorBrush;
-                TextArea.SetBackgroundToLastLine(new SolidColorBrush(textAreaFontColor!.Color, 0.1));
+                TextArea.SetLineBackground(i, new SolidColorBrush(textAreaFontColor!.Color, 0.1));
                 LineNumbers.SetLineBackground(i, new SolidColorBrush(textAreaFontColor!.Color, 0.1));
             }
             
@@ -106,19 +103,16 @@ public partial class TextView : UserControl
             {
                 int selectionBegin = begin ?? 0;
                 int selectionEnd = end ?? line.Length;
-                TextArea.AppendFormattingToLastLine((selectionBegin .. selectionEnd), HighlightForeground, HighlightBackground);
+                TextArea.AppendFormattingToLine(i, (selectionBegin .. selectionEnd), HighlightForeground, HighlightBackground);
             }
-
-            _maxLineWidth = Math.Max(_maxLineWidth, TextArea.MaxLineWidth);
         }
+        _maxLineWidth = Math.Max(_maxLineWidth, TextArea.MaxLineWidth);
 
         UpdateVerticalScroll();
         UpdateHorizontalScroll();
 
         LineNumbers.InvalidateVisual();
         TextArea.InvalidateVisual();
-
-        _maxLineWidth = Math.Max(_maxLineWidth, TextArea.MaxLineWidth);
     }
 
     protected override void OnSizeChanged(SizeChangedEventArgs e)
@@ -206,12 +200,13 @@ public partial class TextView : UserControl
 
     private void SelectWord(int lineIndex, int charIndex)
     {
-        if (_lines[lineIndex].Length == 0)
-            return;
-        if (charIndex >= _lines[lineIndex].Length)
-            charIndex = _lines[lineIndex].Length - 1;
-
+        lineIndex = Math.Clamp(lineIndex, 0, _lines.Count - 1);
         var line = _lines[lineIndex];
+
+        if (line.Length == 0)
+            return;
+        
+        charIndex = Math.Clamp(charIndex, 0, line.Length - 1);
         int begin = charIndex;
         int end = charIndex;
         char originChar = line[charIndex];

@@ -1,5 +1,4 @@
 using System;
-using System.Collections.Generic;
 using System.Diagnostics;
 using System.Globalization;
 using System.Linq;
@@ -13,7 +12,7 @@ namespace LogAlligator.App.Controls;
 
 internal class TextArea : Control
 {
-    private readonly List<Line> _lines = [];
+    private Line[] _lines = [];
 
     public static readonly StyledProperty<IBrush> BackgroundProperty =
         AvaloniaProperty.Register<TextArea, IBrush>(nameof(Background), new SolidColorBrush(Colors.Transparent));
@@ -53,35 +52,40 @@ internal class TextArea : Control
     
     public FontFamily FontFamily { get; set; } = FontFamily.Default;
 
-    public double MaxLineWidth { get; private set; }
-    public int NumberOfLinesThatCanFit => (int)Math.Ceiling(Bounds.Height / GetLineHeight());
-
-    public TextArea()
+    public int NumberOfLines
     {
-        ClipToBounds = true;
-
-        if (Design.IsDesignMode)
+        get => _lines.Length;
+        set
         {
-            _lines.Add(new Line("Sample text"));
+            if (value != _lines.Length)
+            {
+                _lines = new Line[value];
+            }
         }
     }
+    public double MaxLineWidth { get; private set; }
+    public int NumberOfLinesThatCanFit => (int)Math.Ceiling(Bounds.Height / GetLineHeight());
 
     static TextArea()
     {
         FontSizeProperty.Changed.AddClassHandler<TextArea>((o, _) => o.InvalidateVisual());
     }
 
-    public void AppendLine(string line)
+    public string this[int index]
     {
-        _lines.Add(new Line(line));
-        MaxLineWidth = Math.Max(MaxLineWidth, GetLineWidth(line));
+        get => _lines[index].Text;
+        set
+        {
+            _lines[index] = new Line(value);
+            MaxLineWidth = Math.Max(MaxLineWidth, GetLineWidth(value));
+        }
     }
 
-    public void AppendFormattingToLastLine(Range range, IBrush? foreground = null, IBrush? background = null)
+    public void AppendFormattingToLine(int lineIndex, Range range, IBrush? foreground = null, IBrush? background = null)
     {
-        Debug.Assert(_lines.Count > 0);
+        Debug.Assert(_lines.Length > 0);
 
-        var line = _lines.Last();
+        var line = _lines[lineIndex];
         try
         {
             var (begin, length) = range.GetOffsetAndLength(line.Text.Length);
@@ -95,13 +99,10 @@ internal class TextArea : Control
         }
     }
 
-    public void SetBackgroundToLastLine(IBrush? background)
+    public void SetLineBackground(int lineIndex, IBrush? background)
     {
-        Debug.Assert(_lines.Count > 0);
-
-        var line = _lines.Last();
-        line.Background = background;
-        _lines[^1] = line;
+        Debug.Assert(_lines.Length > 0);
+        _lines[lineIndex].Background = background;
     }
     
     /// <summary>
@@ -130,10 +131,10 @@ internal class TextArea : Control
     {
         var lineIndex = (int)(position.Y / GetLineHeight());
 
-        if (lineIndex < 0 || _lines.Count == 0)
+        if (lineIndex < 0 || _lines.Length == 0)
             return (0, 0);
-        if (lineIndex >= _lines.Count)
-            return (_lines.Count - 1, _lines.Last().Text.Length);
+        if (lineIndex >= _lines.Length)
+            return (_lines.Length - 1, _lines.Last().Text.Length);
 
         var line = _lines[lineIndex].Text;
         double cursor = 0;
@@ -160,13 +161,6 @@ internal class TextArea : Control
         return (lineIndex, charIndex - 1);
     }
 
-    public void Clear()
-    {
-        _lines.Clear();
-        MaxLineWidth = 0;
-    }
-
-
     public override void Render(DrawingContext dc)
     {
         base.Render(dc);
@@ -180,7 +174,7 @@ internal class TextArea : Control
     {
         var lineHeight = GetLineHeight();
         var cursor = new Point(Padding.Left, Padding.Top);
-        for (int lineIndex = 0; lineIndex < _lines.Count; lineIndex++)
+        for (int lineIndex = 0; lineIndex < _lines.Length; lineIndex++)
         {
             RenderLine(dc, lineIndex, cursor);
             cursor = new Point(cursor.X, cursor.Y + lineHeight);

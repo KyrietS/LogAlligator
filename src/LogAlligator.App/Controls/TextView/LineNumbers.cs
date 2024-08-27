@@ -1,3 +1,5 @@
+using System;
+using System.Diagnostics;
 using System.Globalization;
 using Avalonia;
 using Avalonia.Controls;
@@ -59,8 +61,10 @@ internal class LineNumbers : Control
 
     public int GetLineNumberAtPosition(Point position)
     {
+        Debug.Assert(_lineNumbers.Length > 0);
+        
         int lineIndex = (int)(position.Y / GetLineHeight());
-        return GetLineNumber(lineIndex);
+        return GetLineNumber(Math.Clamp(lineIndex, 0, _lineNumbers.Length - 1));
     }
 
     public void SetLineBackground(int index, IBrush? background)
@@ -96,7 +100,7 @@ internal class LineNumbers : Control
         }
     }
     
-    private int GetLineNumber(int index)
+    private int GetLineNumber(Index index)
     {
         return _lineNumbers[index].Number;
     }
