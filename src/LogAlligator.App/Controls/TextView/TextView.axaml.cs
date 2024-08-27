@@ -208,6 +208,8 @@ public partial class TextView : UserControl
     {
         if (_lines[lineIndex].Length == 0)
             return;
+        if (charIndex >= _lines[lineIndex].Length)
+            charIndex = _lines[lineIndex].Length - 1;
 
         var line = _lines[lineIndex];
         int begin = charIndex;
