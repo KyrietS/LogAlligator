@@ -18,8 +18,8 @@ public class BufferedFileLineProvider(Uri path) : ILineProvider
         await LoadLinesData(progressCallback, token);
         
         const FileOptions fileOptions = FileOptions.RandomAccess; // profile if better: FileOptions.SequentialScan;
-        _stream = new FileStream(path.AbsolutePath, FileMode.Open, FileAccess.Read, FileShare.Read, 4096, fileOptions);
-        _reader = new StreamReader(_stream, Encoding.UTF8, true, 4096, true);
+        _stream = new FileStream(path.AbsolutePath, FileMode.Open, FileAccess.Read, FileShare.Read, 65536, fileOptions);
+        _reader = new StreamReader(_stream, Encoding.UTF8, true, 300, true);
     }
 
     private async Task LoadLinesData(Action<int> progressCallback, CancellationToken token)
