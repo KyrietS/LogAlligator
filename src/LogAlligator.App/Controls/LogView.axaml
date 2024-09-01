@@ -3,8 +3,12 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:controls="clr-namespace:LogAlligator.App.Controls"
-             mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+             mc:Ignorable="d" d:DesignWidth="700" d:DesignHeight="350"
+             DataContext="{Binding RelativeSource={RelativeSource Self}}"
              x:Class="LogAlligator.App.Controls.LogView">
+    <UserControl.KeyBindings>
+        <KeyBinding Gesture="Ctrl + F" Command="{Binding FocusOnSearch}" />
+    </UserControl.KeyBindings>
     <DockPanel>
         <Border DockPanel.Dock="Bottom"
                 Padding="2">
@@ -23,13 +27,19 @@
                         <Setter Property="Padding" Value="4 2"></Setter>
                     </Style>
                 </StackPanel.Styles>
-                <TextBox Watermark="Search"/>
-                <Button Width="21" Height="20" 
-                        Name="TopButtonik"
+                <TextBox Name="SearchBox" Watermark="Search">
+                    <TextBox.KeyBindings>
+                        <KeyBinding Gesture="Enter" Command="{Binding SearchDown}"/>
+                        <KeyBinding Gesture="Shift+Enter" Command="{Binding SearchUp}" />
+                    </TextBox.KeyBindings>
+                </TextBox>
+                <Button Width="21" Height="20"
+                        Command="{Binding SearchDown}"
                         ToolTip.Tip="Search down" ToolTip.Placement="Top" ToolTip.VerticalOffset="0">
                     <Image Source="/Assets/Icons/arrow-270.png" Stretch="Fill" />
                 </Button>
                 <Button Width="21" Height="20"
+                        Command="{Binding SearchUp}"
                         ToolTip.Tip="Search up" ToolTip.Placement="Top" ToolTip.VerticalOffset="0">
                     <Image Source="/Assets/Icons/arrow-090.png" Stretch="Fill" />
                 </Button>

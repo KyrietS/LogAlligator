@@ -5,20 +5,20 @@
         xmlns:controls="clr-namespace:LogAlligator.App.Controls"
         mc:Ignorable="d" d:DesignWidth="850" d:DesignHeight="300"
         x:Class="LogAlligator.App.MainWindow"
+        DataContext="{Binding RelativeSource={RelativeSource Self}}"
         Title="LogAlligator App"
         Width="850"
         Height="400"
         ShowActivated="True">
-
     <DockPanel>
         <Menu DockPanel.Dock="Top" Name="MainMenuBar">
             <MenuItem Header="_File">
                 <MenuItem Header="_Open..." Click="MenuBar_Open_OnClick"/>
                 <Separator />
-                <MenuItem Header="_Exit" Command="{Binding $parent[Window].OnExit}" />
+                <MenuItem Header="_Exit" Command="{Binding OnExit}" />
             </MenuItem>
-            <MenuItem Header="Load data" Command="{Binding $parent[Window].OnLoadData}" />
-            <MenuItem Header="Switch theme" Command="{Binding $parent[Window].OnSwitchTheme}" />
+            <MenuItem Header="Load data" Command="{Binding OnLoadData}" />
+            <MenuItem Header="Switch theme" Command="{Binding OnSwitchTheme}" />
         </Menu>
 
         <controls:StatusBar DockPanel.Dock="Bottom" />

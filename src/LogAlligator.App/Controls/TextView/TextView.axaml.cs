@@ -39,6 +39,26 @@ public partial class TextView : UserControl
         set => SetValue(HighlightForegroundProperty, value);
     }
 
+    public (int Line, int Char)? CaretPosition
+    {
+        get => _caretPosition;
+        set
+        {
+            if (value == null)
+            {
+                _caretPosition = null;
+                return;
+            }
+            
+            if (value.Value.Line < 0 || value.Value.Line >= _lines.Count)
+                throw new ArgumentOutOfRangeException(nameof(value), value, "Caret line position out of range");
+            if (value.Value.Char > _lines[value.Value.Line].Length)
+                throw new ArgumentOutOfRangeException(nameof(value), value, "Caret char position out of range");
+            
+            _caretPosition = value;
+        }
+    }
+
     public TextView()
     {
         InitializeComponent();
@@ -78,6 +98,24 @@ public partial class TextView : UserControl
         LoadData();
     }
 
+    public void ScrollToLine(int lineIndex)
+    {
+        VerticalScrollBar.Value = Math.Max(0, lineIndex - TextArea.NumberOfLines / 2);
+        UpdateVerticalScroll();
+    }
+
+    public void SelectText(int lineIndex, int begin, int length)
+    {
+        CaretPosition = (lineIndex, begin);
+        _selection.SetBegin(lineIndex, begin);
+        _selection.SetEnd(lineIndex, begin + length);
+    }
+    
+    public void Refresh()
+    {
+        LoadData();
+    }
+    
     private void LoadData()
     {
         _numberOfLines = Math.Min(_lines.Count - _topLineIndex, TextArea.NumberOfLinesThatCanFit);

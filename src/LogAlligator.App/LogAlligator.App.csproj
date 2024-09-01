@@ -12,6 +12,7 @@
         <!-- <SelfContained>true</SelfContained> -->
         <!-- <PublishTrimmed>true</PublishTrimmed> -->
         <!-- <TrimMode>partial</TrimMode> -->
+        <AvaloniaUseCompiledBindingsByDefault>true</AvaloniaUseCompiledBindingsByDefault>
     </PropertyGroup>
 
     <ItemGroup>
