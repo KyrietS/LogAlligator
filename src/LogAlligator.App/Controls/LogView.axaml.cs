@@ -66,7 +66,7 @@ public partial class LogView : UserControl
             return false;
 
         int begin = line.IndexOf(searchPhrase, StringComparison.InvariantCultureIgnoreCase);
-        Log.Debug("Found search phrase at line: {lineIndex}", lineIndex);
+        Log.Debug("Found \"{searchPhrase}\" at line: {lineIndex}", searchPhrase, lineIndex);
         TextView.ScrollToLine(lineIndex);
         TextView.SelectText(lineIndex, begin, searchPhrase.Length);
         TextView.Refresh();
