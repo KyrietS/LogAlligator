@@ -36,6 +36,8 @@ internal struct TextSelection
 
     public (int LineIndex, int CharIndex) Begin => (_begin.LineIndex, _begin.CharIndex);
     public (int LineIndex, int CharIndex) End => (_end.LineIndex, _end.CharIndex);
+    public (int LineIndex, int CharIndex) Start => (SelectionStart.LineIndex, SelectionStart.CharIndex);
+    public (int LineIndex, int CharIndex) Stop => (SelectionStop.LineIndex, SelectionStop.CharIndex);
 
     /// <summary>
     /// Sets the starting point of a selection. This will also set the ending point.

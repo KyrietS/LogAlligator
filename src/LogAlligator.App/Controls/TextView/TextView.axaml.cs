@@ -1,4 +1,6 @@
 using System;
+using System.Text;
+using System.Threading.Tasks;
 using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Controls.Primitives;
@@ -8,6 +10,9 @@ using Avalonia.Media;
 using Avalonia.Utilities;
 using LogAlligator.App.LineProvider;
 using LogAlligator.App.Utils;
+using MsBox.Avalonia;
+using MsBox.Avalonia.Enums;
+using Serilog;
 
 namespace LogAlligator.App.Controls;
 
@@ -114,6 +119,69 @@ public partial class TextView : UserControl
     public void Refresh()
     {
         LoadData();
+    }
+
+    public async Task CopyToClipboard()
+    {
+        try
+        {
+            var selectedText = GetSelectedText();
+
+            if (selectedText.Length > 1_000_000)
+            {
+                var box = MessageBoxManager
+                    .GetMessageBoxStandard("Error",
+                        "Selected more than 1 million characters.\nCannot copy that many to clipboard", ButtonEnum.Ok,
+                        Icon.Error, WindowStartupLocation.CenterOwner);
+                await box.ShowWindowDialogAsync(this.VisualRoot as Window);
+                return;
+            }
+
+            var window = this.VisualRoot as Window ?? throw new InvalidOperationException("Cannot get window");
+            var clipboard = window.Clipboard ?? throw new InvalidOperationException("Cannot get clipboard");
+
+            await clipboard.SetTextAsync(selectedText);
+            Log.Debug("Copied selected text to clipboard: {selectedText}", selectedText);
+        }
+        catch (Exception e)
+        {
+            Log.Warning("Error when tried to copy selected text to clipboard");
+            Log.Warning("Exception: {Exception}", e);
+        }
+    }
+
+    string GetSelectedText()
+    {
+        if (_selection.Start == _selection.Stop)
+            return string.Empty;
+        
+        StringBuilder sb = new();
+        for (int lineIndex = _selection.Start.LineIndex; lineIndex <= _selection.Stop.LineIndex; lineIndex++)
+        {
+            var line = _lines[lineIndex];
+            
+            if (lineIndex == _selection.Start.LineIndex && lineIndex == _selection.Stop.LineIndex)
+            {
+                sb.Append(line[_selection.Start.CharIndex.._selection.Stop.CharIndex]);
+            }
+            else if (lineIndex == _selection.Start.LineIndex)
+            {
+                sb.Append(line[_selection.Start.CharIndex..]);
+            }
+            else if (lineIndex == _selection.Stop.LineIndex)
+            {
+                sb.Append(line[.._selection.Stop.CharIndex]);
+            }
+            else
+            {
+                sb.Append(line);
+            }
+
+            sb.Append(Environment.NewLine);
+        }
+
+        sb.Remove(sb.Length - Environment.NewLine.Length, Environment.NewLine.Length);
+        return sb.ToString();
     }
     
     private void LoadData()
