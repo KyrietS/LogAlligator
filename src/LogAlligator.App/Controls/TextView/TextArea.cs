@@ -137,7 +137,7 @@ internal class TextArea : Control
             return (_lines.Length - 1, _lines.Last().Text.Length);
 
         var line = _lines[lineIndex].Text;
-        double cursor = 0;
+        double cursor = Padding.Left;
         var charIndex = 0;
         double previousWidth = 0;
 
@@ -154,7 +154,7 @@ internal class TextArea : Control
             var textFragment = line.Substring(0, charIndex);
             var textWidth = GetLineWidth(textFragment);
             var letterWidth = textWidth - previousWidth;
-            cursor = textWidth - letterWidth / 2;
+            cursor = Padding.Left + textWidth - letterWidth / 2;
             previousWidth = textWidth;
         } while (position.X > cursor);
 
