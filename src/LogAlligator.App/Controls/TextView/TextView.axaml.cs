@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Text;
 using System.Threading.Tasks;
 using Avalonia;
@@ -27,6 +28,7 @@ public partial class TextView : UserControl
     private bool _selectionOngoing = false;
     private (int Line, int Char)? _caretPosition = null;
 
+    private List<string> _highlights = new();
 
     private static readonly StyledProperty<IBrush> HighlightBackgroundProperty =
     AvaloniaProperty.Register<TextView, IBrush>(nameof(HighlightBackground), new SolidColorBrush(Color.FromRgb(0, 120, 215)));
@@ -121,6 +123,12 @@ public partial class TextView : UserControl
         LoadData();
     }
 
+    public void AddHighlight(string text)
+    {
+        _highlights.Add(text);
+        Refresh();
+    }
+
     public async Task CopyToClipboard()
     {
         try
@@ -150,7 +158,7 @@ public partial class TextView : UserControl
         }
     }
 
-    string GetSelectedText()
+    public string GetSelectedText()
     {
         if (_selection.Start == _selection.Stop)
             return string.Empty;
@@ -204,7 +212,21 @@ public partial class TextView : UserControl
                 TextArea.SetLineBackground(i, new SolidColorBrush(textAreaFontColor!.Color, 0.1));
                 LineNumbers.SetLineBackground(i, new SolidColorBrush(textAreaFontColor!.Color, 0.1));
             }
-            
+
+            foreach (var highlight in _highlights)
+            {
+                int index = 0;
+                while (index < line.Length)
+                {
+                    index = line.IndexOf(highlight, index, StringComparison.OrdinalIgnoreCase);
+                    if (index == -1)
+                        break;
+
+                    TextArea.AppendFormattingToLine(i, (index..(index + highlight.Length)), background: new SolidColorBrush(Colors.Yellow));
+                    index += highlight.Length;
+                }
+            }
+
             if (_selection.GetSelectionAtLine(lineIndex) is var (begin, end))
             {
                 int selectionBegin = begin ?? 0;

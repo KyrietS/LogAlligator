@@ -1,4 +1,5 @@
-using System;
+﻿using System;
+using System.Diagnostics;
 using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
@@ -36,6 +37,13 @@ public partial class FileView : UserControl
         InitializeComponent();
     }
     
+    public void AddHighlight()
+    {
+        var selection = LogView.TextView.GetSelectedText();
+        LogView.TextView.AddHighlight(selection);
+        Log.Debug("Highlight {selection}", selection);
+    }
+
     private void OnLoadDataCancel(object? sender, RoutedEventArgs e)
     {
         if (_loadTask == null)
