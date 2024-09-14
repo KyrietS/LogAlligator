@@ -1,0 +1,32 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        mc:Ignorable="d" d:DesignWidth="350" d:DesignHeight="155"
+        DataContext="{Binding RelativeSource={RelativeSource Self}}"
+        x:Class="LogAlligator.App.Controls.GrepDialog"
+        Title="Grep"
+        Width="350"
+        Height="155"
+        CanResize="False"
+        ShowInTaskbar="False"
+        ExtendClientAreaChromeHints="NoChrome"
+        ExtendClientAreaToDecorationsHint="True"
+        WindowStartupLocation="CenterOwner"
+        ShowActivated="True">
+    <Window.KeyBindings>
+        <KeyBinding Gesture="Escape" Command="{Binding OnEscape}" />
+    </Window.KeyBindings>
+    <StackPanel Margin="10" Spacing="2">
+        <TextBlock>Grep:</TextBlock>
+        <TextBox Name="GrepTextBox" Focusable="True"/>
+        <Separator Height="6" Background="Transparent"/>
+        <CheckBox>Regular expression</CheckBox>
+        <CheckBox IsChecked="True">Case insensitive</CheckBox>
+        <CheckBox>Inverted</CheckBox>
+        <StackPanel FlowDirection="RightToLeft" Orientation="Horizontal" Spacing="5">
+            <Button Click="OnCancelClick" Width="60">Cancel</Button>
+            <Button Click="OnOkClick" Width="60" IsDefault="True">OK</Button>
+        </StackPanel>
+    </StackPanel>
+</Window>

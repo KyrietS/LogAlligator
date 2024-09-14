@@ -8,6 +8,7 @@
              x:Class="LogAlligator.App.Controls.FileView">
     <UserControl.KeyBindings>
         <KeyBinding Gesture="Ctrl + M" Command="{Binding AddHighlight}" />
+        <KeyBinding Gesture="Ctrl + G" Command="{Binding AddGrep}" />
     </UserControl.KeyBindings>
     <Border BorderBrush="{DynamicResource ThemeControlMidBrush}"
             BorderThickness="1">

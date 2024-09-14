@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Diagnostics;
 using System.IO;
 using System.Threading;
@@ -23,7 +23,8 @@ public partial class FileView : UserControl
     private CancellationTokenSource? _loadTaskCancellationToken = null;
     private readonly Uri? _filePath;
     private LoadingDataDialog? _loadingDialog = null;
-    
+    private GrepDialog? _grepDialog = null;
+
     public event EventHandler? RemovalRequested;
     public Uri FilePath
     {
@@ -35,14 +36,14 @@ public partial class FileView : UserControl
             _filePath = value;
         }
     }
-    
+
     public FileView()
     {
         InitializeComponent();
 
         _highlights.OnChange += (sender, args) => LogView.TextView.Refresh();
     }
-    
+
     public void AddHighlight()
     {
         var selection = LogView.TextView.GetSelectedText();
@@ -59,13 +60,28 @@ public partial class FileView : UserControl
         Log.Debug("Highlight {selection}", selection);
     }
 
+    public async void AddGrep()
+    {
+        try
+        {
+            _grepDialog = new GrepDialog();
+            var pattern = await _grepDialog.ShowDialog<string?>((this.VisualRoot as Window)!);
+            Log.Debug("Grep pattern: {pattern}", pattern);
+        }
+        finally
+        {
+            _grepDialog?.Close();
+            _grepDialog = null;
+        }
+    }
+
     private void OnLoadDataCancel(object? sender, RoutedEventArgs e)
     {
         if (_loadTask == null)
             return;
         if (_loadTask.IsCompleted)
             return;
-        
+
         _loadTaskCancellationToken?.Cancel();
     }
 
@@ -73,7 +89,7 @@ public partial class FileView : UserControl
     {
         base.OnAttachedToVisualTree(e);
         if (Design.IsDesignMode) return;
-        
+
         if (FilePath.IsFile && _loadTask == null)
         {
             _loadTask = LoadFile();
@@ -110,14 +126,14 @@ public partial class FileView : UserControl
     {
         _loadTaskCancellationToken = new CancellationTokenSource();
         var lineProvider = new BufferedFileLineProvider(FilePath);
-        
+
         var watch = System.Diagnostics.Stopwatch.StartNew();
         await lineProvider.LoadData(OnLoadProgress, _loadTaskCancellationToken.Token);
         watch.Stop();
         var elapsedMs = watch.ElapsedMilliseconds;
-        
+
         Log.Debug("Loaded {Lines} lines from {FilePath}. It took {ElapsedMs} ms", lineProvider.Count, FilePath, elapsedMs);
-        
+
         LogView.Initialize(lineProvider, _highlights);
         HighlightsView.Initialize(_highlights);
     }
@@ -134,7 +150,7 @@ public partial class FileView : UserControl
         _loadingDialog.CancelButton.Click += OnLoadDataCancel;
         _ = _loadingDialog.ShowDialog((this.VisualRoot as Window)!);
     }
-    
+
     private async Task ShowMessageBoxFileCouldNotBeLoaded()
     {
         var box = MessageBoxManager
