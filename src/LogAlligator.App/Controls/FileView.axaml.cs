@@ -117,6 +117,7 @@ public partial class FileView : UserControl
         Log.Debug("Loaded {Lines} lines from {FilePath}. It took {ElapsedMs} ms", lineProvider.Count, FilePath, elapsedMs);
         
         LogView.Initialize(lineProvider, _highlights);
+        HighlightsView.Initialize(_highlights);
     }
 
     private void OnLoadProgress(int progress)

@@ -22,7 +22,9 @@
                     BorderThickness="1">
                 <TabControl Padding="0 1 0 0">
                     <TabItem Header="Bookmarks"></TabItem>
-                    <TabItem Header="Highlights"></TabItem>
+                    <TabItem Header="Highlights">
+                      <controls:HighlightsView Name="HighlightsView" />
+                    </TabItem>
                     <TabItem Header="Plugins" IsEnabled="False"></TabItem>
                 </TabControl>
             </Border>
