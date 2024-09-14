@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Diagnostics;
 using System.IO;
 using System.Threading;
@@ -6,7 +6,9 @@ using System.Threading.Tasks;
 using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Interactivity;
+using Avalonia.Media;
 using LogAlligator.App.LineProvider;
+using LogAlligator.App.Utils;
 using MsBox.Avalonia;
 using MsBox.Avalonia.Enums;
 using Serilog;
@@ -15,6 +17,8 @@ namespace LogAlligator.App.Controls;
 
 public partial class FileView : UserControl
 {
+    private Highlights _highlights = new();
+
     private Task? _loadTask = null;
     private CancellationTokenSource? _loadTaskCancellationToken = null;
     private readonly Uri? _filePath;
@@ -35,12 +39,21 @@ public partial class FileView : UserControl
     public FileView()
     {
         InitializeComponent();
+
+        _highlights.OnChange += (sender, args) => LogView.TextView.Refresh();
     }
     
     public void AddHighlight()
     {
         var selection = LogView.TextView.GetSelectedText();
-        LogView.TextView.AddHighlight(selection);
+
+        if (_highlights.Contains(selection))
+        {
+            _highlights.Remove(selection);
+            return;
+        }
+
+        _highlights.Add(selection);
         Log.Debug("Highlight {selection}", selection);
     }
 
@@ -103,7 +116,7 @@ public partial class FileView : UserControl
         
         Log.Debug("Loaded {Lines} lines from {FilePath}. It took {ElapsedMs} ms", lineProvider.Count, FilePath, elapsedMs);
         
-        LogView.SetLineProvider(lineProvider);
+        LogView.Initialize(lineProvider, _highlights);
     }
 
     private void OnLoadProgress(int progress)

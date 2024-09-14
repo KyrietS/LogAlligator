@@ -28,7 +28,7 @@ public partial class TextView : UserControl
     private bool _selectionOngoing = false;
     private (int Line, int Char)? _caretPosition = null;
 
-    private List<string> _highlights = new();
+    private Highlights? _highlights;
 
     private static readonly StyledProperty<IBrush> HighlightBackgroundProperty =
     AvaloniaProperty.Register<TextView, IBrush>(nameof(HighlightBackground), new SolidColorBrush(Color.FromRgb(0, 120, 215)));
@@ -98,9 +98,10 @@ public partial class TextView : UserControl
         }
     }
 
-    public void SetLineProvider(ILineProvider lines)
+    public void Initialize(ILineProvider lines, Highlights highlights)
     {
-        this._lines = lines;
+        _lines = lines;
+        _highlights = highlights;
         _topLineIndex = 0;
         LoadData();
     }
@@ -121,12 +122,6 @@ public partial class TextView : UserControl
     public void Refresh()
     {
         LoadData();
-    }
-
-    public void AddHighlight(string text)
-    {
-        _highlights.Add(text);
-        Refresh();
     }
 
     public async Task CopyToClipboard()
@@ -213,17 +208,17 @@ public partial class TextView : UserControl
                 LineNumbers.SetLineBackground(i, new SolidColorBrush(textAreaFontColor!.Color, 0.1));
             }
 
-            foreach (var highlight in _highlights)
+            foreach (var (pattern, background, foreground) in _highlights ?? [])
             {
                 int index = 0;
                 while (index < line.Length)
                 {
-                    index = line.IndexOf(highlight, index, StringComparison.OrdinalIgnoreCase);
+                    index = line.IndexOf(pattern, index, StringComparison.OrdinalIgnoreCase);
                     if (index == -1)
                         break;
 
-                    TextArea.AppendFormattingToLine(i, (index..(index + highlight.Length)), background: new SolidColorBrush(Colors.Yellow));
-                    index += highlight.Length;
+                    TextArea.AppendFormattingToLine(i, (index..(index + pattern.Length)), background: new SolidColorBrush(background));
+                    index += pattern.Length;
                 }
             }
 

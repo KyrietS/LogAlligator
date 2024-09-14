@@ -1,6 +1,7 @@
-﻿using System;
+using System;
 using Avalonia.Controls;
 using LogAlligator.App.LineProvider;
+using LogAlligator.App.Utils;
 using MsBox.Avalonia;
 using MsBox.Avalonia.Enums;
 using Serilog;
@@ -23,10 +24,10 @@ public partial class LogView : UserControl
         SearchBox.SelectAll();
     }
     
-    public void SetLineProvider(ILineProvider lineProvider)
+    internal void Initialize(ILineProvider lineProvider, Highlights highlights)
     {
         _lineProvider = lineProvider;
-        TextView.SetLineProvider(lineProvider);
+        TextView.Initialize(lineProvider, highlights);
     }
 
     // TODO: FIXME: This needs A LOT of optimization. It's much slower than it should be.
