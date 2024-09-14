@@ -46,6 +46,8 @@ public partial class FileView : UserControl
     public void AddHighlight()
     {
         var selection = LogView.TextView.GetSelectedText();
+        if (string.IsNullOrEmpty(selection))
+            return;
 
         if (_highlights.Contains(selection))
         {

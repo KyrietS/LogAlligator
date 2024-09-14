@@ -35,7 +35,7 @@ public class Highlights : IEnumerable<Highlight>
 
     public void Add(string pattern, Color background)
     {
-        if (Contains(pattern))
+        if (pattern.Length == 0 || Contains(pattern))
             return;
 
         _highlights.Add(new Highlight { Pattern = pattern, Background = background });
