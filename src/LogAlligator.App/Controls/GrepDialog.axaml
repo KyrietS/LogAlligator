@@ -21,9 +21,9 @@
         <TextBlock>Grep:</TextBlock>
         <TextBox Name="GrepTextBox" Focusable="True"/>
         <Separator Height="6" Background="Transparent"/>
-        <CheckBox>Regular expression</CheckBox>
-        <CheckBox IsChecked="True">Case insensitive</CheckBox>
-        <CheckBox>Inverted</CheckBox>
+        <CheckBox IsEnabled="False">Regular expression</CheckBox>
+        <CheckBox IsChecked="True" IsEnabled="False">Case insensitive</CheckBox>
+        <CheckBox IsEnabled="False">Inverted</CheckBox>
         <StackPanel FlowDirection="RightToLeft" Orientation="Horizontal" Spacing="5">
             <Button Click="OnCancelClick" Width="60">Cancel</Button>
             <Button Click="OnOkClick" Width="60" IsDefault="True">OK</Button>
