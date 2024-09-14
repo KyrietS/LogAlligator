@@ -71,7 +71,7 @@ public partial class MainWindow : Window
         }
         AddFileTab(file);
     }
-
+    
     public void OnSwitchTheme()
     {
         Application.Current!.RequestedThemeVariant = Application.Current!.ActualThemeVariant == ThemeVariant.Light
@@ -83,7 +83,7 @@ public partial class MainWindow : Window
     {
         Close();
     }
-
+    
     private async void MenuBar_Open_OnClick(object? sender, RoutedEventArgs e)
     {
         var files = await this.StorageProvider.OpenFilePickerAsync(new FilePickerOpenOptions
@@ -113,6 +113,8 @@ public partial class MainWindow : Window
 
         ToolTip.SetTip(fileTab, file.Path.AbsolutePath);
         FileTabs.SelectedIndex = FileTabs.Items.Add(fileTab);
+
+        fileView.Focus();
     }
 
     private ContextMenu CreateFileTabContextMenu(TabItem tab)

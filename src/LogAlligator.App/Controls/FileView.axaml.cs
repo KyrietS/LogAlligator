@@ -117,7 +117,6 @@ public partial class FileView : UserControl
         }
         finally
         {
-            _loadingDialog?.Owner?.Activate();
             _loadingDialog?.Close();
         }
     }
