@@ -71,8 +71,10 @@ public partial class TextView : UserControl
         InitializeComponent();
 
         this.Focusable = true;
+        this.AttachedToVisualTree += (_, _) => Refresh();
         this[!HighlightBackgroundProperty] = new DynamicResourceExtension("HighlightBrush");
         this[!HighlightForegroundProperty] = new DynamicResourceExtension("ThemeBackgroundBrush");
+
 
         LineNumbers.NumberOfLines = _numberOfLines;
         LineNumbers.PointerPressed += LineNumbers_PointerPressed;

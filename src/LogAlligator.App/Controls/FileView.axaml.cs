@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Diagnostics;
 using System.IO;
 using System.Threading;
@@ -25,6 +25,8 @@ public partial class FileView : UserControl
     private LoadingDataDialog? _loadingDialog = null;
     private GrepDialog? _grepDialog = null;
 
+    private LogView? SelectedLogView => RootLogView.GetSelectedView();
+
     public event EventHandler? RemovalRequested;
     public Uri FilePath
     {
@@ -41,12 +43,12 @@ public partial class FileView : UserControl
     {
         InitializeComponent();
 
-        _highlights.OnChange += (sender, args) => LogView.TextView.Refresh();
+        _highlights.OnChange += (_, _) => SelectedLogView?.TextView.Refresh();
     }
 
     public void AddHighlight()
     {
-        var selection = LogView.TextView.GetSelectedText();
+        var selection = SelectedLogView?.TextView.GetSelectedText();
         if (string.IsNullOrEmpty(selection))
             return;
 
@@ -67,6 +69,9 @@ public partial class FileView : UserControl
             _grepDialog = new GrepDialog();
             var pattern = await _grepDialog.ShowDialog<string?>((this.VisualRoot as Window)!);
             Log.Debug("Grep pattern: {pattern}", pattern);
+            if (string.IsNullOrEmpty(pattern))
+                return;
+            SelectedLogView?.AddGrep(pattern);
         }
         finally
         {
@@ -133,7 +138,7 @@ public partial class FileView : UserControl
 
         Log.Debug("Loaded {Lines} lines from {FilePath}. It took {ElapsedMs} ms", lineProvider.Count, FilePath, elapsedMs);
 
-        LogView.Initialize(lineProvider, _highlights);
+        RootLogView.Initialize(lineProvider, _highlights);
         HighlightsView.Initialize(_highlights);
     }
 

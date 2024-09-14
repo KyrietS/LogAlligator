@@ -1,4 +1,4 @@
-﻿<UserControl xmlns="https://github.com/avaloniaui"
+<UserControl xmlns="https://github.com/avaloniaui"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
@@ -9,52 +9,52 @@
     <UserControl.KeyBindings>
         <KeyBinding Gesture="Ctrl + F" Command="{Binding FocusOnSearch}" />
     </UserControl.KeyBindings>
-    <DockPanel>
-        <Border DockPanel.Dock="Bottom"
-                Padding="2">
-            <StackPanel Orientation="Horizontal">
-                <StackPanel.Styles>
-                    <Style Selector="ToggleButton, Button">
-                        <Setter Property="VerticalAlignment" Value="Center" />
-                        <Setter Property="Margin" Value="5 0 0 0" />
-                        <Setter Property="Padding" Value="5 2" />
-                    </Style>
-                    <Style Selector="Button">
-                        <Setter Property="Padding" Value="2 1 1 1"/>
-                    </Style>
-                    <Style Selector="TextBox">
-                        <Setter Property="Width" Value="250"/>
-                        <Setter Property="Padding" Value="4 2"></Setter>
-                    </Style>
-                </StackPanel.Styles>
-                <TextBox Name="SearchBox" Watermark="Search">
-                    <TextBox.KeyBindings>
-                        <KeyBinding Gesture="Enter" Command="{Binding SearchDown}"/>
-                        <KeyBinding Gesture="Shift+Enter" Command="{Binding SearchUp}" />
-                    </TextBox.KeyBindings>
-                </TextBox>
-                <Button Width="21" Height="20"
-                        Command="{Binding SearchDown}"
-                        ToolTip.Tip="Search down" ToolTip.Placement="Top" ToolTip.VerticalOffset="0">
-                    <Image Source="/Assets/Icons/arrow-270.png" Stretch="Fill" />
-                </Button>
-                <Button Width="21" Height="20"
-                        Command="{Binding SearchUp}"
-                        ToolTip.Tip="Search up" ToolTip.Placement="Top" ToolTip.VerticalOffset="0">
-                    <Image Source="/Assets/Icons/arrow-090.png" Stretch="Fill" />
-                </Button>
-                <Panel Width="10" />
-                <ToggleButton Content="_Case sensitive"/>
-                <ToggleButton Content="_RegExp"/>
-                <ToggleButton Content="_Highlight"/>
-                <ToggleButton Content="_All occurrences" IsEnabled="False"/>
-            </StackPanel>
-        </Border>
 
-        <TabControl Padding="0">
-            <TabItem Header="Base">
+    <TabControl Name="Tabs" Padding="0">
+        <TabItem Header="Base">
+            <DockPanel>
+                <Border DockPanel.Dock="Bottom"
+                        Padding="2">
+                    <StackPanel Orientation="Horizontal">
+                        <StackPanel.Styles>
+                            <Style Selector="ToggleButton, Button">
+                                <Setter Property="VerticalAlignment" Value="Center" />
+                                <Setter Property="Margin" Value="5 0 0 0" />
+                                <Setter Property="Padding" Value="5 2" />
+                            </Style>
+                            <Style Selector="Button">
+                                <Setter Property="Padding" Value="2 1 1 1"/>
+                            </Style>
+                            <Style Selector="TextBox">
+                                <Setter Property="Width" Value="250"/>
+                                <Setter Property="Padding" Value="4 2"></Setter>
+                            </Style>
+                        </StackPanel.Styles>
+                        <TextBox Name="SearchBox" Watermark="Search">
+                            <TextBox.KeyBindings>
+                                <KeyBinding Gesture="Enter" Command="{Binding SearchDown}"/>
+                                <KeyBinding Gesture="Shift+Enter" Command="{Binding SearchUp}" />
+                            </TextBox.KeyBindings>
+                        </TextBox>
+                        <Button Width="21" Height="20"
+                                Command="{Binding SearchDown}"
+                                ToolTip.Tip="Search down" ToolTip.Placement="Top" ToolTip.VerticalOffset="0">
+                            <Image Source="/Assets/Icons/arrow-270.png" Stretch="Fill" />
+                        </Button>
+                        <Button Width="21" Height="20"
+                                Command="{Binding SearchUp}"
+                                ToolTip.Tip="Search up" ToolTip.Placement="Top" ToolTip.VerticalOffset="0">
+                            <Image Source="/Assets/Icons/arrow-090.png" Stretch="Fill" />
+                        </Button>
+                        <Panel Width="10" />
+                        <ToggleButton Content="_Case sensitive"/>
+                        <ToggleButton Content="_RegExp"/>
+                        <ToggleButton Content="_Highlight"/>
+                        <ToggleButton Content="_All occurrences" IsEnabled="False"/>
+                    </StackPanel>
+                </Border>
                 <controls:TextView Name="TextView" />
-            </TabItem>
-        </TabControl>
-    </DockPanel>
+            </DockPanel>
+        </TabItem>
+    </TabControl>
 </UserControl>

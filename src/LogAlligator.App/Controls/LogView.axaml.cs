@@ -11,6 +11,7 @@ namespace LogAlligator.App.Controls;
 public partial class LogView : UserControl
 {
     private ILineProvider _lineProvider = new EmptyLineProvider();
+    private Highlights? _highlights = null;
 
     public LogView()
     {
@@ -27,7 +28,28 @@ public partial class LogView : UserControl
     internal void Initialize(ILineProvider lineProvider, Highlights highlights)
     {
         _lineProvider = lineProvider;
+        _highlights = highlights;
         TextView.Initialize(lineProvider, highlights);
+    }
+
+    internal void AddGrep(string pattern)
+    {
+        var logView = new LogView();
+        logView.Initialize(_lineProvider, _highlights!);
+        Tabs.Items.Add(new TabItem { Header = pattern, Content = logView });
+    }
+
+    internal LogView? GetSelectedView()
+    {
+        if (Tabs.SelectedIndex == 0)
+        {
+            return this;
+        }
+        else if (Tabs.SelectedIndex > 0 && Tabs.SelectedItem is TabItem { Content: LogView view })
+        {
+            return view.GetSelectedView();
+        }
+        return null;
     }
 
     // TODO: FIXME: This needs A LOT of optimization. It's much slower than it should be.
