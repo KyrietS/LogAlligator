@@ -16,6 +16,7 @@
     </UserControl.Styles>
     <UserControl.KeyBindings>
         <KeyBinding Gesture="Ctrl + C" Command="{Binding CopyToClipboard}"></KeyBinding>
+        <KeyBinding Gesture="Ctrl + B" Command="{Binding AddBookmark}"></KeyBinding>
     </UserControl.KeyBindings>
 
     <Border Name="TextViewBorder"

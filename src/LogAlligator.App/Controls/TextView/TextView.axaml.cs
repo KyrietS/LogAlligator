@@ -155,6 +155,21 @@ public partial class TextView : UserControl
         }
     }
 
+    public async Task AddBookmark()
+    {
+        var bookmarkDialog = new BookmarkDialog();
+        try
+        {
+            var bookmarkName = await bookmarkDialog.ShowDialog<string?>((VisualRoot as Window)!);
+            Log.Debug("Bookmark name: {BookmarkName}", bookmarkName);
+        }
+        finally
+        {
+            bookmarkDialog?.Close();
+        }
+    }
+
+
     public string GetSelectedText()
     {
         if (_selection.Start == _selection.Stop)
