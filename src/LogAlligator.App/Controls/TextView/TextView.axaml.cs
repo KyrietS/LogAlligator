@@ -116,6 +116,7 @@ public partial class TextView : UserControl
         if (lineIndex == -1)
             return;
 
+        // TODO: If line is already visible, do not scroll - just set caret position
         ScrollToLine(lineIndex);
         _caretPosition = (lineIndex, 0);
     }
