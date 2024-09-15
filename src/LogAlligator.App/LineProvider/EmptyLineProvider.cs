@@ -1,4 +1,5 @@
-﻿using System;
+using System;
+using System.Reflection.Metadata.Ecma335;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -10,4 +11,6 @@ public class EmptyLineProvider : ILineProvider
     public int Count => 0;
     public string this[int index] => throw new IndexOutOfRangeException();
     public int GetLineLength(int index) => throw new IndexOutOfRangeException();
+
+    public ILineProvider Grep(Func<string, bool> filter) => this;
 }

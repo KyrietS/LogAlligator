@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
@@ -20,4 +20,9 @@ public class DesignLineProvider : ILineProvider
     public int Count => _lines.Count;
     public string this[int index] => _lines[index];
     public int GetLineLength(int index) => _lines[index].Length;
+
+    public ILineProvider Grep(Func<string, bool> filter)
+    {
+        throw new NotImplementedException();
+    }
 }

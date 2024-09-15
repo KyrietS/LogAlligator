@@ -1,5 +1,6 @@
-﻿using System;
+using System;
 using System.IO;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -41,5 +42,12 @@ public class StupidFileLineProvider(Uri path) : ILineProvider
             throw new ArgumentOutOfRangeException(nameof(index));
         
         return _lines[index].Length;
+    }
+
+    public ILineProvider Grep(Func<string, bool> filter)
+    {
+        var newProvider = new StupidFileLineProvider(path);
+        newProvider._lines = _lines.Where(filter).ToArray();
+        return newProvider;
     }
 }

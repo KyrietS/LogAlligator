@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
@@ -47,10 +48,7 @@ public class BufferedFileLineProvider(Uri path) : ILineProvider
         {
             if (index >= _lines.Count)
                 throw new ArgumentOutOfRangeException(nameof(index), index, "Could not find requested line at: " + index);
-            _reader.BaseStream.Position = _lines[index].Begin;
-            _reader.DiscardBufferedData();
-            string? line = _reader.ReadLine();
-            return line ?? "";
+            return ReadLine(_lines[index].Begin);
         }
     }
 
@@ -60,5 +58,21 @@ public class BufferedFileLineProvider(Uri path) : ILineProvider
             throw new ArgumentOutOfRangeException(nameof(index));
         
         return _lines[index].Length;
+    }
+
+    public ILineProvider Grep(Func<string, bool> filter)
+    {
+        var newProvider = new BufferedFileLineProvider(path);
+        newProvider._stream = _stream;
+        newProvider._reader = _reader;
+        newProvider._lines.AddRange(_lines.Where(line => filter(ReadLine(line.Begin))));
+        return newProvider;
+    }
+
+    private string ReadLine(long begin)
+    {
+        _reader.BaseStream.Position = begin;
+        _reader.DiscardBufferedData();
+        return _reader.ReadLine() ?? "";
     }
 }

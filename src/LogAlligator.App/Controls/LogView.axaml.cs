@@ -35,7 +35,8 @@ public partial class LogView : UserControl
     internal void AddGrep(string pattern)
     {
         var logView = new LogView();
-        logView.Initialize(_lineProvider, _highlights!);
+        var newLineProvider = _lineProvider.Grep(line => line.Contains(pattern, StringComparison.OrdinalIgnoreCase));
+        logView.Initialize(newLineProvider, _highlights!);
         Tabs.Items.Add(new TabItem { Header = pattern, Content = logView });
     }
 
