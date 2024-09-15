@@ -18,6 +18,7 @@ namespace LogAlligator.App.Controls;
 public partial class FileView : UserControl
 {
     private Highlights _highlights = new();
+    private Bookmarks _bookmarks = new();
 
     private Task? _loadTask = null;
     private CancellationTokenSource? _loadTaskCancellationToken = null;
@@ -138,8 +139,9 @@ public partial class FileView : UserControl
 
         Log.Debug("Loaded {Lines} lines from {FilePath}. It took {ElapsedMs} ms", lineProvider.Count, FilePath, elapsedMs);
 
-        RootLogView.Initialize(lineProvider, _highlights);
+        RootLogView.Initialize(lineProvider, _highlights, _bookmarks);
         HighlightsView.Initialize(_highlights);
+        BookmarksView.Initialize(_bookmarks);
     }
 
     private void OnLoadProgress(int progress)

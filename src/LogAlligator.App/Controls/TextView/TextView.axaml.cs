@@ -29,6 +29,7 @@ public partial class TextView : UserControl
     private (int Line, int Char)? _caretPosition = null;
 
     private Highlights? _highlights;
+    private Bookmarks? _bookmarks;
 
     private static readonly StyledProperty<IBrush> HighlightBackgroundProperty =
     AvaloniaProperty.Register<TextView, IBrush>(nameof(HighlightBackground), new SolidColorBrush(Color.FromRgb(0, 120, 215)));
@@ -100,10 +101,11 @@ public partial class TextView : UserControl
         }
     }
 
-    public void Initialize(ILineProvider lines, Highlights highlights)
+    public void Initialize(ILineProvider lines, Highlights highlights, Bookmarks bookmarks)
     {
         _lines = lines;
         _highlights = highlights;
+        _bookmarks = bookmarks;
         _topLineIndex = 0;
         LoadData();
     }
@@ -161,7 +163,12 @@ public partial class TextView : UserControl
         try
         {
             var bookmarkName = await bookmarkDialog.ShowDialog<string?>((VisualRoot as Window)!);
-            Log.Debug("Bookmark name: {BookmarkName}", bookmarkName);
+            if (string.IsNullOrEmpty(bookmarkName) || _caretPosition is null)
+                return;
+
+            int selectedLineNumber = _lines.GetLineNumber(_caretPosition.Value.Line);
+            _bookmarks?.Add(bookmarkName, selectedLineNumber);
+            Log.Debug("Bookmark name: {BookmarkName}, line number: {number}", bookmarkName, selectedLineNumber);
         }
         finally
         {

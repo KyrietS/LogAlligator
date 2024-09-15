@@ -12,6 +12,7 @@ public partial class LogView : UserControl
 {
     private ILineProvider _lineProvider = new EmptyLineProvider();
     private Highlights? _highlights = null;
+    private Bookmarks? _bookmarks = null;
 
     public LogView()
     {
@@ -25,18 +26,19 @@ public partial class LogView : UserControl
         SearchBox.SelectAll();
     }
     
-    internal void Initialize(ILineProvider lineProvider, Highlights highlights)
+    internal void Initialize(ILineProvider lineProvider, Highlights highlights, Bookmarks bookmarks)
     {
         _lineProvider = lineProvider;
         _highlights = highlights;
-        TextView.Initialize(lineProvider, highlights);
+        _bookmarks = bookmarks;
+        TextView.Initialize(lineProvider, highlights, bookmarks);
     }
 
     internal void AddGrep(string pattern)
     {
         var logView = new LogView();
         var newLineProvider = _lineProvider.Grep(line => line.Contains(pattern, StringComparison.OrdinalIgnoreCase));
-        logView.Initialize(newLineProvider, _highlights!);
+        logView.Initialize(newLineProvider, _highlights!, _bookmarks!);
         Tabs.Items.Add(new TabItem { Header = pattern, Content = logView });
     }
 

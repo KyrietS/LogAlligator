@@ -23,7 +23,9 @@
                     BorderBrush="{DynamicResource ThemeControlMidBrush}"
                     BorderThickness="1">
                 <TabControl Padding="0 1 0 0">
-                    <TabItem Header="Bookmarks"></TabItem>
+                    <TabItem Header="Bookmarks">
+                        <controls:BookmarksView Name="BookmarksView" />
+                    </TabItem>
                     <TabItem Header="Highlights">
                       <controls:HighlightsView Name="HighlightsView" />
                     </TabItem>
