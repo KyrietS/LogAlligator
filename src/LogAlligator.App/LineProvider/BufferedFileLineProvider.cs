@@ -12,7 +12,8 @@ public class BufferedFileLineProvider(Uri path) : ILineProvider
 {
     private FileStream _stream = null!;
     private StreamReader _reader = null!;
-    private readonly List<(long Begin, int Length)> _lines = [];
+    // FIXME: Length does not seem to be needed
+    private readonly List<(int Number, long Begin, int Length)> _lines = [];
 
     public async Task LoadData(Action<int> progressCallback, CancellationToken token)
     {
@@ -28,11 +29,13 @@ public class BufferedFileLineProvider(Uri path) : ILineProvider
         const FileOptions fileOptions = FileOptions.SequentialScan | FileOptions.Asynchronous;
         await using var stream = new FileStream(path.AbsolutePath, FileMode.Open, FileAccess.Read, FileShare.Read, 65536, fileOptions);
         var reader = new StreamLineReader(stream, 65536);
-             
+        int lineNumber = 1;
+
         while (reader.ReadLine() is { } line) // TODO: Make Async
         {
-            _lines.Add((line.Begin, (int)line.Length));
-            
+            _lines.Add((lineNumber, line.Begin, (int)line.Length));
+            lineNumber++;
+
             if (_lines.Count % 100 == 0) 
                 progressCallback(_lines.Count);
         }
@@ -58,6 +61,33 @@ public class BufferedFileLineProvider(Uri path) : ILineProvider
             throw new ArgumentOutOfRangeException(nameof(index));
         
         return _lines[index].Length;
+    }
+
+    public int GetLineNumber(int index)
+    {
+        if (index < 0 || index >= _lines.Count)
+            throw new ArgumentOutOfRangeException(nameof(index));
+
+        return _lines[index].Number;
+    }
+
+    public int GetLineIndex(int lineNumber)
+    {
+        // Binary search
+        int left = 0;
+        int right = _lines.Count - 1;
+        while (left <= right)
+        {
+            int mid = left + (right - left) / 2;
+            if (_lines[mid].Number == lineNumber)
+                return mid;
+            if (_lines[mid].Number < lineNumber)
+                left = mid + 1;
+            else
+                right = mid - 1;
+        }
+
+        return -1; // Not found
     }
 
     public ILineProvider Grep(Func<string, bool> filter)

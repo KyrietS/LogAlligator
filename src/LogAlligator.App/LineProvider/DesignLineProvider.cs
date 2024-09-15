@@ -20,6 +20,8 @@ public class DesignLineProvider : ILineProvider
     public int Count => _lines.Count;
     public string this[int index] => _lines[index];
     public int GetLineLength(int index) => _lines[index].Length;
+    public int GetLineNumber(int index) => index + 1;
+    public int GetLineIndex(int lineNumber) => lineNumber - 1;
 
     public ILineProvider Grep(Func<string, bool> filter)
     {

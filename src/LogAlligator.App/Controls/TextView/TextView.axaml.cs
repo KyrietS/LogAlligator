@@ -200,16 +200,17 @@ public partial class TextView : UserControl
             int lineIndex = _topLineIndex + i;
             var line = _lines[lineIndex];
 
-            LineNumbers[i] = lineIndex + 1;
+            LineNumbers[i] = _lines.GetLineNumber(lineIndex);
             TextArea[i] = line;
 
+            // Background of line where the caret is
             if (lineIndex == _caretPosition?.Line)
             {
                 var textAreaFontColor = TextArea.Foreground as SolidColorBrush;
                 TextArea.SetLineBackground(i, new SolidColorBrush(textAreaFontColor!.Color, 0.1));
                 LineNumbers.SetLineBackground(i, new SolidColorBrush(textAreaFontColor!.Color, 0.1));
             }
-
+            // Highlights
             foreach (var (pattern, background, foreground) in _highlights ?? [])
             {
                 int index = 0;
@@ -223,7 +224,7 @@ public partial class TextView : UserControl
                     index += pattern.Length;
                 }
             }
-
+            // Selection
             if (_selection.GetSelectionAtLine(lineIndex) is var (begin, end))
             {
                 int selectionBegin = begin ?? 0;

@@ -44,6 +44,17 @@ public class StupidFileLineProvider(Uri path) : ILineProvider
         return _lines[index].Length;
     }
 
+    public int GetLineNumber(int index)
+    {
+        return index + 1;
+    }
+
+    public int GetLineIndex(int lineNumber)
+    {
+        return lineNumber - 1;
+
+    }
+
     public ILineProvider Grep(Func<string, bool> filter)
     {
         var newProvider = new StupidFileLineProvider(path);

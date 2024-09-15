@@ -11,6 +11,8 @@ public class EmptyLineProvider : ILineProvider
     public int Count => 0;
     public string this[int index] => throw new IndexOutOfRangeException();
     public int GetLineLength(int index) => throw new IndexOutOfRangeException();
+    public int GetLineNumber(int index) => throw new IndexOutOfRangeException();
+    public int GetLineIndex(int lineNumber) => throw new IndexOutOfRangeException();
 
     public ILineProvider Grep(Func<string, bool> filter) => this;
 }
