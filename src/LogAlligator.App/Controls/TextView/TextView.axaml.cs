@@ -110,6 +110,16 @@ public partial class TextView : UserControl
         LoadData();
     }
 
+    public void GoToLineNumber(int lineNumber)
+    {
+        int lineIndex = _lines.GetLineIndex(lineNumber);
+        if (lineIndex == -1)
+            return;
+
+        ScrollToLine(lineIndex);
+        _caretPosition = (lineIndex, 0);
+    }
+
     public void ScrollToLine(int lineIndex)
     {
         VerticalScrollBar.Value = Math.Max(0, lineIndex - TextArea.NumberOfLines / 2);

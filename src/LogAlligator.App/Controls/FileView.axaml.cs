@@ -45,6 +45,7 @@ public partial class FileView : UserControl
         InitializeComponent();
 
         _highlights.OnChange += (_, _) => SelectedLogView?.TextView.Refresh();
+        BookmarksView.JumpToBookmark += OnJumpToBookmark;
     }
 
     public void AddHighlight()
@@ -163,6 +164,13 @@ public partial class FileView : UserControl
             .GetMessageBoxStandard("Error", "File could not be loaded\nCheck logs for more details", ButtonEnum.Ok,
                 Icon.Error, WindowStartupLocation.CenterOwner);
         await box.ShowWindowDialogAsync(this.VisualRoot as Window);
+    }
+
+    private void OnJumpToBookmark(object? sender, int lineNumber)
+    {
+        Log.Debug("Jumping to line {LineNumber}", lineNumber);
+        SelectedLogView?.TextView.GoToLineNumber(lineNumber);
+        SelectedLogView?.TextView.Refresh();
     }
 
     private void RequestRemovalFromView()

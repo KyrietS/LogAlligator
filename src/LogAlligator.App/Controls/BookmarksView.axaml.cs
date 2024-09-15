@@ -1,7 +1,6 @@
+using System;
 using System.Collections.Generic;
-using Avalonia;
 using Avalonia.Controls;
-using Avalonia.Markup.Xaml;
 using LogAlligator.App.Utils;
 
 namespace LogAlligator.App.Controls;
@@ -9,6 +8,9 @@ namespace LogAlligator.App.Controls;
 public partial class BookmarksView : UserControl
 {
     private Bookmarks? _bookmarks;
+
+    public event EventHandler<int>? JumpToBookmark;
+
     public BookmarksView()
     {
         InitializeComponent();
@@ -66,6 +68,7 @@ public partial class BookmarksView : UserControl
         foreach (var bookmark in _bookmarks ?? [])
         {
             var item = new ListBoxItem { Content = bookmark.Name };
+            item.DoubleTapped += (_, _) => JumpToBookmark?.Invoke(this, bookmark.LineNumber);
             items.Add(item);
         }
 
