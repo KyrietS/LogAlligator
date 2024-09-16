@@ -89,6 +89,34 @@ public class RangeListTests
     }
 
     [Fact]
+    public void Add_AdjoiningRange_WithBackground()
+    {
+        sut.AddRange(0, 9, 'x');
+        sut.AddRange(2, 4, 'a');
+        sut.AddRange(4, 5, 'b');
+
+        Assert.Equal(4, sut.Count);
+        Assert.Equal((0, 2, 'x'), sut[0]);
+        Assert.Equal((2, 4, 'a'), sut[1]);
+        Assert.Equal((4, 5, 'b'), sut[2]);
+        Assert.Equal((5, 9, 'x'), sut[3]);
+    }
+
+    [Fact]
+    public void Add_AdjoiningRange_WithBackgroundReversed()
+    {
+        sut.AddRange(0, 9, 'x');
+        sut.AddRange(4, 5, 'b');
+        sut.AddRange(2, 4, 'a');
+
+        Assert.Equal(4, sut.Count);
+        Assert.Equal((0, 2, 'x'), sut[0]);
+        Assert.Equal((2, 4, 'a'), sut[1]);
+        Assert.Equal((4, 5, 'b'), sut[2]);
+        Assert.Equal((5, 9, 'x'), sut[3]);
+    }
+
+    [Fact]
     public void Add_AdjoiningRange_OnRight()
     {
         sut.AddRange(0, 5, 'a');

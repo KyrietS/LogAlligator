@@ -56,11 +56,18 @@ internal class RangeList<TValueType> : IEnumerable<(int Begin, int End, TValueTy
 
             var rangeBegin = _ranges.GetKeyAtIndex(i);
 
-            if (start <= rangeBegin)
+            if (start < rangeBegin)
             {
                 _ranges[start] = value;
                 break;
             }
+            if (start == rangeBegin)
+            {
+                currVal = _ranges.GetValueAtIndex(i);
+                _ranges[start] = value;
+                break;
+            }
+
 
             currVal = _ranges.GetValueAtIndex(i);
         }
