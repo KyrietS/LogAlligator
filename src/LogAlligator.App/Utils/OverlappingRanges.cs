@@ -14,8 +14,6 @@ namespace LogAlligator.App.Utils;
 /// </summary>
 internal class OverlappingRanges<TValueType> : IEnumerable<(int Begin, int End, TValueType Value)>
 {
-    //  TODO: Instead of (int Begin, int End) use Range struct
-
     private readonly SortedList<int, TValueType> _ranges = new();
 
     public int Count => Math.Max(0, _ranges.Count - 1);
