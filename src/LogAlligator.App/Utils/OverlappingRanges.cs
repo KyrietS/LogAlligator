@@ -12,7 +12,7 @@ namespace LogAlligator.App.Utils;
 ///     ranges in the following order: (1, 3, 'a') and (5, 7, 'b') you will
 ///     get 3 ranges: (1, 3, 'a'), (3, 7, 'a'), (5, 7, 'b')
 /// </summary>
-internal class RangeList<TValueType> : IEnumerable<(int Begin, int End, TValueType Value)>
+internal class OverlappingRanges<TValueType> : IEnumerable<(int Begin, int End, TValueType Value)>
 {
     //  TODO: Instead of (int Begin, int End) use Range struct
 

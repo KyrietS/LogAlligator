@@ -247,7 +247,7 @@ internal class TextArea : Control
     private struct Line
     {
         public readonly string Text;
-        public readonly RangeList<Formatting> Formattings = new();
+        public readonly OverlappingRanges<Formatting> Formattings = new();
         public IBrush? Background { get; set; }
         
         public Line(string text)

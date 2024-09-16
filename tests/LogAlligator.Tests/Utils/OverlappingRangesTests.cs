@@ -2,9 +2,9 @@ using LogAlligator.App.Utils;
 
 namespace LogAlligator.Tests.Utils;
 
-public class RangeListTests
+public class OverlappingRangesTests
 {
-    private RangeList<char> sut = new();
+    private OverlappingRanges<char> sut = new();
 
     [Fact]
     public void Add_FirstRange()
