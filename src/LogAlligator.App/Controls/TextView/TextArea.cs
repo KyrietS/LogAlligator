@@ -51,6 +51,7 @@ internal class TextArea : Control
     }
     
     public FontFamily FontFamily { get; set; } = FontFamily.Default;
+    public FontFamily SecondaryFontFamily { get; set; } = new FontFamily("Courier New");
 
     public int NumberOfLines
     {
@@ -81,7 +82,8 @@ internal class TextArea : Control
         }
     }
 
-    public void AppendFormattingToLine(int lineIndex, Range range, IBrush? foreground = null, IBrush? background = null)
+    public void AppendFormattingToLine(
+        int lineIndex, Range range, IBrush? foreground = null, IBrush? background = null, FontFamily? font = null)
     {
         Debug.Assert(_lines.Length > 0);
 
@@ -91,7 +93,7 @@ internal class TextArea : Control
             var (begin, length) = range.GetOffsetAndLength(line.Text.Length);
             
             if (length > 0)
-                line.AddFormatting(begin, length, foreground, background);
+                line.AddFormatting(begin, length, foreground, background, font);
         }
         catch (ArgumentOutOfRangeException ex)
         {
@@ -206,13 +208,18 @@ internal class TextArea : Control
     private double RenderTextWithFormatting(DrawingContext dc, string text, Line.Formatting formatting, Point cursor)
     {
         var formattedText = FormatText(text);
-        double textWidth = formattedText.WidthIncludingTrailingWhitespace;
 
         if (formatting.Foreground != null)
             formattedText.SetForegroundBrush(formatting.Foreground);
+        if (formatting.Typeface != null)
+            formattedText.SetFontTypeface(formatting.Typeface.Value);
+
+        double textWidth = formattedText.WidthIncludingTrailingWhitespace;
+
         if (formatting.Background != null) // TODO: Instead of 0.5px padding try snapping the Rect to the middle of px
             dc.FillRectangle(formatting.Background,
-                new Rect(cursor - new Point(0.5, 0.5), new Size(textWidth + 1, formattedText.Height + 1)));
+                new Rect(cursor - new Point(0.25, 0.25), new Size(textWidth + 0.5, formattedText.Height + 0.5)));
+
 
         dc.DrawText(formattedText, cursor);
 
@@ -266,9 +273,10 @@ internal class TextArea : Control
             return (textSpan, formatting.Value);
         }
 
-        public void AddFormatting(int begin, int length, IBrush? foreground = null, IBrush? background = null)
+        public void AddFormatting(int begin, int length, IBrush? foreground = null, IBrush? background = null, FontFamily? font = null)
         {
-            AddFormatting(begin, length, new Formatting() { Foreground = foreground, Background = background });
+            Typeface? typeface = font != null ? new Typeface(font) : null;
+            AddFormatting(begin, length, new Formatting() { Foreground = foreground, Background = background, Typeface = typeface });
         }
 
         public void AddFormatting(int begin, int length, Formatting formatting)
@@ -289,6 +297,7 @@ internal class TextArea : Control
 
             public IBrush? Foreground;
             public IBrush? Background;
+            public Typeface? Typeface;
         }
     }
 }
