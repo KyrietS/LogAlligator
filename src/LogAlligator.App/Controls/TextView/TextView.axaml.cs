@@ -1,5 +1,4 @@
 using System;
-using System.Collections.Generic;
 using System.Text;
 using System.Threading.Tasks;
 using Avalonia;
@@ -286,13 +285,13 @@ public partial class TextView : UserControl
 
         if (e.Delta.Y < 0)
         {
-            _topLineIndex += 3;
+            _topLineIndex -= (int)e.Delta.Y * 3;
             _topLineIndex = Math.Min(_topLineIndex, _lines.Count - 1);
             _topLineIndex = Math.Max(_topLineIndex, 0);
         }
         if (e.Delta.Y > 0)
         {
-            _topLineIndex -= 3;
+            _topLineIndex -= (int)e.Delta.Y * 3;
             _topLineIndex = Math.Max(_topLineIndex, 0);
         }
 
