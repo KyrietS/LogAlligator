@@ -5,7 +5,7 @@ using System.Linq;
 using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Media;
-using LogAlligator.App.Utils;
+using LogAlligator.App.Utils.Ranges;
 using Serilog;
 
 namespace LogAlligator.App.Controls;
