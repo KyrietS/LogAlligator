@@ -120,4 +120,35 @@ public class RangesMergerTests
         Assert.Equal((0, 4, ('1', '2', 'a')), result[0]);
         Assert.Equal((4, 9, ('1', '2', 'b')), result[1]);
     }
+
+    [Fact]
+    public void MergeTwoRanges_WithNullValues()
+    {
+        channel1.AddRange(0, 9, 'a');
+        channel2.AddRange(0, 4, null);
+        channel2.AddRange(4, 9, 'b');
+
+        var result = RangesMerger.Merge(channel1, channel2);
+
+        Assert.Equal(2, result.Count);
+        Assert.Equal((0, 4, ('a', null)), result[0]);
+        Assert.Equal((4, 9, ('a', 'b')), result[1]);
+    }
+
+    [Fact]
+    public void MergeThreeRanges_WithNullValues()
+    {
+        channel1.AddRange(0, 9, 'a');
+        channel2.AddRange(0, 4, 'b');
+        channel2.AddRange(4, 6, null);
+        channel2.AddRange(6, 9, 'c');
+        channel3.AddRange(0, 9, null);
+
+        var result = RangesMerger.Merge(channel1, channel2, channel3);
+
+        Assert.Equal(3, result.Count);
+        Assert.Equal((0, 4, ('a', 'b', null)), result[0]);
+        Assert.Equal((4, 6, ('a', null, null)), result[1]);
+        Assert.Equal((6, 9, ('a', 'c', null)), result[2]);
+    }
 }

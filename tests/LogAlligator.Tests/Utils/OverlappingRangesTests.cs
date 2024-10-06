@@ -217,3 +217,42 @@ public class OverlappingRangesTests
         Assert.Equal((6, 9, 'b'), sut[2]);
     }
 }
+
+public class OverlappingRangesWithNullValuesTests
+{
+    private OverlappingRanges<char?> sut = new();
+
+    [Fact]
+    public void Add_Range_AllNulls()
+    {
+        sut.AddRange(0, 9, null);
+
+        Assert.Single(sut);
+        Assert.Equal((0, 9, null), sut[0]);
+    }
+
+    [Fact]
+    public void Add_OverlappingRange_WithNull()
+    {
+        sut.AddRange(0, 9, 'a');
+        sut.AddRange(4, 6, null);
+
+        Assert.Equal(3, sut.Count);
+        Assert.Equal((0, 4, 'a'), sut[0]);
+        Assert.Equal((4, 6, null), sut[1]);
+        Assert.Equal((6, 9, 'a'), sut[2]);
+    }
+
+    [Fact]
+    public void Add_OverlappingNullRange_WithValue()
+    {
+        sut.AddRange(0, 9, null);
+        sut.AddRange(4, 6, 'a');
+
+        Assert.Equal(3, sut.Count);
+        Assert.Equal((0, 4, null), sut[0]);
+        Assert.Equal((4, 6, 'a'), sut[1]);
+        Assert.Equal((6, 9, null), sut[2]);
+    }
+
+}

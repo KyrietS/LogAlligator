@@ -4,6 +4,10 @@ using System.Linq;
 
 namespace LogAlligator.App.Utils.Ranges;
 
+/// <summary>
+/// Merges multiple ranges into one. Each range is treated as a separate channel.
+/// The result is a single range with a tuple of values from each channel.
+/// </summary>
 internal static class RangesMerger
 {
     public static Ranges<(T1, T2)> Merge<T1, T2>(Ranges<T1> channel1, Ranges<T2> channel2)
@@ -12,7 +16,7 @@ internal static class RangesMerger
         Ranges<(T1, T2)> result = new(merged.Boundaries.Count);
         foreach (var (begin, values) in merged.Boundaries)
         {
-            result.Boundaries[begin] = ((T1)values[0], (T2)values[1]);
+            result.Boundaries[begin] = ((T1)values[0].Value!, (T2)values[1].Value!);
         }
         return result;
     }
@@ -22,13 +26,13 @@ internal static class RangesMerger
         Ranges<(T1, T2, T3)> result = new(merged.Boundaries.Count);
         foreach (var (begin, values) in merged.Boundaries)
         {
-            result.Boundaries[begin] = ((T1)values[0], (T2)values[1], (T3)values[2]);
+            result.Boundaries[begin] = ((T1)values[0].Value!, (T2)values[1].Value!, (T3)values[2].Value!);
         }
         return result;
     }
 
 
-    private class MergedRanges : Ranges<object[]>
+    private class MergedRanges : Ranges<MergedRanges.MergedValue[]>
     {
         IDictionary[] _channels;
         public MergedRanges(IDictionary[] channels) : base(channels.Sum(ch => ch.Count))
@@ -53,21 +57,21 @@ internal static class RangesMerger
             var channel = _channels[channelIndex];
             foreach (DictionaryEntry boundary in channel)
             {
-                AddValueFromChannel(channelIndex, (int)boundary.Key, boundary.Value!);
+                AddValueFromChannel(channelIndex, (int)boundary.Key, boundary.Value);
             }
         }
 
-        private void AddValueFromChannel(int channelIndex, int begin, object value)
+        private void AddValueFromChannel(int channelIndex, int begin, object? value)
         {
             if (!Boundaries.ContainsKey(begin))
             {
-                var channelValues = new object[_channels.Length];
-                channelValues[channelIndex] = value;
+                var channelValues = new MergedValue[_channels.Length];
+                channelValues[channelIndex] = new MergedValue { Value = value };
                 Boundaries[begin] = channelValues;
             }
             else
             {
-                Boundaries[begin][channelIndex] = value;
+                Boundaries[begin][channelIndex] = new MergedValue { Value = value };
             }
         }
 
@@ -75,14 +79,14 @@ internal static class RangesMerger
         {
             Debug.Assert(Boundaries.Count > 0);
 
-            var oldValues = (object[])Boundaries[0].Clone();
+            var oldValues = (MergedValue[])Boundaries[0].Clone();
             foreach (var (begin, newValues) in Boundaries)
             {
                 MergeValues(begin, oldValues, newValues);
             }
         }
 
-        private void MergeValues(int begin, object[] oldValues, object[] newValues)
+        private void MergeValues(int begin, MergedValue[] oldValues, MergedValue[] newValues)
         {
             Debug.Assert(oldValues.Length == newValues.Length);
 
@@ -97,6 +101,11 @@ internal static class RangesMerger
                     oldValues[i] = newValues[i];
                 }
             }
+        }
+
+        internal class MergedValue
+        {
+            public object? Value;
         }
     }
 }

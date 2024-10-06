@@ -1,4 +1,6 @@
 using System;
+using System.Collections;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.Globalization;
 using System.Linq;
@@ -189,9 +191,8 @@ internal class TextArea : Control
         RenderLineBackground(dc, cursor, line.Background);
         using var _ = ClipTextAreaToPadding(dc);
         
-        for (int formattingIndex = 0; formattingIndex < line.Formattings.Count; formattingIndex++)
+        foreach (var (text, formatting) in line)
         {
-            var (text, formatting) = line.GetTextSpan(formattingIndex);
             double width = RenderTextWithFormatting(dc, text, formatting, cursor);
             cursor = cursor.WithX(cursor.X + width);
         }
@@ -251,26 +252,24 @@ internal class TextArea : Control
             Foreground);
     }
 
-    private struct Line
+    private struct Line : IEnumerable<(string, Line.Formatting)>
     {
         public readonly string Text;
-        public readonly OverlappingRanges<Formatting> Formattings = new();
+
+        private readonly OverlappingRanges<IBrush?> _foregrounds = new();
+        private readonly OverlappingRanges<IBrush?> _backgrounds = new();
+        private readonly OverlappingRanges<Typeface?> _typefaces = new();
+        private Ranges<(IBrush? Foreground, IBrush? Background, Typeface? Typeface)>? _formattings = null;
+
         public IBrush? Background { get; set; }
         
         public Line(string text)
         {
             Text = text;
-            Formattings.AddRange(0, Text.Length, Formatting.Default);
-        }
 
-        public (string, Formatting) GetTextSpan(int formattingIndex)
-        {
-            Debug.Assert(formattingIndex >= 0 && formattingIndex < Formattings.Count);
-
-            var formatting = Formattings.GetRangeAtIndex(formattingIndex);
-            var textSpan = Text.Substring(formatting.Begin, formatting.End - formatting.Begin);
-
-            return (textSpan, formatting.Value);
+            _foregrounds.AddRange(0, Text.Length, Formatting.Default.Foreground);
+            _backgrounds.AddRange(0, Text.Length, Formatting.Default.Background);
+            _typefaces.AddRange(0, Text.Length, Formatting.Default.Typeface);
         }
 
         public void AddFormatting(int begin, int length, IBrush? foreground = null, IBrush? background = null, FontFamily? font = null)
@@ -288,16 +287,68 @@ internal class TextArea : Control
                 return;
 
             int end = begin + length;
-            Formattings.AddRange(begin, end, formatting);
+
+            if (formatting.Foreground != null)
+                _foregrounds.AddRange(begin, end, formatting.Foreground);
+            if (formatting.Background != null)
+                _backgrounds.AddRange(begin, end, formatting.Background);
+            if (formatting.Typeface != null)
+                _typefaces.AddRange(begin, end, formatting.Typeface.Value);
+
+            _formattings = null;
+        }
+
+        IEnumerator IEnumerable.GetEnumerator()
+        {
+            return GetEnumerator();
+        }
+
+        public IEnumerator<(string, Formatting)> GetEnumerator()
+        {
+            MergeFormattings();
+            return new LineEnumerator(Text, _formattings!);
+        }
+
+        private void MergeFormattings()
+        {
+            if (_formattings != null)
+                return;
+
+            _formattings = RangesMerger.Merge(_foregrounds, _backgrounds, _typefaces);
         }
 
         public struct Formatting
         {
-            public static readonly Formatting Default = new Formatting();
+            public static readonly Formatting Default = new Formatting() { };
 
             public IBrush? Foreground;
             public IBrush? Background;
             public Typeface? Typeface;
+        }
+
+        private class LineEnumerator(string _text, Ranges<(IBrush? Foreground, IBrush? Background, Typeface? Font)> mergedFormattings)
+            : IEnumerator<(string Text, Formatting Value)>
+        {
+            private int _index = -1;
+
+            public (string Text, Line.Formatting Value) Current
+            {
+                get
+                {
+                    var (begin, end, (foreground, background, typeface)) = mergedFormattings.GetRangeAtIndex(_index);
+                    var textSpan = _text.Substring(begin, end - begin);
+                    return (textSpan, new Line.Formatting() { Foreground = foreground, Background = background, Typeface = typeface });
+                }
+            }
+                
+
+            object IEnumerator.Current => Current;
+
+            public bool MoveNext() => ++_index < mergedFormattings.Count;
+
+            public void Reset() { _index = -1; }
+
+            public void Dispose() { }
         }
     }
 }

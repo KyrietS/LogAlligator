@@ -14,7 +14,6 @@ internal class Ranges<TValueType>(int _capacity = 0) : IEnumerable<(int Begin, i
 
     public void Clear()
     {
-        Tuple<int> x;
         Boundaries.Clear();
     }
 

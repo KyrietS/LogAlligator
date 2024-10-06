@@ -252,7 +252,7 @@ public partial class TextView : UserControl
                     if (index == -1)
                         break;
 
-                    TextArea.AppendFormattingToLine(i, (index..(index + pattern.Length)), background: new SolidColorBrush(background));
+                    TextArea.AppendFormattingToLine(i, (index..(index + pattern.Length)), background: new SolidColorBrush(background), font: TextArea.SecondaryFontFamily);
                     index += pattern.Length;
                 }
             }
