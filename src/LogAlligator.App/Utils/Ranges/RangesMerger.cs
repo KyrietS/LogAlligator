@@ -75,7 +75,7 @@ internal static class RangesMerger
         {
             Debug.Assert(Boundaries.Count > 0);
 
-            var oldValues = Boundaries[0];
+            var oldValues = (object[])Boundaries[0].Clone();
             foreach (var (begin, newValues) in Boundaries)
             {
                 MergeValues(begin, oldValues, newValues);
