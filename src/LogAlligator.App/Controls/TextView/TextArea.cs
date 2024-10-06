@@ -116,14 +116,14 @@ internal class TextArea : Control
     /// <returns>
     /// <para>A tuple containing the index of pointed line and index of pointer character in that line.</para>
     /// <para>If <paramref name="position"/> points above the first line, then <c>(0, 0)</c> is returned.</para>
-    /// <para>If <paramref name="position"/> points below the last line, then <c>(lastL, lastC)</c> is returned,
-    /// where <c>lastL</c> is the index of the last line and <c>lastC</c> is the index of the last character of this line.</para>
+    /// <para>If <paramref name="position"/> points below the last line, then <c>(lastL, afterLastC)</c> is returned,
     /// <para>If <paramref name="position"/> points before first character of the line, then <c>(L, 0)</c> is returned.</para>
-    /// <para>If <paramref name="position"/> points after the last character of the line, then <c>(L, lastC)</c> is returned,
-    /// where <c>lastC</c> is the index of the last character of this line.</para>
+    /// <para>If <paramref name="position"/> points after the last character of the line, then <c>(L, afterLastC)</c> is returned,
+    /// where <c>lastL</c> is the index of the last line,
+    /// where <c>afterLastC</c> is the index of the last character of the line + 1.</para>
     /// </returns>
     /// <remarks>
-    /// Given a <paramref name="position"/> this function finds a character before which a caret should be placed. 
+    /// Given a <paramref name="position"/> this function finds a character <b>before</b> which a caret should be placed. 
     /// Let's take two letters: <c>AB</c>. Each letter is split in half. Now, if you point at:
     /// <list type="bullet">
     /// <item>Left side of <c>A</c> or before <c>A</c>, the index <c>0</c> will be returned</item>
