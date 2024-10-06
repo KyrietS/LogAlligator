@@ -79,8 +79,9 @@ internal class TextArea : Control
         get => _lines[index].Text;
         set
         {
-            _lines[index] = new Line(value);
-            MaxLineWidth = Math.Max(MaxLineWidth, GetLineWidth(value));
+            var line = new Line(value);
+            _lines[index] = line;
+            MaxLineWidth = Math.Max(MaxLineWidth, GetLineWidth(line));
         }
     }
 
@@ -140,7 +141,7 @@ internal class TextArea : Control
         if (lineIndex >= _lines.Length)
             return (_lines.Length - 1, _lines.Last().Text.Length);
 
-        var line = _lines[lineIndex].Text;
+        var line = _lines[lineIndex];
         double cursor = Padding.Left;
         var charIndex = 0;
         double previousWidth = 0;
@@ -150,13 +151,12 @@ internal class TextArea : Control
             charIndex++;
 
             // When clicked after last character, return index after last character
-            if (charIndex > line.Length)
+            if (charIndex > line.Text.Length)
             {
-                return (lineIndex, line.Length);
+                return (lineIndex, line.Text.Length);
             }
 
-            var textFragment = line.Substring(0, charIndex);
-            var textWidth = GetLineWidth(textFragment);
+            var textWidth = GetLineWidth(line, length: charIndex);
             var letterWidth = textWidth - previousWidth;
             cursor = Padding.Left + textWidth - letterWidth / 2;
             previousWidth = textWidth;
@@ -235,9 +235,27 @@ internal class TextArea : Control
         dc.FillRectangle(background, new Rect(0, cursor.Y, Bounds.Width, GetLineHeight()));
     }
 
-    private double GetLineWidth(string line)
+    private double GetLineWidth(Line line, int length = -1)
     {
-        return FormatText(line).WidthIncludingTrailingWhitespace;
+        Debug.Assert(length <= line.Text.Length);
+
+        if (length < 0)
+            length = line.Text.Length;
+
+        double width = 0;
+        int cursor = 0;
+        foreach(var (text, formatting) in line)
+        {
+            int currCursor = Math.Min(cursor + text.Length, length);
+            string textFragment = text.Substring(0, currCursor - cursor);
+            width += FormatText(textFragment, formatting.Typeface).WidthIncludingTrailingWhitespace;
+            cursor = currCursor;
+
+            if (cursor >= length)
+                break;
+        }
+
+        return width;
     }
 
     private double GetLineHeight()
@@ -245,10 +263,10 @@ internal class TextArea : Control
         return FormatText(".").Height;
     }
 
-    private FormattedText FormatText(string text)
+    private FormattedText FormatText(string text, Typeface? typeface = null)
     {
-        var typeface = new Typeface(FontFamily);
-        return new FormattedText(text, CultureInfo.CurrentCulture, FlowDirection.LeftToRight, typeface, FontSize,
+        typeface ??= new Typeface(FontFamily);
+        return new FormattedText(text, CultureInfo.CurrentCulture, FlowDirection.LeftToRight, typeface.Value, FontSize,
             Foreground);
     }
 
