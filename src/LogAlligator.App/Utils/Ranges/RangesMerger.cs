@@ -12,6 +12,8 @@ internal static class RangesMerger
 {
     public static Ranges<(T1, T2)> Merge<T1, T2>(Ranges<T1> channel1, Ranges<T2> channel2)
     {
+        Debug.Assert(channel1.First().Begin == channel2.First().Begin, "Cannot merge ranges with different begin");
+
         MergedRanges merged = new([channel1.Boundaries, channel2.Boundaries]);
         Ranges<(T1, T2)> result = new(merged.Boundaries.Count);
         foreach (var (begin, values) in merged.Boundaries)
@@ -22,6 +24,9 @@ internal static class RangesMerger
     }
     public static Ranges<(T1, T2, T3)> Merge<T1, T2, T3>(Ranges<T1> channel1, Ranges<T2> channel2, Ranges<T3> channel3)
     {
+        Debug.Assert(channel1.First().Begin == channel2.First().Begin && 
+            channel2.First().Begin == channel3.First().Begin, "Cannot merge ranges with different begin");
+
         MergedRanges merged = new([channel1.Boundaries, channel2.Boundaries, channel3.Boundaries]);
         Ranges<(T1, T2, T3)> result = new(merged.Boundaries.Count);
         foreach (var (begin, values) in merged.Boundaries)

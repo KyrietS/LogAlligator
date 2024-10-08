@@ -34,34 +34,37 @@ public class RangesMergerTests
     }
 
     [Fact]
-    public void MergeTwoAdjoiningChannels()
+    public void CannotMergeTwoChannelsWithDifferentBegins()
     {
-        channel1.AddRange(0, 4, 'a');
-        channel2.AddRange(4, 9, 'b');
+        channel1.AddRange(0, 9, 'a');
+        channel2.AddRange(1, 9, 'b');
 
-        var result = RangesMerger.Merge(channel1, channel2);
-
-        // Note: gaps between ranges and channels are not supported
-        // All empty spaces are filled with the surrounding values.
-        Assert.Equal(2, result.Count);
-        Assert.Equal((0, 4, ('a', 'b')), result[0]);
-        Assert.Equal((4, 9, ('a', 'b')), result[1]);
+        Assert.ThrowsAny<Exception>(() => RangesMerger.Merge(channel1, channel2));
     }
 
     [Fact]
-    public void MergeTwoOverlappingChannels()
+    public void CannotMergeThreeChannelsWithDifferentBegins()
+    {
+        channel1.AddRange(0, 9, 'a');
+        channel2.AddRange(0, 9, 'b');
+        channel3.AddRange(1, 9, 'c');
+
+        Assert.ThrowsAny<Exception>(() => RangesMerger.Merge(channel1, channel2, channel3));
+    }
+
+    [Fact]
+    public void MergeTwoChannelsWithDifferentEnds()
     {
         channel1.AddRange(0, 5, 'a');
-        channel2.AddRange(3, 7, 'b');
+        channel2.AddRange(0, 3, 'b');
+        channel2.AddRange(3, 7, 'c');
 
         var result = RangesMerger.Merge(channel1, channel2);
 
-        // Note: gaps between ranges and channels are not supported.
-        // All empty spaces are filled with the surrounding values.
         Assert.Equal(3, result.Count);
         Assert.Equal((0, 3, ('a', 'b')), result[0]);
-        Assert.Equal((3, 5, ('a', 'b')), result[1]);
-        Assert.Equal((5, 7, ('a', 'b')), result[2]);
+        Assert.Equal((3, 5, ('a', 'c')), result[1]);
+        Assert.Equal((5, 7, ('a', 'c')), result[2]);
     }
 
     [Fact]
