@@ -36,28 +36,14 @@ internal class Ranges<TValueType>(int _capacity = 0) : IEnumerable<(int Begin, i
 
     public IEnumerator<(int Begin, int End, TValueType Value)> GetEnumerator()
     {
-        return new RangesEnumerator(Boundaries);
+        for (int i = 0; i < Boundaries.Count - 1; i++)
+        {
+            yield return (Boundaries.GetKeyAtIndex(i), Boundaries.GetKeyAtIndex(i + 1), Boundaries.GetValueAtIndex(i));
+        }
     }
 
     IEnumerator IEnumerable.GetEnumerator()
     {
         return GetEnumerator();
-    }
-
-    private class RangesEnumerator(SortedList<int, TValueType> ranges)
-        : IEnumerator<(int Begin, int End, TValueType Value)>
-    {
-        private int _index = -1;
-
-        public (int Begin, int End, TValueType Value) Current => (ranges.GetKeyAtIndex(_index),
-            ranges.GetKeyAtIndex(_index + 1), ranges.GetValueAtIndex(_index));
-
-        object IEnumerator.Current => Current;
-
-        public bool MoveNext() => ++_index < ranges.Count - 1;
-
-        public void Reset() => _index = -1;
-
-        public void Dispose() { }
     }
 }
