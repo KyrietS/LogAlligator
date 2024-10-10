@@ -1,4 +1,5 @@
 using System;
+using System.Diagnostics;
 using System.Text;
 using System.Threading.Tasks;
 using Avalonia;
@@ -233,7 +234,7 @@ public partial class TextView : UserControl
             var line = _lines[lineIndex];
 
             LineNumbers[i] = _lines.GetLineNumber(lineIndex);
-            TextArea[i] = line;
+            TextArea[i] = line.AsMemory();
 
             // Background of line where the caret is
             if (lineIndex == _caretPosition?.Line)
@@ -252,7 +253,12 @@ public partial class TextView : UserControl
                     if (index == -1)
                         break;
 
-                    TextArea.AppendFormattingToLine(i, (index..(index + pattern.Length)), background: new SolidColorBrush(background), font: TextArea.SecondaryFontFamily);
+                    TextArea.AppendFormattingToLine(
+                        i, 
+                        (index..(index + pattern.Length)), 
+                        background: new SolidColorBrush(background), 
+                        typeface: new Typeface(TextArea.SecondaryFontFamily)
+                    );
                     index += pattern.Length;
                 }
             }
@@ -264,6 +270,7 @@ public partial class TextView : UserControl
                 TextArea.AppendFormattingToLine(i, (selectionBegin .. selectionEnd), HighlightForeground, HighlightBackground);
             }
         }
+        TextArea.ShapeAllLines();
         _maxLineWidth = Math.Max(_maxLineWidth, TextArea.MaxLineWidth);
 
         UpdateVerticalScroll();

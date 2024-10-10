@@ -1,20 +1,16 @@
 using System;
-using System.Collections;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.Globalization;
 using System.Linq;
 using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Media;
-using LogAlligator.App.Utils.Ranges;
 using Serilog;
 
 namespace LogAlligator.App.Controls;
 
 internal class TextArea : Control
 {
-    private Line[] _lines = [];
+    private TextAreaLine[] _lines = [];
+    private double _lineHeight = 12;
 
     public static readonly StyledProperty<IBrush> BackgroundProperty =
         AvaloniaProperty.Register<TextArea, IBrush>(nameof(Background), new SolidColorBrush(Colors.Transparent));
@@ -45,14 +41,21 @@ internal class TextArea : Control
 
     public static readonly StyledProperty<Thickness> PaddingProperty =
         Decorator.PaddingProperty.AddOwner<TextArea>();
-    
+
     public Thickness Padding
     {
         get => GetValue(PaddingProperty);
         set => SetValue(PaddingProperty, value);
     }
-    
-    public FontFamily FontFamily { get; set; } = FontFamily.Default;
+
+    public static readonly StyledProperty<FontFamily> FontFamilyProperty =
+        AvaloniaProperty.Register<TextArea, FontFamily>(nameof(FontFamily), FontFamily.Default);
+
+    public FontFamily FontFamily
+    {
+        get => GetValue(FontFamilyProperty);
+        set => SetValue(FontFamilyProperty, value);
+    }
     public FontFamily SecondaryFontFamily { get; set; } = new FontFamily("Courier New");
 
     public int NumberOfLines
@@ -62,41 +65,45 @@ internal class TextArea : Control
         {
             if (value != _lines.Length)
             {
-                _lines = new Line[value];
+                foreach (var line in _lines)
+                    line.Dispose();
+                _lines = new TextAreaLine[value];
             }
         }
     }
-    public double MaxLineWidth { get; private set; }
-    public int NumberOfLinesThatCanFit => (int)Math.Ceiling(Bounds.Height / GetLineHeight());
+    public double MaxLineWidth => _lines.Length > 0 ? _lines.Max(l => l.Width) : 0;
+
+    public int NumberOfLinesThatCanFit => (int)Math.Ceiling(Bounds.Height / _lineHeight);
 
     static TextArea()
     {
-        FontSizeProperty.Changed.AddClassHandler<TextArea>((o, _) => o.InvalidateVisual());
+        FontSizeProperty.Changed.AddClassHandler<TextArea>((o, _) => o.OnFontSizeChanged());
+        FontFamilyProperty.Changed.AddClassHandler<TextArea>((o, _) => o.OnFontFamilyChanged());
     }
 
-    public string this[int index]
+    public TextArea()
+    {
+        _lineHeight = GetInitialLineHeight(FontFamily, FontSize);
+    }
+
+    public ReadOnlyMemory<char> this[int index]
     {
         get => _lines[index].Text;
         set
         {
-            var line = new Line(value);
-            _lines[index] = line;
-            MaxLineWidth = Math.Max(MaxLineWidth, GetLineWidth(line));
+            if (_lines[index] != null)
+                _lines[index].Dispose();
+            _lines[index] = new TextAreaLine(value, Foreground, this.FontFamily, FontSize);
         }
     }
 
     public void AppendFormattingToLine(
-        int lineIndex, Range range, IBrush? foreground = null, IBrush? background = null, FontFamily? font = null)
+        int lineIndex, Range range, IBrush? foreground = null, IBrush? background = null, Typeface? typeface = null)
     {
-        Debug.Assert(_lines.Length > 0);
-
         var line = _lines[lineIndex];
         try
         {
-            var (begin, length) = range.GetOffsetAndLength(line.Text.Length);
-            
-            if (length > 0)
-                line.AddFormatting(begin, length, foreground, background, font);
+            line.AddFormatting(range, foreground, background, typeface);
         }
         catch (ArgumentOutOfRangeException ex)
         {
@@ -106,7 +113,6 @@ internal class TextArea : Control
 
     public void SetLineBackground(int lineIndex, IBrush? background)
     {
-        Debug.Assert(_lines.Length > 0);
         _lines[lineIndex].Background = background;
     }
     
@@ -134,7 +140,7 @@ internal class TextArea : Control
     /// </remarks>
     public (int LineIndex, int CharIndex) GetCharIndexAtPosition(Point position)
     {
-        var lineIndex = (int)(position.Y / GetLineHeight());
+        var lineIndex = (int)(position.Y / _lineHeight);
 
         if (lineIndex < 0 || _lines.Length == 0)
             return (0, 0);
@@ -156,7 +162,7 @@ internal class TextArea : Control
                 return (lineIndex, line.Text.Length);
             }
 
-            var textWidth = GetLineWidth(line, length: charIndex);
+            var textWidth = line.GetWidthSpan(length: charIndex);
             var letterWidth = textWidth - previousWidth;
             cursor = Padding.Left + textWidth - letterWidth / 2;
             previousWidth = textWidth;
@@ -165,37 +171,51 @@ internal class TextArea : Control
         return (lineIndex, charIndex - 1);
     }
 
+    public void ShapeLine(int lineIndex)
+    {
+        _lines[lineIndex].Shape();
+    }
+    public void ShapeAllLines()
+    {
+        foreach (var line in _lines)
+        {
+            line.Shape();
+        }
+    }
+
     public override void Render(DrawingContext dc)
     {
         base.Render(dc);
 
         dc.FillRectangle(Background, new Rect(0, 0, Bounds.Width, Bounds.Height));
 
-        RenderAllLines(dc);
+        if (_lines.Length > 0)
+            RenderAllLines(dc);
     }
 
     private void RenderAllLines(DrawingContext dc)
     {
-        var lineHeight = GetLineHeight();
         var cursor = new Point(Padding.Left, Padding.Top);
-        for (int lineIndex = 0; lineIndex < _lines.Length; lineIndex++)
+        foreach(var line in _lines)
         {
-            RenderLine(dc, lineIndex, cursor);
-            cursor = new Point(cursor.X, cursor.Y + lineHeight);
+            RenderLine(dc, line, cursor);
+            cursor = new Point(cursor.X, cursor.Y + line.Height);
         }
     }
 
-    private void RenderLine(DrawingContext dc, int lineIndex, Point cursor)
+    private void RenderLine(DrawingContext dc, TextAreaLine line, Point cursor)
     {
-        var line = _lines[lineIndex];
-        RenderLineBackground(dc, cursor, line.Background);
+        RenderLineBackground(dc, cursor, line);
         using var _ = ClipTextAreaToPadding(dc);
-        
-        foreach (var (text, formatting) in line)
-        {
-            double width = RenderTextWithFormatting(dc, text, formatting, cursor);
-            cursor = cursor.WithX(cursor.X + width);
-        }
+        line.Draw(dc, cursor);
+    }
+
+    private void RenderLineBackground(DrawingContext dc, Point cursor, TextAreaLine line)
+    {
+        if (line.Background == null)
+            return;
+
+        dc.FillRectangle(line.Background, new Rect(0, cursor.Y, Bounds.Width, line.Height));
     }
 
     private IDisposable ClipTextAreaToPadding(DrawingContext dc)
@@ -206,167 +226,22 @@ internal class TextArea : Control
             Bounds.Height - Padding.Top - Padding.Bottom);
         return dc.PushClip(clipRect);
     }
-    private double RenderTextWithFormatting(DrawingContext dc, string text, Line.Formatting formatting, Point cursor)
+    private void OnFontSizeChanged()
     {
-        var formattedText = FormatText(text);
-
-        if (formatting.Foreground != null)
-            formattedText.SetForegroundBrush(formatting.Foreground);
-        if (formatting.Typeface != null)
-            formattedText.SetFontTypeface(formatting.Typeface.Value);
-
-        double textWidth = formattedText.WidthIncludingTrailingWhitespace;
-
-        if (formatting.Background != null) // TODO: Instead of 0.5px padding try snapping the Rect to the middle of px
-            dc.FillRectangle(formatting.Background,
-                new Rect(cursor - new Point(0.25, 0.25), new Size(textWidth + 0.5, formattedText.Height + 0.5)));
-
-
-        dc.DrawText(formattedText, cursor);
-
-        return textWidth;
+        _lineHeight = GetInitialLineHeight(FontFamily, FontSize);
+        InvalidateVisual();
     }
 
-    private void RenderLineBackground(DrawingContext dc, Point cursor, IBrush? background)
+    private void OnFontFamilyChanged()
     {
-        if (background == null)
-            return;
-        
-        dc.FillRectangle(background, new Rect(0, cursor.Y, Bounds.Width, GetLineHeight()));
+        _lineHeight = GetInitialLineHeight(FontFamily, FontSize);
+        InvalidateVisual();
     }
 
-    private double GetLineWidth(Line line, int length = -1)
+    private double GetInitialLineHeight(FontFamily fontFamily, double fontSize)
     {
-        Debug.Assert(length <= line.Text.Length);
-
-        if (length < 0)
-            length = line.Text.Length;
-
-        double width = 0;
-        int cursor = 0;
-        foreach(var (text, formatting) in line)
-        {
-            int currCursor = Math.Min(cursor + text.Length, length);
-            string textFragment = text.Substring(0, currCursor - cursor);
-            width += FormatText(textFragment, formatting.Typeface).WidthIncludingTrailingWhitespace;
-            cursor = currCursor;
-
-            if (cursor >= length)
-                break;
-        }
-
-        return width;
-    }
-
-    private double GetLineHeight()
-    {
-        return FormatText(".").Height;
-    }
-
-    private FormattedText FormatText(string text, Typeface? typeface = null)
-    {
-        typeface ??= new Typeface(FontFamily);
-        return new FormattedText(text, CultureInfo.CurrentCulture, FlowDirection.LeftToRight, typeface.Value, FontSize,
-            Foreground);
-    }
-
-    private struct Line : IEnumerable<(string, Line.Formatting)>
-    {
-        public readonly string Text;
-
-        private readonly OverlappingRanges<IBrush?> _foregrounds = new();
-        private readonly OverlappingRanges<IBrush?> _backgrounds = new();
-        private readonly OverlappingRanges<Typeface?> _typefaces = new();
-        private Ranges<(IBrush? Foreground, IBrush? Background, Typeface? Typeface)>? _formattings = null;
-
-        public IBrush? Background { get; set; }
-        
-        public Line(string text)
-        {
-            Text = text;
-
-            _foregrounds.AddRange(0, Text.Length, Formatting.Default.Foreground);
-            _backgrounds.AddRange(0, Text.Length, Formatting.Default.Background);
-            _typefaces.AddRange(0, Text.Length, Formatting.Default.Typeface);
-        }
-
-        public void AddFormatting(int begin, int length, IBrush? foreground = null, IBrush? background = null, FontFamily? font = null)
-        {
-            Typeface? typeface = font != null ? new Typeface(font) : null;
-            AddFormatting(begin, length, new Formatting() { Foreground = foreground, Background = background, Typeface = typeface });
-        }
-
-        public void AddFormatting(int begin, int length, Formatting formatting)
-        {
-            Debug.Assert(begin >= 0 && begin < Text.Length);
-            Debug.Assert(length >= 0);
-
-            if (length == 0)
-                return;
-
-            int end = begin + length;
-
-            if (formatting.Foreground != null)
-                _foregrounds.AddRange(begin, end, formatting.Foreground);
-            if (formatting.Background != null)
-                _backgrounds.AddRange(begin, end, formatting.Background);
-            if (formatting.Typeface != null)
-                _typefaces.AddRange(begin, end, formatting.Typeface.Value);
-
-            _formattings = null;
-        }
-
-        IEnumerator IEnumerable.GetEnumerator()
-        {
-            return GetEnumerator();
-        }
-
-        public IEnumerator<(string, Formatting)> GetEnumerator()
-        {
-            MergeFormattings();
-            return new LineEnumerator(Text, _formattings!);
-        }
-
-        private void MergeFormattings()
-        {
-            if (_formattings != null)
-                return;
-
-            _formattings = RangesMerger.Merge(_foregrounds, _backgrounds, _typefaces);
-        }
-
-        public struct Formatting
-        {
-            public static readonly Formatting Default = new Formatting() { };
-
-            public IBrush? Foreground;
-            public IBrush? Background;
-            public Typeface? Typeface;
-        }
-
-        private class LineEnumerator(string _text, Ranges<(IBrush? Foreground, IBrush? Background, Typeface? Font)> mergedFormattings)
-            : IEnumerator<(string Text, Formatting Value)>
-        {
-            private int _index = -1;
-
-            public (string Text, Line.Formatting Value) Current
-            {
-                get
-                {
-                    var (begin, end, (foreground, background, typeface)) = mergedFormattings.GetRangeAtIndex(_index);
-                    var textSpan = _text.Substring(begin, end - begin);
-                    return (textSpan, new Line.Formatting() { Foreground = foreground, Background = background, Typeface = typeface });
-                }
-            }
-                
-
-            object IEnumerator.Current => Current;
-
-            public bool MoveNext() => ++_index < mergedFormattings.Count;
-
-            public void Reset() { _index = -1; }
-
-            public void Dispose() { }
-        }
+        using TextAreaLine dummyLine = new("A".AsMemory(), Brushes.Black, fontFamily, fontSize);
+        dummyLine.Shape();
+        return dummyLine.Height;
     }
 }

@@ -8,7 +8,7 @@ public interface ILineProvider
 {
     public Task LoadData(Action<int> progressCallback, CancellationToken token = default);
     public int Count { get; }
-    public string this[int index] { get; }
+    public string this[int index] { get; } // FIXME: This should return a ReadOnlyMemory<char>
     public int GetLineLength(int index); // FIXME: This does not seem to be used anywhere. Is it needed?
     public int GetLineNumber(int index);
     public int GetLineIndex(int lineNUmber);
