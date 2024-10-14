@@ -54,13 +54,13 @@ public partial class FileView : UserControl
         if (string.IsNullOrEmpty(selection))
             return;
 
-        if (_highlights.Contains(selection))
+        if (_highlights.Contains(selection.AsMemory()))
         {
-            _highlights.Remove(selection);
+            _highlights.Remove(selection.AsMemory());
             return;
         }
 
-        _highlights.Add(selection);
+        _highlights.Add(selection.AsMemory());
         Log.Debug("Highlight {selection}", selection);
     }
 

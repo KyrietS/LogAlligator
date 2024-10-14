@@ -11,6 +11,16 @@ namespace LogAlligator.App.Utils
         public bool IsCaseSensitive { get; set; }
         public bool IsRegex { get; set; }
 
+        public bool Equals(ReadOnlyMemory<char> otherPattern)
+        {
+            return Pattern.Span == otherPattern.Span;
+        }
+
+        public override string ToString()
+        {
+            return Pattern.ToString();
+        }
+
         public SearchPattern(ReadOnlyMemory<char> pattern, bool caseSensitive = false, bool regex = false)
         {
             Pattern = pattern;

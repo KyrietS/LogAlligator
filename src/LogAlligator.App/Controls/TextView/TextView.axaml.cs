@@ -245,6 +245,8 @@ public partial class TextView : UserControl
             LineNumbers[i] = _lines.GetLineNumber(lineIndex);
             TextArea[i] = line.AsMemory();
 
+            // TODO: Move these formattings to separate functions
+
             // Background of line where the caret is
             if (lineIndex == _caretPosition?.Line)
             {
@@ -255,20 +257,15 @@ public partial class TextView : UserControl
             // Highlights
             foreach (var (pattern, background, foreground) in _highlights ?? [])
             {
-                int index = 0;
-                while (index < line.Length)
+                var matches = pattern.MatchAll(line.AsMemory());
+                foreach (var (matchBegin, matchEnd) in matches)
                 {
-                    index = line.IndexOf(pattern, index, StringComparison.OrdinalIgnoreCase);
-                    if (index == -1)
-                        break;
-
-                    TextArea.ApplyStyleToLine(i, (index..(index + pattern.Length)),
+                    TextArea.ApplyStyleToLine(i, (matchBegin..matchEnd),
                         new Style
                         {
                             Background = new SolidColorBrush(background),
                             Typeface = new Typeface(TextArea.SecondaryFontFamily)
                         });
-                    index += pattern.Length;
                 }
             }
             // Selection
@@ -279,7 +276,7 @@ public partial class TextView : UserControl
                 TextArea.ApplyStyleToLine(i, (selectionBegin..selectionEnd),
                     new Style { Foreground = HighlightForeground, Background = HighlightBackground });
             }
-
+            // Search highlight
             if (_searchHighlight != null)
             {
                 var matches = _searchHighlight.MatchAll(line.AsMemory());

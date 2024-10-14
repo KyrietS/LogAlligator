@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using Avalonia;
 using Avalonia.Controls;
@@ -44,7 +45,7 @@ public partial class HighlightsView : UserControl
 
         foreach (var pattern in patternsToRemove)
         {
-            _highlights?.Remove(pattern);
+            _highlights?.Remove(pattern.AsMemory());
         }
     }
 

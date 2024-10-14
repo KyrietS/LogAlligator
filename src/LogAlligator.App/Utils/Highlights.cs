@@ -2,19 +2,17 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using Avalonia.Media;
 
 namespace LogAlligator.App.Utils;
 
 public record struct Highlight
 {
-    public string Pattern { get; set; }
+    public SearchPattern Pattern { get; set; }
     public Color Background { get; set; }
     public Color? Foreground { get; set; }
 
-    public void Deconstruct(out string pattern, out Color background, out Color? foreground)
+    public void Deconstruct(out SearchPattern pattern, out Color background, out Color? foreground)
     {
         pattern = Pattern;
         background = Background;
@@ -23,7 +21,7 @@ public record struct Highlight
 
     public override string ToString()
     {
-        return Pattern;
+        return Pattern.Pattern.ToString();
     }
 }
 
@@ -33,32 +31,32 @@ public class Highlights : IEnumerable<Highlight>
 
     public event EventHandler? OnChange;
 
-    public void Add(string pattern, Color background)
+    public void Add(ReadOnlyMemory<char> pattern, Color background)
     {
         if (pattern.Length == 0 || Contains(pattern))
             return;
 
-        _highlights.Add(new Highlight { Pattern = pattern, Background = background });
+        _highlights.Add(new Highlight { Pattern = new SearchPattern(pattern), Background = background });
         OnChange?.Invoke(this, EventArgs.Empty);
     }
 
-    public void Add(string pattern)
+    public void Add(ReadOnlyMemory<char> pattern)
     {
         Add(pattern, GetColor());
     }
 
-    public void Remove(string pattern)
+    public void Remove(ReadOnlyMemory<char> pattern)
     {
         if (!Contains(pattern))
             return;
 
-        _highlights.RemoveAll(h => h.Pattern == pattern);
+        _highlights.RemoveAll(h => h.Pattern.Equals(pattern));
         OnChange?.Invoke(this, EventArgs.Empty);
     }
 
-    public bool Contains(string pattern)
+    public bool Contains(ReadOnlyMemory<char> pattern)
     {
-        return _highlights.Any(h => h.Pattern == pattern);
+        return _highlights.Any(h => h.Pattern.Equals(pattern));
     }
 
     private Color GetColor()
