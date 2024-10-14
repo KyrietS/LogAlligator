@@ -64,10 +64,22 @@ public partial class HighlightsView : UserControl
 
         foreach (var highlight in _highlights ?? [])
         {
-            var item = new ListBoxItem { Content = highlight.Pattern };
+            var item = new ListBoxItem { Content = highlight.ToString() };
+
+            item.ContextMenu = BuildContextMenu(highlight.Pattern);
             items.Add(item);
         }
 
         return items;
+    }
+
+    ContextMenu BuildContextMenu(SearchPattern pattern)
+    {
+        var delete = new MenuItem { Header = "Delete" };
+        delete.Click += (_, _) => _highlights?.Remove(pattern.Pattern);
+
+        var contextMenu = new ContextMenu();
+        contextMenu.Items.Add(delete);
+        return contextMenu;
     }
 }
