@@ -431,7 +431,7 @@ public partial class TextView : UserControl
     private void LineNumbers_PointerPressed(object? sender, PointerPressedEventArgs e)
     {
         var pointer = e.GetCurrentPoint(LineNumbers);
-        if (pointer.Properties.IsLeftButtonPressed)
+        if (pointer.Properties.IsLeftButtonPressed && LineNumbers.NumberOfLines > 0)
         {
             _selectionOngoing = true;
             var cursor = pointer.Position;
