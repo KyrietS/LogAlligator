@@ -73,7 +73,7 @@ public partial class HighlightsView : UserControl
         return items;
     }
 
-    ContextMenu BuildContextMenu(SearchPattern pattern)
+    private ContextMenu BuildContextMenu(SearchPattern pattern)
     {
         var delete = new MenuItem { Header = "Delete" };
         delete.Click += (_, _) => _highlights?.Remove(pattern.Pattern);

@@ -14,6 +14,7 @@ namespace LogAlligator.App.Utils
         public int LineNumber { get; set; }
     }
 
+    // FIXME: All bookmarks should be sorted by line number. Be careful with context menu when you do this.
     public class Bookmarks : IEnumerable<Bookmark>
     {
         private List<Bookmark> _bookmarks = new();

@@ -68,10 +68,21 @@ public partial class BookmarksView : UserControl
         foreach (var bookmark in _bookmarks ?? [])
         {
             var item = new ListBoxItem { Content = bookmark.Name };
+            item.ContextMenu = BuildContextMenu(items.Count);
             item.DoubleTapped += (_, _) => JumpToBookmark?.Invoke(this, bookmark.LineNumber);
             items.Add(item);
         }
 
         return items;
+    }
+
+    private ContextMenu BuildContextMenu(int index)
+    {
+        var delete = new MenuItem { Header = "Delete" };
+        delete.Click += (_, _) => _bookmarks?.RemoveAt(index);
+
+        var contextMenu = new ContextMenu();
+        contextMenu.Items.Add(delete);
+        return contextMenu;
     }
 }
