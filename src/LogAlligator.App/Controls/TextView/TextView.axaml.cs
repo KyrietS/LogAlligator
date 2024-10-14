@@ -57,12 +57,12 @@ public partial class TextView : UserControl
                 _caretPosition = null;
                 return;
             }
-            
+
             if (value.Value.Line < 0 || value.Value.Line >= _lines.Count)
                 throw new ArgumentOutOfRangeException(nameof(value), value, "Caret line position out of range");
             if (value.Value.Char > _lines[value.Value.Line].Length)
                 throw new ArgumentOutOfRangeException(nameof(value), value, "Caret char position out of range");
-            
+
             _caretPosition = value;
         }
     }
@@ -88,7 +88,7 @@ public partial class TextView : UserControl
 
         WeakEventHandlerManager.Subscribe<Application, EventArgs, TextView>(
             Application.Current!, nameof(Application.ActualThemeVariantChanged), OnActualThemeVariantChanged);
-        
+
         if (Design.IsDesignMode)
         {
             var designLineProvider = new DesignLineProvider();
@@ -133,7 +133,7 @@ public partial class TextView : UserControl
         _selection.SetBegin(lineIndex, begin);
         _selection.SetEnd(lineIndex, begin + length);
     }
-    
+
     public void Refresh()
     {
         LoadData();
@@ -192,12 +192,12 @@ public partial class TextView : UserControl
     {
         if (_selection.Start == _selection.Stop)
             return string.Empty;
-        
+
         StringBuilder sb = new();
         for (int lineIndex = _selection.Start.LineIndex; lineIndex <= _selection.Stop.LineIndex; lineIndex++)
         {
             var line = _lines[lineIndex];
-            
+
             if (lineIndex == _selection.Start.LineIndex && lineIndex == _selection.Stop.LineIndex)
             {
                 sb.Append(line[_selection.Start.CharIndex.._selection.Stop.CharIndex]);
@@ -221,13 +221,13 @@ public partial class TextView : UserControl
         sb.Remove(sb.Length - Environment.NewLine.Length, Environment.NewLine.Length);
         return sb.ToString();
     }
-    
+
     private void LoadData()
     {
         _numberOfLines = Math.Min(_lines.Count - _topLineIndex, TextArea.NumberOfLinesThatCanFit);
         TextArea.NumberOfLines = _numberOfLines;
         LineNumbers.NumberOfLines = _numberOfLines;
-        
+
         for (int i = 0; i < _numberOfLines; i++)
         {
             int lineIndex = _topLineIndex + i;
@@ -254,9 +254,9 @@ public partial class TextView : UserControl
                         break;
 
                     TextArea.AppendFormattingToLine(
-                        i, 
-                        (index..(index + pattern.Length)), 
-                        background: new SolidColorBrush(background), 
+                        i,
+                        (index..(index + pattern.Length)),
+                        background: new SolidColorBrush(background),
                         typeface: new Typeface(TextArea.SecondaryFontFamily)
                     );
                     index += pattern.Length;
@@ -321,7 +321,7 @@ public partial class TextView : UserControl
             var (lineIndex, charIndex) = TextArea.GetCharIndexAtPosition(cursor);
             lineIndex += _topLineIndex;
             _caretPosition = (lineIndex, charIndex);
-            
+
             if (e.ClickCount == 1)
                 _selection.SetBegin(lineIndex, charIndex);
             else if (e.ClickCount == 2)
@@ -352,7 +352,7 @@ public partial class TextView : UserControl
             var (lineIndex, charIndex) = TextArea.GetCharIndexAtPosition(cursor);
             lineIndex += _topLineIndex;
             _caretPosition = (lineIndex, charIndex);
-            
+
             _selection.SetEnd(lineIndex, charIndex);
             LoadData();
         }
@@ -370,7 +370,7 @@ public partial class TextView : UserControl
 
         if (line.Length == 0)
             return;
-        
+
         charIndex = Math.Clamp(charIndex, 0, line.Length - 1);
         int begin = charIndex;
         int end = charIndex;
@@ -466,7 +466,7 @@ public partial class TextView : UserControl
             e.Handled = true;
         }
     }
-    
+
     private void OnActualThemeVariantChanged(object? sender, EventArgs e)
     {
         LoadData();
