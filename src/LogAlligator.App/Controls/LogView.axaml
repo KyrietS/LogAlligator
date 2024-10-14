@@ -47,9 +47,9 @@
                             <Image Source="/Assets/Icons/arrow-090.png" Stretch="Fill" />
                         </Button>
                         <Panel Width="10" />
-                        <ToggleButton Content="_Case sensitive"/>
+                        <ToggleButton Content="_Case sensitive" Name="CaseSensitiveButton" Click="CaseSensitiveButtonClicked"/>
                         <ToggleButton Content="_RegExp"/>
-                        <ToggleButton Content="_Highlight" Name="SearchHighlightButton" Click="SearchHighlightButtonPressed"/>
+                        <ToggleButton Content="_Highlight" Name="SearchHighlightButton" Click="SearchHighlightButtonClicked"/>
                         <ToggleButton Content="_All occurrences" IsEnabled="False"/>
                     </StackPanel>
                 </Border>

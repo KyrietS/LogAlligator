@@ -29,7 +29,7 @@ public partial class TextView : UserControl
 
     private Highlights? _highlights;
     private Bookmarks? _bookmarks;
-    private string? _searchHighlight;
+    private SearchPattern? _searchHighlight;
 
     private static readonly StyledProperty<IBrush> HighlightBackgroundProperty =
     AvaloniaProperty.Register<TextView, IBrush>(nameof(HighlightBackground), new SolidColorBrush(Color.FromRgb(0, 120, 215)));
@@ -47,15 +47,12 @@ public partial class TextView : UserControl
         set => SetValue(HighlightForegroundProperty, value);
     }
 
-    public string? SearchHighlight
+    public SearchPattern? SearchHighlight
     {
         set
         {
-            if (value != _searchHighlight)
-            {
-                _searchHighlight = value;
-                Refresh();
-            }
+            _searchHighlight = value;
+            Refresh();
         }
     }
 
@@ -279,24 +276,17 @@ public partial class TextView : UserControl
             {
                 int selectionBegin = begin ?? 0;
                 int selectionEnd = end ?? line.Length;
-                TextArea.ApplyStyleToLine(i, (selectionBegin..selectionEnd), 
+                TextArea.ApplyStyleToLine(i, (selectionBegin..selectionEnd),
                     new Style { Foreground = HighlightForeground, Background = HighlightBackground });
             }
-            // TODO: Do not copy the code from Highlight. Refator it.
-            // TODO: Instead of background I should add border around the text (TextArea do not support it yet)
-            // Search highlight
-            if (_searchHighlight != null && _searchHighlight.Length > 0)
-            {
-                int index = 0;
-                while (index < line.Length)
-                {
-                    index = line.IndexOf(_searchHighlight, index, StringComparison.OrdinalIgnoreCase);
-                    if (index == -1)
-                        break;
 
-                    TextArea.ApplyStyleToLine(i, (index..(index + _searchHighlight.Length)),
+            if (_searchHighlight != null)
+            {
+                var matches = _searchHighlight.MatchAll(line.AsMemory());
+                foreach (var (searchBegin, searchEnd) in matches)
+                {
+                    TextArea.ApplyStyleToLine(i, (searchBegin..searchEnd),
                         new Style { Border = new Pen(new SolidColorBrush(Colors.GreenYellow), thickness: 1) });
-                    index += _searchHighlight.Length;
                 }
             }
         }

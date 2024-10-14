@@ -1,6 +1,6 @@
 using System;
 using Avalonia.Controls;
-using Avalonia.Controls.Primitives;
+using Avalonia.Interactivity;
 using LogAlligator.App.LineProvider;
 using LogAlligator.App.Utils;
 using MsBox.Avalonia;
@@ -15,19 +15,20 @@ public partial class LogView : UserControl
     private Highlights? _highlights = null;
     private Bookmarks? _bookmarks = null;
     private bool SearchHighlightEnabled => SearchHighlightButton.IsChecked ?? false;
+    private bool CaseSensitiveEnabled => CaseSensitiveButton.IsChecked ?? false;
 
     public LogView()
     {
         this.DataContext = this;
         InitializeComponent();
     }
-    
+
     public void FocusOnSearch()
     {
         SearchBox.Focus();
         SearchBox.SelectAll();
     }
-    
+
     internal void Initialize(ILineProvider lineProvider, Highlights highlights, Bookmarks bookmarks)
     {
         _lineProvider = lineProvider;
@@ -58,7 +59,7 @@ public partial class LogView : UserControl
     }
 
     // TODO: FIXME: This needs A LOT of optimization. It's much slower than it should be.
-    private void Search(string searchPhrase, bool down = true)
+    private void Search(SearchPattern pattern, bool down = true)
     {
         var (lineIndex, character) = TextView.CaretPosition ?? (0, 0);
 
@@ -69,12 +70,12 @@ public partial class LogView : UserControl
 
         if (lineIndex < 0 || lineIndex >= _lineProvider.Count)
             return;
-        if (searchPhrase.Length == 0)
+        if (pattern.Pattern.Length == 0)
             return;
 
         while (lineIndex != endLineIndex)
         {
-            if (SearchInLine(lineIndex, searchPhrase))
+            if (SearchInLine(lineIndex, pattern))
                 return;
 
             lineIndex += nextLineDiff;
@@ -87,45 +88,67 @@ public partial class LogView : UserControl
         box.ShowWindowDialogAsync(this.VisualRoot as Window);
     }
 
-    private bool SearchInLine(int lineIndex, string searchPhrase)
+    private bool SearchInLine(int lineIndex, SearchPattern pattern)
     {
+        // TODO: What about searching in the same line?
         var line = _lineProvider[lineIndex];
-        if (!line.Contains(searchPhrase, StringComparison.InvariantCultureIgnoreCase))
+
+        var results = pattern.MatchAll(line.AsMemory());
+        if (results.Count == 0)
             return false;
 
-        int begin = line.IndexOf(searchPhrase, StringComparison.InvariantCultureIgnoreCase);
-        Log.Debug("Found \"{searchPhrase}\" at line: {lineIndex}", searchPhrase, lineIndex);
+        var (begin, end) = results[0];
+        Log.Debug("Found \"{searchPhrase}\" at line: {lineIndex}", pattern.Pattern, lineIndex);
         TextView.ScrollToLine(lineIndex);
-        TextView.SelectText(lineIndex, begin, searchPhrase.Length);
+        TextView.SelectText(lineIndex, begin, end - begin);
         TextView.Refresh();
         return true;
     }
 
     public void SearchDown()
     {
-        Search(SearchBox.Text ?? "", down: true);
+        if (string.IsNullOrEmpty(SearchBox.Text))
+            return;
+
+        var pattern = new SearchPattern(SearchBox.Text.AsMemory());
+        Search(pattern, down: true);
     }
 
     public void SearchUp()
     {
-        Search(SearchBox.Text ?? "", down: false);
+        if (string.IsNullOrEmpty(SearchBox.Text))
+            return;
+
+        var pattern = new SearchPattern(SearchBox.Text.AsMemory());
+        Search(pattern, down: false);
     }
 
-    private void SearchBoxChanged(object? sender, Avalonia.Controls.TextChangedEventArgs e)
+    private SearchPattern PrepareSearchPattern()
+    {
+        return new SearchPattern(SearchBox.Text.AsMemory(), caseSensitive: CaseSensitiveEnabled);
+    }
+
+    private void SearchBoxChanged(object? sender, TextChangedEventArgs e)
     {
         if (SearchHighlightEnabled)
         {
-            TextView.SearchHighlight = SearchBox.Text;
+            TextView.SearchHighlight = PrepareSearchPattern();
         }
     }
 
-    private void SearchHighlightButtonPressed(object? sender, Avalonia.Interactivity.RoutedEventArgs e)
+    private void CaseSensitiveButtonClicked(object? sender, RoutedEventArgs e)
     {
-        ToggleButton button = (ToggleButton)sender!;
-
         if (SearchHighlightEnabled)
         {
-            TextView.SearchHighlight = SearchBox.Text;
+            TextView.SearchHighlight = PrepareSearchPattern();
+        }
+    }
+
+    private void SearchHighlightButtonClicked(object? sender, RoutedEventArgs e)
+    {
+        if (SearchHighlightEnabled)
+        {
+            TextView.SearchHighlight = PrepareSearchPattern();
         }
         else
         {
