@@ -6,7 +6,7 @@ namespace LogAlligator.App.Controls
     {
         public IBrush? Foreground;
         public IBrush? Background;
-        public IBrush? Border;
+        public IPen? Border;
         public Typeface? Typeface;
     }
 }

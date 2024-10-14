@@ -295,7 +295,7 @@ public partial class TextView : UserControl
                         break;
 
                     TextArea.ApplyStyleToLine(i, (index..(index + _searchHighlight.Length)),
-                        new Style { Border = new SolidColorBrush(Colors.Black) });
+                        new Style { Border = new Pen(new SolidColorBrush(Colors.GreenYellow), thickness: 1) });
                     index += _searchHighlight.Length;
                 }
             }

@@ -42,6 +42,23 @@ internal static class RangesMerger
         return result;
     }
 
+    public static Ranges<(T1, T2, T3, T4)> Merge<T1, T2, T3, T4>(Ranges<T1> channel1, Ranges<T2> channel2, Ranges<T3> channel3, Ranges<T4> channel4)
+    {
+        if (channel1.Count == 0 && channel2.Count == 0 && channel3.Count == 0)
+            return new Ranges<(T1, T2, T3, T4)>(0);
+
+        Debug.Assert(channel1.First().Begin == channel2.First().Begin &&
+            channel2.First().Begin == channel3.First().Begin &&
+            channel3.First().Begin == channel4.First().Begin, "Cannot merge ranges with different begin");
+
+        MergedRanges merged = new([channel1.Boundaries, channel2.Boundaries, channel3.Boundaries, channel4.Boundaries]);
+        Ranges<(T1, T2, T3, T4)> result = new(merged.Boundaries.Count);
+        foreach (var (begin, values) in merged.Boundaries)
+        {
+            result.Boundaries[begin] = ((T1)values[0].Value!, (T2)values[1].Value!, (T3)values[2].Value!, (T4)values[3].Value!);
+        }
+        return result;
+    }
 
     private class MergedRanges : Ranges<MergedRanges.MergedValue[]>
     {

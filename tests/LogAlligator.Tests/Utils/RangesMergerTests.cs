@@ -7,6 +7,7 @@ public class RangesMergerTests
     private OverlappingRanges<char?> channel1 = new();
     private OverlappingRanges<char?> channel2 = new();
     private OverlappingRanges<char?> channel3 = new();
+    private OverlappingRanges<char?> channel4 = new();
 
     [Fact]
     public void MergeTwoIdenticalChannels()
@@ -153,5 +154,19 @@ public class RangesMergerTests
         Assert.Equal((0, 4, ('a', 'b', null)), result[0]);
         Assert.Equal((4, 6, ('a', null, null)), result[1]);
         Assert.Equal((6, 9, ('a', 'c', null)), result[2]);
+    }
+
+    [Fact]
+    public void MergeFourRanges()
+    {
+        channel1.AddRange(0, 9, 'a');
+        channel2.AddRange(0, 9, 'b');
+        channel3.AddRange(0, 9, 'c');
+        channel4.AddRange(0, 9, 'd');
+
+        var result = RangesMerger.Merge(channel1, channel2, channel3, channel4);
+
+        Assert.Single(result);
+        Assert.Equal((0, 9, ('a', 'b', 'c', 'd')), result[0]);
     }
 }
