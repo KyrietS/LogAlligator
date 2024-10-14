@@ -237,55 +237,19 @@ public partial class TextView : UserControl
         TextArea.NumberOfLines = _numberOfLines;
         LineNumbers.NumberOfLines = _numberOfLines;
 
-        for (int i = 0; i < _numberOfLines; i++)
+        for (int viewLineIndex = 0; viewLineIndex < _numberOfLines; viewLineIndex++)
         {
-            int lineIndex = _topLineIndex + i;
-            var line = _lines[lineIndex];
+            int fileLineIndex = GetFileLineIndex(viewLineIndex);
+            var line = _lines[fileLineIndex].AsMemory();
 
-            LineNumbers[i] = _lines.GetLineNumber(lineIndex);
-            TextArea[i] = line.AsMemory();
+            LineNumbers[viewLineIndex] = _lines.GetLineNumber(fileLineIndex);
+            TextArea[viewLineIndex] = line;
 
-            // TODO: Move these formattings to separate functions
+            SetBackgroundToLineWithCaret(viewLineIndex);
+            SetLineHighlight(viewLineIndex, line);
+            SetLineSelection(viewLineIndex, line);
+            SetLineSearchHighlight(viewLineIndex, line);
 
-            // Background of line where the caret is
-            if (lineIndex == _caretPosition?.Line)
-            {
-                var textAreaFontColor = TextArea.Foreground as SolidColorBrush;
-                TextArea.SetLineBackground(i, new SolidColorBrush(textAreaFontColor!.Color, 0.1));
-                LineNumbers.SetLineBackground(i, new SolidColorBrush(textAreaFontColor!.Color, 0.1));
-            }
-            // Highlights
-            foreach (var (pattern, background, foreground) in _highlights ?? [])
-            {
-                var matches = pattern.MatchAll(line.AsMemory());
-                foreach (var (matchBegin, matchEnd) in matches)
-                {
-                    TextArea.ApplyStyleToLine(i, (matchBegin..matchEnd),
-                        new Style
-                        {
-                            Background = new SolidColorBrush(background),
-                            Typeface = new Typeface(TextArea.SecondaryFontFamily)
-                        });
-                }
-            }
-            // Selection
-            if (_selection.GetSelectionAtLine(lineIndex) is var (begin, end))
-            {
-                int selectionBegin = begin ?? 0;
-                int selectionEnd = end ?? line.Length;
-                TextArea.ApplyStyleToLine(i, (selectionBegin..selectionEnd),
-                    new Style { Foreground = HighlightForeground, Background = HighlightBackground });
-            }
-            // Search highlight
-            if (_searchHighlight != null)
-            {
-                var matches = _searchHighlight.MatchAll(line.AsMemory());
-                foreach (var (searchBegin, searchEnd) in matches)
-                {
-                    TextArea.ApplyStyleToLine(i, (searchBegin..searchEnd),
-                        new Style { Border = new Pen(new SolidColorBrush(Colors.GreenYellow), thickness: 1) });
-                }
-            }
         }
         TextArea.ShapeAllLines();
         _maxLineWidth = Math.Max(_maxLineWidth, TextArea.MaxLineWidth);
@@ -295,6 +259,65 @@ public partial class TextView : UserControl
 
         LineNumbers.InvalidateVisual();
         TextArea.InvalidateVisual();
+    }
+
+    private void SetBackgroundToLineWithCaret(int viewLineIndex)
+    {
+        // Background of line where the caret is
+        if (GetFileLineIndex(viewLineIndex) == _caretPosition?.Line)
+        {
+            var textAreaFontColor = TextArea.Foreground as SolidColorBrush;
+            TextArea.SetLineBackground(viewLineIndex, new SolidColorBrush(textAreaFontColor!.Color, 0.1));
+            LineNumbers.SetLineBackground(viewLineIndex, new SolidColorBrush(textAreaFontColor!.Color, 0.1));
+        }
+    }
+
+    private void SetLineHighlight(int viewLineIndex, ReadOnlyMemory<char> line)
+    {
+        foreach (var (pattern, background, foreground) in _highlights ?? [])
+        {
+            var matches = pattern.MatchAll(line);
+            foreach (var (matchBegin, matchEnd) in matches)
+            {
+                TextArea.ApplyStyleToLine(viewLineIndex, (matchBegin..matchEnd),
+                    new Style
+                    {
+                        Background = new SolidColorBrush(background),
+                        Typeface = new Typeface(TextArea.SecondaryFontFamily)
+                    });
+            }
+        }
+    }
+
+    private void SetLineSelection(int viewLineIndex, ReadOnlyMemory<char> line)
+    {
+        var fileLineIndex = GetFileLineIndex(viewLineIndex);
+        if (_selection.GetSelectionAtLine(fileLineIndex) is var (begin, end))
+        {
+            int selectionBegin = begin ?? 0;
+            int selectionEnd = end ?? line.Length;
+            TextArea.ApplyStyleToLine(viewLineIndex, (selectionBegin..selectionEnd),
+                new Style { Foreground = HighlightForeground, Background = HighlightBackground });
+        }
+    }
+
+    private void SetLineSearchHighlight(int viewLineIndex, ReadOnlyMemory<char> line)
+    {
+        if (_searchHighlight != null)
+        {
+            var matches = _searchHighlight.MatchAll(line);
+            foreach (var (searchBegin, searchEnd) in matches)
+            {
+                TextArea.ApplyStyleToLine(viewLineIndex, (searchBegin..searchEnd),
+                    new Style { Border = new Pen(new SolidColorBrush(Colors.GreenYellow), thickness: 1) });
+            }
+        }
+    }
+
+
+    private int GetFileLineIndex(int viewLineIndex)
+    {
+        return _topLineIndex + viewLineIndex;
     }
 
     protected override void OnSizeChanged(SizeChangedEventArgs e)
