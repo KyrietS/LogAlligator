@@ -106,7 +106,7 @@ public partial class TextView : UserControl
             var designLineProvider = new DesignLineProvider();
             for (int i = 0; i < _numberOfLines; i++)
             {
-                designLineProvider.AddLine($"Sample text in line {i+1}");
+                designLineProvider.AddLine($"Sample text in line {i + 1}");
             }
 
             _lines = designLineProvider;
@@ -265,12 +265,12 @@ public partial class TextView : UserControl
                     if (index == -1)
                         break;
 
-                    TextArea.AppendFormattingToLine(
-                        i,
-                        (index..(index + pattern.Length)),
-                        background: new SolidColorBrush(background),
-                        typeface: new Typeface(TextArea.SecondaryFontFamily)
-                    );
+                    TextArea.ApplyStyleToLine(i, (index..(index + pattern.Length)),
+                        new Style
+                        {
+                            Background = new SolidColorBrush(background),
+                            Typeface = new Typeface(TextArea.SecondaryFontFamily)
+                        });
                     index += pattern.Length;
                 }
             }
@@ -279,7 +279,8 @@ public partial class TextView : UserControl
             {
                 int selectionBegin = begin ?? 0;
                 int selectionEnd = end ?? line.Length;
-                TextArea.AppendFormattingToLine(i, (selectionBegin .. selectionEnd), HighlightForeground, HighlightBackground);
+                TextArea.ApplyStyleToLine(i, (selectionBegin..selectionEnd), 
+                    new Style { Foreground = HighlightForeground, Background = HighlightBackground });
             }
             // TODO: Do not copy the code from Highlight. Refator it.
             // TODO: Instead of background I should add border around the text (TextArea do not support it yet)
@@ -293,11 +294,8 @@ public partial class TextView : UserControl
                     if (index == -1)
                         break;
 
-                    TextArea.AppendFormattingToLine(
-                    i,
-                        (index..(index + _searchHighlight.Length)),
-                        background: new SolidColorBrush(Colors.Yellow)
-                    );
+                    TextArea.ApplyStyleToLine(i, (index..(index + _searchHighlight.Length)),
+                        new Style { Border = new SolidColorBrush(Colors.Black) });
                     index += _searchHighlight.Length;
                 }
             }

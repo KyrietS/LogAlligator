@@ -63,7 +63,7 @@ class TextAreaLine : IDisposable
     private double _height = 0;
 
     private (int Begin, int End, ShapedBuffer Buffer)[]? _shapedBuffers = null;
-    private (GlyphRun GlyphRun, Formatting Formatting)[]? _glyphRuns = null;
+    private (GlyphRun GlyphRun, SliceStyle Formatting)[]? _glyphRuns = null;
     public IBrush? Background { get; set; }
 
     public double Width 
@@ -93,7 +93,7 @@ class TextAreaLine : IDisposable
         _fontSize = fontSize;
     }
 
-    public void AddFormatting(Range range, IBrush? foreground = null, IBrush? background = null, Typeface? typeface = null)
+    public void ApplyStyle(Range range, Style style)
     {
         int begin = range.Start.Value;
         int end = range.End.Value;
@@ -104,13 +104,13 @@ class TextAreaLine : IDisposable
         Debug.Assert(begin >= 0 && begin < Text.Length);
         Debug.Assert(begin <= end);
 
-        if (foreground != null)
-            _foregrounds.AddRange(begin, end, foreground);
-        if (background != null)
-            _highlights.AddRange(begin, end, background);
-        if (typeface != null)
+        if (style.Foreground != null)
+            _foregrounds.AddRange(begin, end, style.Foreground);
+        if (style.Background != null)
+            _highlights.AddRange(begin, end, style.Background);
+        if (style.Typeface != null)
         {
-            _typefaces.AddRange(begin, end, typeface.Value);
+            _typefaces.AddRange(begin, end, style.Typeface.Value);
         }
 
         _shapedBuffers = null;
@@ -161,13 +161,13 @@ class TextAreaLine : IDisposable
 
         int glyphRunIndex = 0;
         var formattings = RangesMerger.Merge(_foregrounds, _highlights, _typefaces);
-        _glyphRuns = new (GlyphRun, Formatting)[formattings.Count];
+        _glyphRuns = new (GlyphRun, SliceStyle)[formattings.Count];
         foreach (var (begin, end, (foreground, highlight, typeface)) in formattings)
         {
             var shapedBuffer = FindShapedBuffer(begin, end);
             var textSlice = Text.Slice(begin, end - begin);
             var glyphRun = new GlyphRun(typeface.GlyphTypeface, _fontSize, textSlice, shapedBuffer);
-            var formatting = new Formatting { Foreground = foreground, Background = highlight, Typeface = typeface };
+            var formatting = new SliceStyle { Foreground = foreground, Background = highlight, Typeface = typeface };
             _glyphRuns[glyphRunIndex++] = (glyphRun, formatting);
         }
 
@@ -226,10 +226,11 @@ class TextAreaLine : IDisposable
         _glyphRuns = null;
     }
 
-    public struct Formatting
+    private struct SliceStyle
     {
         public IBrush Foreground;
         public IBrush? Background;
+        public IBrush? Border;
         public Typeface Typeface;
     }
 

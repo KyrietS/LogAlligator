@@ -97,13 +97,13 @@ internal class TextArea : Control
         }
     }
 
-    public void AppendFormattingToLine(
-        int lineIndex, Range range, IBrush? foreground = null, IBrush? background = null, Typeface? typeface = null)
+    public void ApplyStyleToLine(
+        int lineIndex, Range range, Style style)
     {
         var line = _lines[lineIndex];
         try
         {
-            line.AddFormatting(range, foreground, background, typeface);
+            line.ApplyStyle(range, style);
         }
         catch (ArgumentOutOfRangeException ex)
         {
