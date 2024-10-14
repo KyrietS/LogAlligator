@@ -51,7 +51,7 @@ public class SearchPatternTests
 
         var sut = new SearchPattern("ab".AsMemory());
 
-        var result = sut.MatchAll("abxab".AsMemory());
+        var result = sut.MatchAll("ab_ab".AsMemory());
         Assert.Equal(2, result.Count);
         Assert.Equal((0, 2), result[0]);
         Assert.Equal((3, 5), result[1]);
@@ -62,7 +62,7 @@ public class SearchPatternTests
     {
         var sut = new SearchPattern("ab".AsMemory(), caseSensitive: false);
 
-        var result = sut.MatchAll("xxABxx".AsMemory());
+        var result = sut.MatchAll("__AB__".AsMemory());
         Assert.Single(result);
         Assert.Equal((2, 4), result[0]);
     }
@@ -72,7 +72,7 @@ public class SearchPatternTests
     {
         var sut = new SearchPattern("AB".AsMemory(), caseSensitive: false);
 
-        var result = sut.MatchAll("xxabxx".AsMemory());
+        var result = sut.MatchAll("__ab__".AsMemory());
         Assert.Single(result);
         Assert.Equal((2, 4), result[0]);
     }
@@ -82,7 +82,7 @@ public class SearchPatternTests
     {
         var sut = new SearchPattern("aB".AsMemory(), caseSensitive: true);
 
-        var result = sut.MatchAll("xxaBxx".AsMemory());
+        var result = sut.MatchAll("__aB__".AsMemory());
         Assert.Single(result);
         Assert.Equal((2, 4), result[0]);
     }
@@ -92,7 +92,73 @@ public class SearchPatternTests
     {
         var sut = new SearchPattern("aB".AsMemory(), caseSensitive: true);
 
-        var result = sut.MatchAll("xxabxx".AsMemory());
+        var result = sut.MatchAll("__ab__".AsMemory());
         Assert.Empty(result);
+    }
+
+    [Fact]
+    public void Regex_Simple_ShouldMatchAnyChar()
+    {
+        var sut = new SearchPattern("a.b".AsMemory(), regex: true);
+
+        var result = sut.MatchAll("_a_b_".AsMemory());
+        Assert.Equal((1, 4), result[0]);
+    }
+
+    [Fact]
+    public void Regex_Simple_ShouldMatchAnyrCharOrNone()
+    {
+        var sut = new SearchPattern("a.?b".AsMemory(), regex: true);
+
+        var result = sut.MatchAll("_a_b_".AsMemory());
+        Assert.Equal((1, 4), result[0]);
+    }
+
+    [Fact]
+    public void Regex_Simple_ShouldNotMatch()
+    {
+        var sut = new SearchPattern("a.b".AsMemory(), regex: true);
+
+        var result = sut.MatchAll("__ab__".AsMemory());
+        Assert.Empty(result);
+    }
+
+    [Fact]
+    public void Regex_Wildcard_ShouldMatch()
+    {
+        var sut = new SearchPattern("a.*b".AsMemory(), regex: true);
+
+        var result1 = sut.MatchAll("__ab__".AsMemory());
+        Assert.Equal( (2, 4), result1[0]);
+
+        var result2 = sut.MatchAll("__a_b__".AsMemory());
+        Assert.Equal((2, 5), result2[0]);
+    }
+
+    [Fact]
+    public void Regex_Wildcard_ShouldMatchTheLongestOccurence()
+    {
+        var sut = new SearchPattern("a.*b".AsMemory(), regex: true);
+
+        var result = sut.MatchAll("a_ab_b".AsMemory());
+        Assert.Equal((0, 6), result[0]);
+    }
+
+    [Fact]
+    public void Regex_CastSensitive_ShouldNotMatch()
+    {
+        var sut = new SearchPattern("a.b".AsMemory(), caseSensitive: true, regex: true);
+
+        var result = sut.MatchAll("A_B".AsMemory());
+        Assert.Empty(result);
+    }
+
+    [Fact]
+    public void Regex_CaseInsensitive_ShouldMatch()
+    {
+        var sut = new SearchPattern("a.b".AsMemory(), caseSensitive: false, regex: true);
+
+        var result = sut.MatchAll("A_B".AsMemory());
+        Assert.Equal((0, 3), result[0]);
     }
 }

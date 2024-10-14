@@ -48,7 +48,7 @@
                         </Button>
                         <Panel Width="10" />
                         <ToggleButton Content="_Case sensitive" Name="CaseSensitiveButton" Click="CaseSensitiveButtonClicked"/>
-                        <ToggleButton Content="_RegExp"/>
+                        <ToggleButton Content="_RegExp" Name="RegexButton" Click="RegexButtonClicked"/>
                         <ToggleButton Content="_Highlight" Name="SearchHighlightButton" Click="SearchHighlightButtonClicked"/>
                         <ToggleButton Content="_All occurrences" IsEnabled="False"/>
                     </StackPanel>

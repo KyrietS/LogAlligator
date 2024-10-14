@@ -15,7 +15,9 @@ public partial class LogView : UserControl
     private Highlights? _highlights = null;
     private Bookmarks? _bookmarks = null;
     private bool SearchHighlightEnabled => SearchHighlightButton.IsChecked ?? false;
+    private bool RegexEnabled => RegexButton.IsChecked ?? false;
     private bool CaseSensitiveEnabled => CaseSensitiveButton.IsChecked ?? false;
+
 
     public LogView()
     {
@@ -110,8 +112,7 @@ public partial class LogView : UserControl
         if (string.IsNullOrEmpty(SearchBox.Text))
             return;
 
-        var pattern = new SearchPattern(SearchBox.Text.AsMemory());
-        Search(pattern, down: true);
+        Search(PrepareSearchPattern(), down: true);
     }
 
     public void SearchUp()
@@ -119,13 +120,12 @@ public partial class LogView : UserControl
         if (string.IsNullOrEmpty(SearchBox.Text))
             return;
 
-        var pattern = new SearchPattern(SearchBox.Text.AsMemory());
-        Search(pattern, down: false);
+        Search(PrepareSearchPattern(), down: false);
     }
 
     private SearchPattern PrepareSearchPattern()
     {
-        return new SearchPattern(SearchBox.Text.AsMemory(), caseSensitive: CaseSensitiveEnabled);
+        return new SearchPattern(SearchBox.Text.AsMemory(), caseSensitive: CaseSensitiveEnabled, regex: RegexEnabled);
     }
 
     private void SearchBoxChanged(object? sender, TextChangedEventArgs e)
@@ -138,13 +138,20 @@ public partial class LogView : UserControl
 
     private void CaseSensitiveButtonClicked(object? sender, RoutedEventArgs e)
     {
-        if (SearchHighlightEnabled)
-        {
-            TextView.SearchHighlight = PrepareSearchPattern();
-        }
+        UpdateHighlight();
+    }
+
+    private void RegexButtonClicked(object? sender, RoutedEventArgs e)
+    {
+        UpdateHighlight();
     }
 
     private void SearchHighlightButtonClicked(object? sender, RoutedEventArgs e)
+    {
+        UpdateHighlight();
+    }
+
+    private void UpdateHighlight()
     {
         if (SearchHighlightEnabled)
         {
