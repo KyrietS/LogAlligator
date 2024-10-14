@@ -66,17 +66,17 @@ public partial class HighlightsView : UserControl
         {
             var item = new ListBoxItem { Content = highlight.ToString() };
 
-            item.ContextMenu = BuildContextMenu(highlight.Pattern);
+            item.ContextMenu = BuildContextMenu();
             items.Add(item);
         }
 
         return items;
     }
 
-    private ContextMenu BuildContextMenu(SearchPattern pattern)
+    private ContextMenu BuildContextMenu()
     {
         var delete = new MenuItem { Header = "Delete" };
-        delete.Click += (_, _) => _highlights?.Remove(pattern.Pattern);
+        delete.Click += (_, _) => OnDelete();
 
         var contextMenu = new ContextMenu();
         contextMenu.Items.Add(delete);

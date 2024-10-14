@@ -10,6 +10,7 @@ namespace LogAlligator.App.Utils
 {
     public record struct Bookmark
     {
+        public int Id { get; init; }
         public string Name { get; set; }
         public int LineNumber { get; set; }
     }
@@ -18,6 +19,7 @@ namespace LogAlligator.App.Utils
     public class Bookmarks : IEnumerable<Bookmark>
     {
         private List<Bookmark> _bookmarks = new();
+        private int _nextId = 1;
         public event EventHandler? OnChange;
 
         public void Add(string name, int lineNumber)
@@ -28,15 +30,17 @@ namespace LogAlligator.App.Utils
                 return;
             }
 
-            _bookmarks.Add(new Bookmark { Name = name, LineNumber = lineNumber });
+            _bookmarks.Add(new Bookmark { Id = _nextId++, Name = name, LineNumber = lineNumber });
+            SortBookmarks();
             OnChange?.Invoke(this, EventArgs.Empty);
         }
 
-        public void RemoveAt(int index)
+        public void RemoveById(int id)
         {
-            _bookmarks.RemoveAt(index);
+            _bookmarks.RemoveAll(b => b.Id == id);
             OnChange?.Invoke(this, EventArgs.Empty);
         }
+
         public IEnumerator<Bookmark> GetEnumerator()
         {
             return _bookmarks.GetEnumerator();
@@ -45,6 +49,11 @@ namespace LogAlligator.App.Utils
         IEnumerator IEnumerable.GetEnumerator()
         {
             return GetEnumerator();
+        }
+
+        private void SortBookmarks()
+        {
+            _bookmarks.Sort((b1, b2) => b1.LineNumber.CompareTo(b2.LineNumber));
         }
     }
 }

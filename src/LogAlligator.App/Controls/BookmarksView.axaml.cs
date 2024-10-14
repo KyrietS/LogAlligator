@@ -34,21 +34,19 @@ public partial class BookmarksView : UserControl
         if (ListOfBookmarks.SelectedItems is null)
             return;
 
-        List<int> bookmarksToRemove = [];
-        int index = 0;
+        List<int> bookmarkIdsToRemove = [];
         foreach (var selectedItem in ListOfBookmarks.SelectedItems)
         {
             if (selectedItem is ListBoxItem item)
             {
-                bookmarksToRemove.Add(index);
+                Bookmark bookmark = (Bookmark)item.DataContext!;
+                bookmarkIdsToRemove.Add(bookmark.Id);
             }
-
-            index++;
         }
 
-        foreach (int indexToRemove in bookmarksToRemove)
+        foreach (int bookmarkId in bookmarkIdsToRemove)
         {
-            _bookmarks!.RemoveAt(indexToRemove);
+            _bookmarks!.RemoveById(bookmarkId);
         }
     }
 
@@ -68,7 +66,8 @@ public partial class BookmarksView : UserControl
         foreach (var bookmark in _bookmarks ?? [])
         {
             var item = new ListBoxItem { Content = bookmark.Name };
-            item.ContextMenu = BuildContextMenu(items.Count);
+            item.DataContext = bookmark;
+            item.ContextMenu = BuildContextMenu();
             item.DoubleTapped += (_, _) => JumpToBookmark?.Invoke(this, bookmark.LineNumber);
             items.Add(item);
         }
@@ -76,10 +75,10 @@ public partial class BookmarksView : UserControl
         return items;
     }
 
-    private ContextMenu BuildContextMenu(int index)
+    private ContextMenu BuildContextMenu()
     {
         var delete = new MenuItem { Header = "Delete" };
-        delete.Click += (_, _) => _bookmarks?.RemoveAt(index);
+        delete.Click += (_, _) => OnDelete();
 
         var contextMenu = new ContextMenu();
         contextMenu.Items.Add(delete);
