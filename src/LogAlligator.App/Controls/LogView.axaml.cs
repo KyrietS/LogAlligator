@@ -1,5 +1,6 @@
 using System;
 using Avalonia.Controls;
+using Avalonia.Controls.Primitives;
 using LogAlligator.App.LineProvider;
 using LogAlligator.App.Utils;
 using MsBox.Avalonia;
@@ -13,6 +14,7 @@ public partial class LogView : UserControl
     private ILineProvider _lineProvider = new EmptyLineProvider();
     private Highlights? _highlights = null;
     private Bookmarks? _bookmarks = null;
+    private bool SearchHighlightEnabled => SearchHighlightButton.IsChecked ?? false;
 
     public LogView()
     {
@@ -107,5 +109,27 @@ public partial class LogView : UserControl
     public void SearchUp()
     {
         Search(SearchBox.Text ?? "", down: false);
+    }
+
+    private void SearchBoxChanged(object? sender, Avalonia.Controls.TextChangedEventArgs e)
+    {
+        if (SearchHighlightEnabled)
+        {
+            TextView.SearchHighlight = SearchBox.Text;
+        }
+    }
+
+    private void SearchHighlightButtonPressed(object? sender, Avalonia.Interactivity.RoutedEventArgs e)
+    {
+        ToggleButton button = (ToggleButton)sender!;
+
+        if (SearchHighlightEnabled)
+        {
+            TextView.SearchHighlight = SearchBox.Text;
+        }
+        else
+        {
+            TextView.SearchHighlight = null;
+        }
     }
 }

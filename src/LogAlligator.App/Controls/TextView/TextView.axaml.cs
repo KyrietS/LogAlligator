@@ -1,5 +1,4 @@
 using System;
-using System.Diagnostics;
 using System.Text;
 using System.Threading.Tasks;
 using Avalonia;
@@ -30,6 +29,7 @@ public partial class TextView : UserControl
 
     private Highlights? _highlights;
     private Bookmarks? _bookmarks;
+    private string? _searchHighlight;
 
     private static readonly StyledProperty<IBrush> HighlightBackgroundProperty =
     AvaloniaProperty.Register<TextView, IBrush>(nameof(HighlightBackground), new SolidColorBrush(Color.FromRgb(0, 120, 215)));
@@ -45,6 +45,18 @@ public partial class TextView : UserControl
     {
         get => GetValue(HighlightForegroundProperty);
         set => SetValue(HighlightForegroundProperty, value);
+    }
+
+    public string? SearchHighlight
+    {
+        set
+        {
+            if (value != _searchHighlight)
+            {
+                _searchHighlight = value;
+                Refresh();
+            }
+        }
     }
 
     public (int Line, int Char)? CaretPosition
@@ -268,6 +280,26 @@ public partial class TextView : UserControl
                 int selectionBegin = begin ?? 0;
                 int selectionEnd = end ?? line.Length;
                 TextArea.AppendFormattingToLine(i, (selectionBegin .. selectionEnd), HighlightForeground, HighlightBackground);
+            }
+            // TODO: Do not copy the code from Highlight. Refator it.
+            // TODO: Instead of background I should add border around the text (TextArea do not support it yet)
+            // Search highlight
+            if (_searchHighlight != null && _searchHighlight.Length > 0)
+            {
+                int index = 0;
+                while (index < line.Length)
+                {
+                    index = line.IndexOf(_searchHighlight, index, StringComparison.OrdinalIgnoreCase);
+                    if (index == -1)
+                        break;
+
+                    TextArea.AppendFormattingToLine(
+                    i,
+                        (index..(index + _searchHighlight.Length)),
+                        background: new SolidColorBrush(Colors.Yellow)
+                    );
+                    index += _searchHighlight.Length;
+                }
             }
         }
         TextArea.ShapeAllLines();

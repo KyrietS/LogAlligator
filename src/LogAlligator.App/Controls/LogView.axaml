@@ -30,7 +30,7 @@
                                 <Setter Property="Padding" Value="4 2"></Setter>
                             </Style>
                         </StackPanel.Styles>
-                        <TextBox Name="SearchBox" Watermark="Search">
+                        <TextBox Name="SearchBox" Watermark="Search" TextChanged="SearchBoxChanged">
                             <TextBox.KeyBindings>
                                 <KeyBinding Gesture="Enter" Command="{Binding SearchDown}"/>
                                 <KeyBinding Gesture="Shift+Enter" Command="{Binding SearchUp}" />
@@ -49,7 +49,7 @@
                         <Panel Width="10" />
                         <ToggleButton Content="_Case sensitive"/>
                         <ToggleButton Content="_RegExp"/>
-                        <ToggleButton Content="_Highlight"/>
+                        <ToggleButton Content="_Highlight" Name="SearchHighlightButton" Click="SearchHighlightButtonPressed"/>
                         <ToggleButton Content="_All occurrences" IsEnabled="False"/>
                     </StackPanel>
                 </Border>
