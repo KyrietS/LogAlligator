@@ -5,6 +5,14 @@ namespace LogAlligator.Tests.Utils;
 public class SearchPatternTests
 {
     [Fact]
+    public void SingleIsMatchTest()
+    {
+        var sut = new SearchPattern("a".AsMemory());
+        Assert.True(sut.Match("__a__".AsMemory()));
+        Assert.False(sut.Match("__b__".AsMemory()));
+    }
+
+    [Fact]
     public void EmptyPattern_ShouldNotMatchAnything()
     {
         var sut = new SearchPattern("".AsMemory());
@@ -94,6 +102,14 @@ public class SearchPatternTests
 
         var result = sut.MatchAll("__ab__".AsMemory());
         Assert.Empty(result);
+    }
+
+    [Fact]
+    public void Regex_IsMatch()
+    {
+        var sut = new SearchPattern("a.b".AsMemory(), regex: true);
+        Assert.True(sut.Match("a_b".AsMemory()));
+        Assert.False(sut.Match("ab".AsMemory()));
     }
 
     [Fact]

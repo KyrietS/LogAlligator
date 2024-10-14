@@ -37,10 +37,10 @@ namespace LogAlligator.App.Utils
             IsRegex = regex;
         }
 
-        public List<(int Begin, int End)> MatchAll(ReadOnlyMemory<char> line)
+        public bool Match(ReadOnlyMemory<char> line)
         {
             if (Pattern.Length == 0 || line.Length == 0)
-                return new();
+                return false;
 
             if (IsRegex)
                 return MatchRegex(line);
@@ -48,7 +48,28 @@ namespace LogAlligator.App.Utils
                 return MatchClassic(line);
         }
 
-        private List<(int, int)> MatchRegex(ReadOnlyMemory<char> line)
+        public List<(int Begin, int End)> MatchAll(ReadOnlyMemory<char> line)
+        {
+            if (Pattern.Length == 0 || line.Length == 0)
+                return new();
+
+            if (IsRegex)
+                return MatchAllRegex(line);
+            else
+                return MatchAllClassic(line);
+        }
+
+        private bool MatchRegex(ReadOnlyMemory<char> line)
+        {
+            return Regex.IsMatch(line.ToString());
+        }
+
+        private bool MatchClassic(ReadOnlyMemory<char> line)
+        {
+            return line.Span.Contains(Pattern.Span, GetClassicStringComparison());
+        }
+
+        private List<(int, int)> MatchAllRegex(ReadOnlyMemory<char> line)
         {
             List<(int, int)> results = new();
 
@@ -61,7 +82,7 @@ namespace LogAlligator.App.Utils
             return results;
         }
 
-        private List<(int, int)> MatchClassic(ReadOnlyMemory<char> line)
+        private List<(int, int)> MatchAllClassic(ReadOnlyMemory<char> line)
         {
             List<(int, int)> results = new();
             var lineSpan = line.Span;

@@ -69,11 +69,10 @@ public partial class FileView : UserControl
         try
         {
             _grepDialog = new GrepDialog();
-            var pattern = await _grepDialog.ShowDialog<string?>((this.VisualRoot as Window)!);
+            var pattern = await _grepDialog.ShowDialog<SearchPattern?>((this.VisualRoot as Window)!);
             Log.Debug("Grep pattern: {pattern}", pattern);
-            if (string.IsNullOrEmpty(pattern))
-                return;
-            SelectedLogView?.AddGrep(pattern);
+            if (pattern != null)
+                SelectedLogView?.AddGrep(pattern);
         }
         finally
         {

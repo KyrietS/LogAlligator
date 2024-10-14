@@ -39,10 +39,10 @@ public partial class LogView : UserControl
         TextView.Initialize(lineProvider, highlights, bookmarks);
     }
 
-    internal void AddGrep(string pattern)
+    internal void AddGrep(SearchPattern pattern)
     {
         var logView = new LogView();
-        var newLineProvider = _lineProvider.Grep(line => line.Contains(pattern, StringComparison.OrdinalIgnoreCase));
+        var newLineProvider = _lineProvider.Grep(line => pattern.Match(line.AsMemory()));
         logView.Initialize(newLineProvider, _highlights!, _bookmarks!);
         Tabs.Items.Add(new TabItem { Header = pattern, Content = logView });
     }
