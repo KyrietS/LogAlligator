@@ -13,7 +13,7 @@ internal static class RangesMerger
     public static Ranges<(T1, T2)> Merge<T1, T2>(Ranges<T1> channel1, Ranges<T2> channel2)
     {
         if (channel1.Count == 0 && channel2.Count == 0)
-            return new Ranges<(T1, T2)>(0);
+            return new Ranges<(T1, T2)>();
 
         Debug.Assert(channel1.First().Begin == channel2.First().Begin, "Cannot merge ranges with different begin");
 
@@ -28,7 +28,7 @@ internal static class RangesMerger
     public static Ranges<(T1, T2, T3)> Merge<T1, T2, T3>(Ranges<T1> channel1, Ranges<T2> channel2, Ranges<T3> channel3)
     {
         if (channel1.Count == 0 && channel2.Count == 0 && channel3.Count == 0)
-            return new Ranges<(T1, T2, T3)>(0);
+            return new Ranges<(T1, T2, T3)>();
 
         Debug.Assert(channel1.First().Begin == channel2.First().Begin && 
             channel2.First().Begin == channel3.First().Begin, "Cannot merge ranges with different begin");
@@ -45,7 +45,7 @@ internal static class RangesMerger
     public static Ranges<(T1, T2, T3, T4)> Merge<T1, T2, T3, T4>(Ranges<T1> channel1, Ranges<T2> channel2, Ranges<T3> channel3, Ranges<T4> channel4)
     {
         if (channel1.Count == 0 && channel2.Count == 0 && channel3.Count == 0)
-            return new Ranges<(T1, T2, T3, T4)>(0);
+            return new Ranges<(T1, T2, T3, T4)>();
 
         Debug.Assert(channel1.First().Begin == channel2.First().Begin &&
             channel2.First().Begin == channel3.First().Begin &&
@@ -108,13 +108,13 @@ internal static class RangesMerger
             Debug.Assert(Boundaries.Count > 0);
 
             var oldValues = (MergedValue[])Boundaries[0].Clone();
-            foreach (var (begin, newValues) in Boundaries)
+            foreach (var (_, newValues) in Boundaries)
             {
-                MergeValues(begin, oldValues, newValues);
+                MergeValues(oldValues, newValues);
             }
         }
 
-        private void MergeValues(int begin, MergedValue[] oldValues, MergedValue[] newValues)
+        private void MergeValues(MergedValue[] oldValues, MergedValue[] newValues)
         {
             Debug.Assert(oldValues.Length == newValues.Length);
 

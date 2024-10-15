@@ -4,9 +4,9 @@ using System.Collections;
 using System.Collections.Generic;
 
 namespace LogAlligator.App.Utils.Ranges;
-internal class Ranges<TValueType>(int _capacity = 0) : IEnumerable<(int Begin, int End, TValueType Value)>
+internal class Ranges<TValueType>(int capacity = 0) : IEnumerable<(int Begin, int End, TValueType Value)>
 {
-    public SortedList<int, TValueType> Boundaries { get; set; } = new(_capacity);
+    public SortedList<int, TValueType> Boundaries { get; set; } = new(capacity);
 
     public int Count => Math.Max(0, Boundaries.Count - 1);
     public (int Begin, int End, TValueType Value) this[int index] => GetRangeAtIndex(index);
@@ -27,7 +27,7 @@ internal class Ranges<TValueType>(int _capacity = 0) : IEnumerable<(int Begin, i
 
     public List<(int Begin, int End, TValueType Value)> GetAllRanges()
     {
-        List<(int, int, TValueType)> result = new();
+        List<(int, int, TValueType)> result = [];
         for (var i = 0; i < Boundaries.Count - 1; i++)
             result.Add((Boundaries.GetKeyAtIndex(i), Boundaries.GetKeyAtIndex(i + 1), Boundaries.GetValueAtIndex(i)));
 
