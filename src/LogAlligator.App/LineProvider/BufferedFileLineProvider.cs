@@ -92,9 +92,7 @@ public class BufferedFileLineProvider(Uri path) : ILineProvider
 
     public ILineProvider Grep(Func<string, bool> filter)
     {
-        var newProvider = new BufferedFileLineProvider(path);
-        newProvider._stream = _stream;
-        newProvider._reader = _reader;
+        var newProvider = new BufferedFileLineProvider(path) { _stream = _stream, _reader = _reader };
         newProvider._lines.AddRange(_lines.Where(line => filter(ReadLine(line.Begin))));
         return newProvider;
     }

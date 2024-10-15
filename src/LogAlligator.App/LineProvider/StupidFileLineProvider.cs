@@ -8,7 +8,7 @@ namespace LogAlligator.App.LineProvider;
 
 /// <summary>
 /// This line provider is stupid because it reads the whole file into memory.
-/// It is most probably the fastest line provider but not everyone can affort
+/// It is most probably the fastest line provider but not everyone can afford
 /// to load the whole (possibly multi-GB) file into RAM.
 /// </summary>
 /// <param name="path"></param>
@@ -57,8 +57,7 @@ public class StupidFileLineProvider(Uri path) : ILineProvider
 
     public ILineProvider Grep(Func<string, bool> filter)
     {
-        var newProvider = new StupidFileLineProvider(path);
-        newProvider._lines = _lines.Where(filter).ToArray();
+        var newProvider = new StupidFileLineProvider(path) { _lines = _lines.Where(filter).ToArray() };
         return newProvider;
     }
 }

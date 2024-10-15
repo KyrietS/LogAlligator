@@ -13,7 +13,7 @@ public class DesignLineProvider : ILineProvider
     public DesignLineProvider()
     {
         if (!Design.IsDesignMode)
-            throw new System.InvalidOperationException("DesignLineProvider should be used only in design mode");
+            throw new InvalidOperationException("DesignLineProvider should be used only in design mode");
     }
     public void AddLine(string line) => _lines.Add(line);
     public Task LoadData(Action<int> _1, CancellationToken _2) => Task.CompletedTask;
