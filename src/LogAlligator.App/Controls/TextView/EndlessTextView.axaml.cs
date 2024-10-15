@@ -14,9 +14,9 @@ using MsBox.Avalonia;
 using MsBox.Avalonia.Enums;
 using Serilog;
 
-namespace LogAlligator.App.Controls;
+namespace LogAlligator.App.Controls.TextView;
 
-public partial class TextView : UserControl
+public partial class EndlessTextView : UserControl
 {
     private ILineProvider _lines = new EmptyLineProvider();
     private int _topLineIndex = 0;
@@ -32,7 +32,7 @@ public partial class TextView : UserControl
     private SearchPattern? _searchHighlight;
 
     private static readonly StyledProperty<IBrush> HighlightBackgroundProperty =
-    AvaloniaProperty.Register<TextView, IBrush>(nameof(HighlightBackground), new SolidColorBrush(Color.FromRgb(0, 120, 215)));
+    AvaloniaProperty.Register<EndlessTextView, IBrush>(nameof(HighlightBackground), new SolidColorBrush(Color.FromRgb(0, 120, 215)));
     public IBrush HighlightBackground
     {
         get => GetValue(HighlightBackgroundProperty);
@@ -40,7 +40,7 @@ public partial class TextView : UserControl
     }
 
     private static readonly StyledProperty<IBrush> HighlightForegroundProperty =
-    AvaloniaProperty.Register<TextView, IBrush>(nameof(HighlightForeground), new SolidColorBrush(Colors.Black));
+    AvaloniaProperty.Register<EndlessTextView, IBrush>(nameof(HighlightForeground), new SolidColorBrush(Colors.Black));
     public IBrush HighlightForeground
     {
         get => GetValue(HighlightForegroundProperty);
@@ -59,7 +59,7 @@ public partial class TextView : UserControl
     public (int Line, int Char)? CaretPosition
     {
         get => _caretPosition;
-        set
+        private set
         {
             if (value == null)
             {
@@ -76,7 +76,7 @@ public partial class TextView : UserControl
         }
     }
 
-    public TextView()
+    public EndlessTextView()
     {
         InitializeComponent();
 
@@ -95,7 +95,7 @@ public partial class TextView : UserControl
         TextArea.PointerReleased += TextArea_PointerReleased;
         TextArea.PointerMoved += TextArea_PointerMoved;
 
-        WeakEventHandlerManager.Subscribe<Application, EventArgs, TextView>(
+        WeakEventHandlerManager.Subscribe<Application, EventArgs, EndlessTextView>(
             Application.Current!, nameof(Application.ActualThemeVariantChanged), OnActualThemeVariantChanged);
 
         if (Design.IsDesignMode)
@@ -192,7 +192,7 @@ public partial class TextView : UserControl
         }
         finally
         {
-            bookmarkDialog?.Close();
+            bookmarkDialog.Close();
         }
     }
 
@@ -268,7 +268,7 @@ public partial class TextView : UserControl
         {
             var textAreaFontColor = TextArea.Foreground as SolidColorBrush;
             TextArea.SetLineBackground(viewLineIndex, new SolidColorBrush(textAreaFontColor!.Color, 0.1));
-            LineNumbers.SetLineBackground(viewLineIndex, new SolidColorBrush(textAreaFontColor!.Color, 0.1));
+            LineNumbers.SetLineBackground(viewLineIndex, new SolidColorBrush(textAreaFontColor.Color, 0.1));
         }
     }
 

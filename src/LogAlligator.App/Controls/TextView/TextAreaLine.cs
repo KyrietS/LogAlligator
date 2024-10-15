@@ -8,7 +8,7 @@ using Avalonia.Media;
 using Avalonia.Media.TextFormatting;
 using LogAlligator.App.Utils.Ranges;
 
-namespace LogAlligator.App.Controls;
+namespace LogAlligator.App.Controls.TextView;
 
 class ReadOnlyListSlice<T> : IReadOnlyList<T>
 {

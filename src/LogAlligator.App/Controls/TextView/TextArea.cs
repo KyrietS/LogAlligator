@@ -5,12 +5,12 @@ using Avalonia.Controls;
 using Avalonia.Media;
 using Serilog;
 
-namespace LogAlligator.App.Controls;
+namespace LogAlligator.App.Controls.TextView;
 
 internal class TextArea : Control
 {
     private TextAreaLine[] _lines = [];
-    private double _lineHeight = 12;
+    private double _lineHeight;
 
     public static readonly StyledProperty<IBrush> BackgroundProperty =
         AvaloniaProperty.Register<TextArea, IBrush>(nameof(Background), new SolidColorBrush(Colors.Transparent));
@@ -123,7 +123,7 @@ internal class TextArea : Control
     /// <returns>
     /// <para>A tuple containing the index of pointed line and index of pointer character in that line.</para>
     /// <para>If <paramref name="position"/> points above the first line, then <c>(0, 0)</c> is returned.</para>
-    /// <para>If <paramref name="position"/> points below the last line, then <c>(lastL, afterLastC)</c> is returned,
+    /// <para>If <paramref name="position"/> points below the last line, then <c>(lastL, afterLastC)</c> is returned,</para>
     /// <para>If <paramref name="position"/> points before first character of the line, then <c>(L, 0)</c> is returned.</para>
     /// <para>If <paramref name="position"/> points after the last character of the line, then <c>(L, afterLastC)</c> is returned,
     /// where <c>lastL</c> is the index of the last line,
@@ -148,7 +148,7 @@ internal class TextArea : Control
             return (_lines.Length - 1, _lines.Last().Text.Length);
 
         var line = _lines[lineIndex];
-        double cursor = Padding.Left;
+        double cursor;
         var charIndex = 0;
         double previousWidth = 0;
 

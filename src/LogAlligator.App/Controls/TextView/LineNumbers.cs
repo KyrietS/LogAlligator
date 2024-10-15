@@ -5,7 +5,7 @@ using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Media;
 
-namespace LogAlligator.App.Controls;
+namespace LogAlligator.App.Controls.TextView;
 
 internal class LineNumbers : Control
 {

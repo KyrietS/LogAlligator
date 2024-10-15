@@ -3,6 +3,7 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:controls="clr-namespace:LogAlligator.App.Controls"
+             xmlns:textView="clr-namespace:LogAlligator.App.Controls.TextView"
              mc:Ignorable="d" d:DesignWidth="700" d:DesignHeight="350"
              DataContext="{Binding RelativeSource={RelativeSource Self}}"
              x:Class="LogAlligator.App.Controls.LogView">
@@ -53,7 +54,7 @@
                         <ToggleButton Content="_All occurrences" IsEnabled="False"/>
                     </StackPanel>
                 </Border>
-                <controls:TextView Name="TextView" />
+                <textView:EndlessTextView Name="TextView" />
             </DockPanel>
         </TabItem>
     </TabControl>

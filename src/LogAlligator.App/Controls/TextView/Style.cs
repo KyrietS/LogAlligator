@@ -1,12 +1,11 @@
 using Avalonia.Media;
 
-namespace LogAlligator.App.Controls
+namespace LogAlligator.App.Controls.TextView;
+
+struct Style
 {
-    struct Style
-    {
-        public IBrush? Foreground;
-        public IBrush? Background;
-        public IPen? Border;
-        public Typeface? Typeface;
-    }
+    public IBrush? Foreground;
+    public IBrush? Background;
+    public IPen? Border;
+    public Typeface? Typeface;
 }
