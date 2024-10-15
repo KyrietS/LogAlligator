@@ -6,7 +6,6 @@ using System.Threading.Tasks;
 using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Interactivity;
-using Avalonia.Media;
 using LogAlligator.App.LineProvider;
 using LogAlligator.App.Utils;
 using MsBox.Avalonia;
@@ -17,8 +16,8 @@ namespace LogAlligator.App.Controls;
 
 public partial class FileView : UserControl
 {
-    private Highlights _highlights = new();
-    private Bookmarks _bookmarks = new();
+    private readonly Highlights _highlights = new();
+    private readonly Bookmarks _bookmarks = new();
 
     private Task? _loadTask = null;
     private CancellationTokenSource? _loadTaskCancellationToken = null;
@@ -73,6 +72,10 @@ public partial class FileView : UserControl
             Log.Debug("Grep pattern: {pattern}", pattern);
             if (pattern != null)
                 SelectedLogView?.AddGrep(pattern);
+        }
+        catch (Exception)
+        {
+            Log.Warning("Exception caught from grep dialog");
         }
         finally
         {
@@ -132,7 +135,7 @@ public partial class FileView : UserControl
         _loadTaskCancellationToken = new CancellationTokenSource();
         var lineProvider = new BufferedFileLineProvider(FilePath);
 
-        var watch = System.Diagnostics.Stopwatch.StartNew();
+        var watch = Stopwatch.StartNew();
         await lineProvider.LoadData(OnLoadProgress, _loadTaskCancellationToken.Token);
         watch.Stop();
         var elapsedMs = watch.ElapsedMilliseconds;

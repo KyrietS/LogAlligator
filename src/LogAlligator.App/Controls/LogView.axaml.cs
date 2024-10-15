@@ -63,7 +63,7 @@ public partial class LogView : UserControl
     // TODO: FIXME: This needs A LOT of optimization. It's much slower than it should be.
     private void Search(SearchPattern pattern, bool down = true)
     {
-        var (lineIndex, character) = TextView.CaretPosition ?? (0, 0);
+        var (lineIndex, _) = TextView.CaretPosition ?? (0, 0);
 
         var numOfLines = _lineProvider.Count;
         var endLineIndex = down ? numOfLines : -1;
@@ -153,13 +153,6 @@ public partial class LogView : UserControl
 
     private void UpdateHighlight()
     {
-        if (SearchHighlightEnabled)
-        {
-            TextView.SearchHighlight = PrepareSearchPattern();
-        }
-        else
-        {
-            TextView.SearchHighlight = null;
-        }
+        TextView.SearchHighlight = SearchHighlightEnabled ? PrepareSearchPattern() : null;
     }
 }

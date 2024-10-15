@@ -26,7 +26,7 @@ public partial class BookmarksView : UserControl
     public void Initialize(Bookmarks bookmarks)
     {
         _bookmarks = bookmarks;
-        _bookmarks.OnChange += (sender, args) => Refresh();
+        _bookmarks.OnChange += (_, _) => Refresh();
     }
 
     public void OnDelete()
@@ -61,13 +61,11 @@ public partial class BookmarksView : UserControl
 
     private List<ListBoxItem> PrepareListOfBookmarks()
     {
-        List<ListBoxItem> items = new();
+        List<ListBoxItem> items = [];
 
         foreach (var bookmark in _bookmarks ?? [])
         {
-            var item = new ListBoxItem { Content = bookmark.Name };
-            item.DataContext = bookmark;
-            item.ContextMenu = BuildContextMenu();
+            var item = new ListBoxItem { Content = bookmark.Name, DataContext = bookmark, ContextMenu = BuildContextMenu() };
             item.DoubleTapped += (_, _) => JumpToBookmark?.Invoke(this, bookmark.LineNumber);
             items.Add(item);
         }

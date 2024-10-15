@@ -1,10 +1,7 @@
 using System;
 using System.Collections.Generic;
-using Avalonia;
 using Avalonia.Controls;
-using Avalonia.Markup.Xaml;
 using LogAlligator.App.Utils;
-using Serilog;
 
 namespace LogAlligator.App.Controls;
 
@@ -26,7 +23,7 @@ public partial class HighlightsView : UserControl
     public void Initialize(Highlights highlights)
     {
         _highlights = highlights;
-        _highlights.OnChange += (sender, args) => Refresh();
+        _highlights.OnChange += (_, _) => Refresh();
     }
 
     public void OnDelete()
@@ -60,13 +57,11 @@ public partial class HighlightsView : UserControl
 
     private List<ListBoxItem> PrepareListOfHighlights()
     {
-        List<ListBoxItem> items = new();
+        List<ListBoxItem> items = [];
 
         foreach (var highlight in _highlights ?? [])
         {
-            var item = new ListBoxItem { Content = highlight.ToString() };
-
-            item.ContextMenu = BuildContextMenu();
+            var item = new ListBoxItem { Content = highlight.ToString(), ContextMenu = BuildContextMenu() };
             items.Add(item);
         }
 
