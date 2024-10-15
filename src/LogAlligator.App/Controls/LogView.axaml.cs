@@ -39,10 +39,12 @@ public partial class LogView : UserControl
         TextView.Initialize(lineProvider, highlights, bookmarks);
     }
 
-    internal void AddGrep(SearchPattern pattern)
+    internal void AddGrep(SearchPattern pattern, bool inverted = false)
     {
+        bool ShouldKeepLine(string line) => pattern.Match(line.AsMemory()) != inverted;
+
         var logView = new LogView();
-        var newLineProvider = _lineProvider.Grep(line => pattern.Match(line.AsMemory()));
+        var newLineProvider = _lineProvider.Grep(ShouldKeepLine);
         logView.Initialize(newLineProvider, _highlights!, _bookmarks!);
         Tabs.Items.Add(new TabItem { Header = pattern, Content = logView });
     }

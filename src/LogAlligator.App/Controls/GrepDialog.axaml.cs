@@ -28,7 +28,7 @@ public partial class GrepDialog : Window
             Close(null);
 
         SearchPattern pattern = new(GrepTextBox.Text.AsMemory(), caseSensitive: CaseSensitive, regex: Regex);
-        Close(pattern);
+        Close((pattern, Inverted));
     }
 
     private void OnCancelClick(object? sender, RoutedEventArgs e)
