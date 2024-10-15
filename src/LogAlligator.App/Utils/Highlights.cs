@@ -27,7 +27,7 @@ public record struct Highlight
 
 public class Highlights : IEnumerable<Highlight>
 {
-    private List<Highlight> _highlights = new();
+    private readonly List<Highlight> _highlights = [];
 
     public event EventHandler? OnChange;
 
@@ -77,7 +77,7 @@ public class Highlights : IEnumerable<Highlight>
 
         foreach (var color in colors)
         {
-            if (!_highlights.Any(h => h.Background == color))
+            if (_highlights.All(h => h.Background != color))
                 return color;
         }
 

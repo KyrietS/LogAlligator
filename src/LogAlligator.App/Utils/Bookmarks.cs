@@ -1,9 +1,6 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using Serilog;
 
 namespace LogAlligator.App.Utils
@@ -18,7 +15,7 @@ namespace LogAlligator.App.Utils
     // FIXME: All bookmarks should be sorted by line number. Be careful with context menu when you do this.
     public class Bookmarks : IEnumerable<Bookmark>
     {
-        private List<Bookmark> _bookmarks = new();
+        private readonly List<Bookmark> _bookmarks = [];
         private int _nextId = 1;
         public event EventHandler? OnChange;
 
