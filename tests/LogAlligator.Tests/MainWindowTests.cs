@@ -8,15 +8,11 @@ namespace LogAlligator.Tests;
 
 public class MainWindowTests
 {
-    private Window window;
-    public MainWindowTests()
+    private readonly Window window = new MainWindow()
     {
-        window = new MainWindow()
-        {
-            Width = 500,
-            Height = 500
-        };
-    }
+        Width = 500,
+        Height = 500
+    };
 
     [AvaloniaFact]
     public void CloseWindowUsingKeyboard()

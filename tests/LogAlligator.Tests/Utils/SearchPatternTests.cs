@@ -55,8 +55,6 @@ public class SearchPatternTests
     [Fact]
     public void PatternMultipleChars_ShouldMatch()
     {
-        var sr = new SearchResult(0, 2);
-
         var sut = new SearchPattern("ab".AsMemory());
 
         var result = sut.MatchAll("ab_ab".AsMemory());
