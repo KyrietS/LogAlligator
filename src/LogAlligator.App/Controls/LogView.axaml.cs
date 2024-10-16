@@ -46,7 +46,10 @@ public partial class LogView : UserControl
         var logView = new LogView();
         var newLineProvider = _lineProvider.Grep(ShouldKeepLine);
         logView.Initialize(newLineProvider, _highlights!, _bookmarks!);
-        Tabs.Items.Add(new TabItem { Header = pattern, Content = logView });
+        var tabItem = new TabItem { Header = pattern, Content = logView };
+        tabItem.ContextMenu = BuildContextMenu(tabItem);
+
+        Tabs.Items.Add(tabItem);
     }
 
     internal LogView? GetSelectedView()
@@ -156,5 +159,15 @@ public partial class LogView : UserControl
     private void UpdateHighlight()
     {
         TextView.SearchHighlight = SearchHighlightEnabled ? PrepareSearchPattern() : null;
+    }
+
+    private ContextMenu BuildContextMenu(TabItem tabItem)
+    {
+        var delete = new MenuItem { Header = "Close" };
+        delete.Click += (_, _) => Tabs.Items.Remove(tabItem);
+
+        var contextMenu = new ContextMenu();
+        contextMenu.Items.Add(delete);
+        return contextMenu;
     }
 }
