@@ -22,7 +22,7 @@ namespace LogAlligator.App.Utils
 
         public bool Equals(ReadOnlyMemory<char> otherPattern)
         {
-            return Pattern.Span == otherPattern.Span;
+            return Pattern.Span.SequenceEqual(otherPattern.Span);
         }
 
         public override string ToString()
