@@ -30,6 +30,9 @@ internal class TextArea : Control
         set => SetValue(ForegroundProperty, value);
     }
 
+    public Color ForegroundColor => ((SolidColorBrush)Foreground).Color;
+    public Color BackgroundColor => ((SolidColorBrush)Background).Color;
+
     public static readonly StyledProperty<double> FontSizeProperty =
         AvaloniaProperty.Register<TextArea, double>(nameof(FontSize), 12);
 

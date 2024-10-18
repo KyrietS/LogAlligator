@@ -274,15 +274,16 @@ public partial class EndlessTextView : UserControl
 
     private void SetLineHighlight(int viewLineIndex, ReadOnlyMemory<char> line)
     {
-        foreach (var (pattern, background, foreground) in _highlights ?? [])
+        foreach (var highlight in _highlights ?? [])
         {
-            var matches = pattern.MatchAll(line);
+            var matches = highlight.Pattern.MatchAll(line);
             foreach (var (matchBegin, matchEnd) in matches)
             {
                 TextArea.ApplyStyleToLine(viewLineIndex, (matchBegin..matchEnd),
                     new Style
                     {
-                        Background = new SolidColorBrush(background),
+                        Foreground = highlight.HasEnoughContrastWith(TextArea.ForegroundColor) ? TextArea.Foreground : TextArea.Background,
+                        Background = new SolidColorBrush(highlight.Background),
                         Typeface = new Typeface(TextArea.SecondaryFontFamily)
                     });
             }
