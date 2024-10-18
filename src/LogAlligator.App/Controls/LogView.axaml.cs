@@ -13,7 +13,6 @@ public partial class LogView : UserControl
 {
     private ILineProvider _lineProvider = new EmptyLineProvider();
     private Highlights? _highlights = null;
-    private Bookmarks? _bookmarks = null;
     private bool SearchHighlightEnabled => SearchHighlightButton.IsChecked ?? false;
     private bool RegexEnabled => RegexButton.IsChecked ?? false;
     private bool CaseSensitiveEnabled => CaseSensitiveButton.IsChecked ?? false;
@@ -31,12 +30,11 @@ public partial class LogView : UserControl
         SearchBox.SelectAll();
     }
 
-    internal void Initialize(ILineProvider lineProvider, Highlights highlights, Bookmarks bookmarks)
+    internal void Initialize(ILineProvider lineProvider, Highlights highlights)
     {
         _lineProvider = lineProvider;
         _highlights = highlights;
-        _bookmarks = bookmarks;
-        TextView.Initialize(lineProvider, highlights, bookmarks);
+        TextView.Initialize(lineProvider, highlights);
     }
 
     internal void AddGrep(SearchPattern pattern, bool inverted = false)
@@ -45,7 +43,7 @@ public partial class LogView : UserControl
 
         var logView = new LogView();
         var newLineProvider = _lineProvider.Grep(ShouldKeepLine);
-        logView.Initialize(newLineProvider, _highlights!, _bookmarks!);
+        logView.Initialize(newLineProvider, _highlights!);
         var tabItem = new TabItem { Header = pattern, Content = logView };
         tabItem.ContextMenu = BuildContextMenu(tabItem);
 

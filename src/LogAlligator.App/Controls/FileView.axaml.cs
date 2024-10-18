@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Interactivity;
+using LogAlligator.App.Controls.TextView;
 using LogAlligator.App.LineProvider;
 using LogAlligator.App.Utils;
 using MsBox.Avalonia;
@@ -45,6 +46,26 @@ public partial class FileView : UserControl
 
         _highlights.OnChange += (_, _) => SelectedLogView?.TextView.Refresh();
         BookmarksView.JumpToBookmark += OnJumpToBookmark;
+
+        EndlessTextView.AddBookmarkEvent.AddClassHandler<FileView>(OnAddBookmark);
+    }
+
+    public async void OnAddBookmark(object? sender, EndlessTextView.BookmarkEventArgs bookmarkEvent)
+    {
+        var bookmarkDialog = new BookmarkDialog();
+        try
+        {
+            var bookmarkName = await bookmarkDialog.ShowDialog<string?>((VisualRoot as Window)!);
+            if (string.IsNullOrEmpty(bookmarkName))
+                return;
+
+            _bookmarks.Add(bookmarkName, bookmarkEvent.LineNumber);
+            Log.Debug("Bookmark name: {BookmarkName}, line number: {number}", bookmarkName, bookmarkEvent.LineNumber);
+        }
+        finally
+        {
+            bookmarkDialog.Close();
+        }
     }
 
     public void AddHighlight()
@@ -142,7 +163,7 @@ public partial class FileView : UserControl
 
         Log.Debug("Loaded {Lines} lines from {FilePath}. It took {ElapsedMs} ms", lineProvider.Count, FilePath, elapsedMs);
 
-        RootLogView.Initialize(lineProvider, _highlights, _bookmarks);
+        RootLogView.Initialize(lineProvider, _highlights);
         HighlightsView.Initialize(_highlights);
         BookmarksView.Initialize(_bookmarks);
     }

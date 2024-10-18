@@ -5,6 +5,7 @@ using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Controls.Primitives;
 using Avalonia.Input;
+using Avalonia.Interactivity;
 using Avalonia.Markup.Xaml.MarkupExtensions;
 using Avalonia.Media;
 using Avalonia.Utilities;
@@ -28,7 +29,6 @@ public partial class EndlessTextView : UserControl
     private (int Line, int Char)? _caretPosition = null;
 
     private Highlights? _highlights;
-    private Bookmarks? _bookmarks;
     private SearchPattern? _searchHighlight;
 
     private static readonly StyledProperty<IBrush> HighlightBackgroundProperty =
@@ -45,6 +45,26 @@ public partial class EndlessTextView : UserControl
     {
         get => GetValue(HighlightForegroundProperty);
         set => SetValue(HighlightForegroundProperty, value);
+    }
+
+    public class BookmarkEventArgs : RoutedEventArgs
+    {
+        public required int LineNumber { get; init; }
+        public required string LineText { get; init; }
+        public required string SelectedText { get; init; }
+
+        public BookmarkEventArgs() : base(EndlessTextView.AddBookmarkEvent)
+        {
+        }
+    }
+
+    public static readonly RoutedEvent<BookmarkEventArgs> AddBookmarkEvent =
+        RoutedEvent.Register<EndlessTextView, BookmarkEventArgs>(nameof(AddBookmark2), RoutingStrategies.Bubble);
+
+    public event EventHandler<BookmarkEventArgs> AddBookmark2
+    {
+        add => AddHandler(AddBookmarkEvent, value);
+        remove => RemoveHandler(AddBookmarkEvent, value);
     }
 
     public SearchPattern? SearchHighlight
@@ -110,11 +130,10 @@ public partial class EndlessTextView : UserControl
         }
     }
 
-    public void Initialize(ILineProvider lines, Highlights highlights, Bookmarks bookmarks)
+    public void Initialize(ILineProvider lines, Highlights highlights)
     {
         _lines = lines;
         _highlights = highlights;
-        _bookmarks = bookmarks;
         _topLineIndex = 0;
         LoadData();
     }
@@ -177,23 +196,20 @@ public partial class EndlessTextView : UserControl
         }
     }
 
-    public async Task AddBookmark()
+    public void AddBookmark()
     {
-        var bookmarkDialog = new BookmarkDialog();
-        try
-        {
-            var bookmarkName = await bookmarkDialog.ShowDialog<string?>((VisualRoot as Window)!);
-            if (string.IsNullOrEmpty(bookmarkName) || _caretPosition is null)
-                return;
+        if (_caretPosition is null)
+            return;
 
-            int selectedLineNumber = _lines.GetLineNumber(_caretPosition.Value.Line);
-            _bookmarks?.Add(bookmarkName, selectedLineNumber);
-            Log.Debug("Bookmark name: {BookmarkName}, line number: {number}", bookmarkName, selectedLineNumber);
-        }
-        finally
-        {
-            bookmarkDialog.Close();
-        }
+        int currentLineNumber = _lines.GetLineNumber(_caretPosition.Value.Line);
+        string currentLineText = _lines[currentLineNumber];
+        string? selectedText = GetSelectedText();
+
+        RaiseEvent(new BookmarkEventArgs { 
+            LineNumber = currentLineNumber,
+            LineText = currentLineText,
+            SelectedText = selectedText
+        });
     }
 
 
