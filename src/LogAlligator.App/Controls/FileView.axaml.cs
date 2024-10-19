@@ -46,19 +46,6 @@ public partial class FileView : UserControl
 
         _context.Highlights.OnChange += (_, _) => SelectedLogView?.TextView.Refresh();
         BookmarksView.JumpToBookmark += OnJumpToBookmark;
-
-        AttachedToVisualTree += OnAttachedToVisualTree;
-        DetachedFromVisualTree += OnDetachedFromVisualTree;
-    }
-
-    private void OnAttachedToVisualTree(object? sender, VisualTreeAttachmentEventArgs e)
-    {
-        AddHandler(EndlessTextView.AddBookmarkEvent, OnAddBookmark);
-    }
-
-    private void OnDetachedFromVisualTree(object? sender, VisualTreeAttachmentEventArgs e)
-    {
-        RemoveHandler(EndlessTextView.AddBookmarkEvent, OnAddBookmark);
     }
 
     public async void OnAddBookmark(object? sender, EndlessTextView.BookmarkEventArgs bookmarkEvent)
