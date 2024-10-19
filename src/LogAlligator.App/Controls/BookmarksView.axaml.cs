@@ -75,7 +75,7 @@ public partial class BookmarksView : UserControl
 
     private ContextMenu BuildContextMenu()
     {
-        var delete = new MenuItem { Header = "Delete" };
+        var delete = new MenuItem { Header = "Remove" };
         delete.Click += (_, _) => OnDelete();
 
         var contextMenu = new ContextMenu();
