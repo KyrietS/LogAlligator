@@ -1,6 +1,9 @@
 using System;
+using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Interactivity;
+using Avalonia.LogicalTree;
+using LogAlligator.App.Context;
 using LogAlligator.App.LineProvider;
 using LogAlligator.App.Utils;
 using MsBox.Avalonia;
@@ -12,7 +15,7 @@ namespace LogAlligator.App.Controls;
 public partial class LogView : UserControl
 {
     private ILineProvider _lineProvider = new EmptyLineProvider();
-    private Highlights? _highlights = null;
+    private FileViewContext? _fileViewContext = null;
     private bool SearchHighlightEnabled => SearchHighlightButton.IsChecked ?? false;
     private bool RegexEnabled => RegexButton.IsChecked ?? false;
     private bool CaseSensitiveEnabled => CaseSensitiveButton.IsChecked ?? false;
@@ -30,11 +33,11 @@ public partial class LogView : UserControl
         SearchBox.SelectAll();
     }
 
-    internal void Initialize(ILineProvider lineProvider, Highlights highlights)
+    internal void Initialize(ILineProvider lineProvider, FileViewContext fileViewContext)
     {
         _lineProvider = lineProvider;
-        _highlights = highlights;
-        TextView.Initialize(lineProvider, highlights);
+        _fileViewContext = fileViewContext;
+        TextView.Initialize(lineProvider, _fileViewContext.Highlights);
     }
 
     internal void AddGrep(SearchPattern pattern, bool inverted = false)
@@ -43,7 +46,7 @@ public partial class LogView : UserControl
 
         var logView = new LogView();
         var newLineProvider = _lineProvider.Grep(ShouldKeepLine);
-        logView.Initialize(newLineProvider, _highlights!);
+        logView.Initialize(newLineProvider, _fileViewContext!);
         var tabItem = new TabItem { Header = pattern, Content = logView };
         tabItem.ContextMenu = BuildContextMenu(tabItem);
 

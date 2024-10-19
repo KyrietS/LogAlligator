@@ -21,7 +21,7 @@ public partial class MainWindow : Window
     public MainWindow()
     {
         InitializeComponent();
-        
+
         FileTabs.Background = new SolidColorBrush(Colors.Transparent);
         FileTabs.AddHandler(DragDrop.DragOverEvent, OnDragOver);
         FileTabs.AddHandler(DragDrop.DropEvent, OnDrop);

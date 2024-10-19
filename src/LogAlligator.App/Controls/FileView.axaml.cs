@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Interactivity;
+using LogAlligator.App.Context;
 using LogAlligator.App.Controls.TextView;
 using LogAlligator.App.LineProvider;
 using LogAlligator.App.Utils;
@@ -17,8 +18,7 @@ namespace LogAlligator.App.Controls;
 
 public partial class FileView : UserControl
 {
-    private readonly Highlights _highlights = new();
-    private readonly Bookmarks _bookmarks = new();
+    private readonly FileViewContext _context = new();
 
     private Task? _loadTask = null;
     private CancellationTokenSource? _loadTaskCancellationToken = null;
@@ -44,7 +44,7 @@ public partial class FileView : UserControl
     {
         InitializeComponent();
 
-        _highlights.OnChange += (_, _) => SelectedLogView?.TextView.Refresh();
+        _context.Highlights.OnChange += (_, _) => SelectedLogView?.TextView.Refresh();
         BookmarksView.JumpToBookmark += OnJumpToBookmark;
 
         EndlessTextView.AddBookmarkEvent.AddClassHandler<FileView>(OnAddBookmark);
@@ -59,7 +59,7 @@ public partial class FileView : UserControl
             if (string.IsNullOrEmpty(bookmarkName))
                 return;
 
-            _bookmarks.Add(bookmarkName, bookmarkEvent.LineNumber);
+            _context.Bookmarks.Add(bookmarkName, bookmarkEvent.LineNumber);
             Log.Debug("Bookmark name: {BookmarkName}, line number: {number}", bookmarkName, bookmarkEvent.LineNumber);
         }
         finally
@@ -74,13 +74,13 @@ public partial class FileView : UserControl
         if (string.IsNullOrEmpty(selection))
             return;
 
-        if (_highlights.Contains(selection.AsMemory()))
+        if (_context.Highlights.Contains(selection.AsMemory()))
         {
-            _highlights.Remove(selection.AsMemory());
+            _context.Highlights.Remove(selection.AsMemory());
             return;
         }
 
-        _highlights.Add(selection.AsMemory());
+        _context.Highlights.Add(selection.AsMemory());
         Log.Debug("Highlight {selection}", selection);
     }
 
@@ -163,9 +163,9 @@ public partial class FileView : UserControl
 
         Log.Debug("Loaded {Lines} lines from {FilePath}. It took {ElapsedMs} ms", lineProvider.Count, FilePath, elapsedMs);
 
-        RootLogView.Initialize(lineProvider, _highlights);
-        HighlightsView.Initialize(_highlights);
-        BookmarksView.Initialize(_bookmarks);
+        RootLogView.Initialize(lineProvider, _context);
+        HighlightsView.Initialize(_context.Highlights);
+        BookmarksView.Initialize(_context.Bookmarks);
     }
 
     private void OnLoadProgress(int progress)
