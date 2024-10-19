@@ -17,7 +17,7 @@ using Serilog;
 
 namespace LogAlligator.App.Controls.TextView;
 
-public partial class EndlessTextView : UserControl
+public partial class TextAreaView : UserControl
 {
     private ILineProvider _lines = new EmptyLineProvider();
     private int _topLineIndex = 0;
@@ -32,7 +32,7 @@ public partial class EndlessTextView : UserControl
     private SearchPattern? _searchHighlight;
 
     private static readonly StyledProperty<IBrush> HighlightBackgroundProperty =
-    AvaloniaProperty.Register<EndlessTextView, IBrush>(nameof(HighlightBackground), new SolidColorBrush(Color.FromRgb(0, 120, 215)));
+    AvaloniaProperty.Register<TextAreaView, IBrush>(nameof(HighlightBackground), new SolidColorBrush(Color.FromRgb(0, 120, 215)));
     public IBrush HighlightBackground
     {
         get => GetValue(HighlightBackgroundProperty);
@@ -40,7 +40,7 @@ public partial class EndlessTextView : UserControl
     }
 
     private static readonly StyledProperty<IBrush> HighlightForegroundProperty =
-    AvaloniaProperty.Register<EndlessTextView, IBrush>(nameof(HighlightForeground), new SolidColorBrush(Colors.Black));
+    AvaloniaProperty.Register<TextAreaView, IBrush>(nameof(HighlightForeground), new SolidColorBrush(Colors.Black));
     public IBrush HighlightForeground
     {
         get => GetValue(HighlightForegroundProperty);
@@ -53,13 +53,13 @@ public partial class EndlessTextView : UserControl
         public required string LineText { get; init; }
         public required string SelectedText { get; init; }
 
-        public BookmarkEventArgs() : base(EndlessTextView.AddBookmarkEvent)
+        public BookmarkEventArgs() : base(TextAreaView.AddBookmarkEvent)
         {
         }
     }
 
     public static readonly RoutedEvent<BookmarkEventArgs> AddBookmarkEvent =
-        RoutedEvent.Register<EndlessTextView, BookmarkEventArgs>(nameof(AddBookmark2), RoutingStrategies.Bubble);
+        RoutedEvent.Register<TextAreaView, BookmarkEventArgs>(nameof(AddBookmark2), RoutingStrategies.Bubble);
 
     public event EventHandler<BookmarkEventArgs> AddBookmark2
     {
@@ -96,7 +96,7 @@ public partial class EndlessTextView : UserControl
         }
     }
 
-    public EndlessTextView()
+    public TextAreaView()
     {
         InitializeComponent();
 
@@ -115,7 +115,7 @@ public partial class EndlessTextView : UserControl
         TextArea.PointerReleased += TextArea_PointerReleased;
         TextArea.PointerMoved += TextArea_PointerMoved;
 
-        WeakEventHandlerManager.Subscribe<Application, EventArgs, EndlessTextView>(
+        WeakEventHandlerManager.Subscribe<Application, EventArgs, TextAreaView>(
             Application.Current!, nameof(Application.ActualThemeVariantChanged), OnActualThemeVariantChanged);
 
         if (Design.IsDesignMode)

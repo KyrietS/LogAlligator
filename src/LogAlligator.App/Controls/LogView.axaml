@@ -54,7 +54,7 @@
                         <ToggleButton Content="_All occurrences" IsEnabled="False"/>
                     </StackPanel>
                 </Border>
-                <textView:EndlessTextView Name="TextView" />
+                <textView:TextAreaView Name="TextView" />
             </DockPanel>
         </TabItem>
     </TabControl>

@@ -6,12 +6,12 @@
              xmlns:textView="clr-namespace:LogAlligator.App.Controls.TextView"
              mc:Ignorable="d" d:DesignWidth="500" d:DesignHeight="250"
              DataContext="{Binding RelativeSource={RelativeSource Self}}"
-             x:Class="LogAlligator.App.Controls.TextView.EndlessTextView">
+             x:Class="LogAlligator.App.Controls.TextView.TextAreaView">
     <UserControl.Styles>
         <Style Selector="Border#TextViewBorder">
             <Setter Property="BorderBrush" Value="{DynamicResource ThemeBorderLowBrush}" />
         </Style>
-        <Style Selector="textView|EndlessTextView:focus Border#TextViewBorder">
+        <Style Selector="textView|TextAreaView:focus Border#TextViewBorder">
             <Setter Property="BorderBrush" Value="{DynamicResource HighlightBrush2}" />
         </Style>
     </UserControl.Styles>
@@ -57,7 +57,7 @@
             </StackPanel>
             <Panel Name="TextAreaContainer"
                    ClipToBounds="True">
-                <textView:TextArea Name="TextArea"
+                <textView:TextAreaControl Name="TextArea"
                                    Cursor="Ibeam"
                                    FontFamily="Arial"
                                    FontSize="12"

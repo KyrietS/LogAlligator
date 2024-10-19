@@ -7,13 +7,13 @@ using Serilog;
 
 namespace LogAlligator.App.Controls.TextView;
 
-internal class TextArea : Control
+internal class TextAreaControl : Control
 {
     private TextAreaLine[] _lines = [];
     private double _lineHeight;
 
     public static readonly StyledProperty<IBrush> BackgroundProperty =
-        AvaloniaProperty.Register<TextArea, IBrush>(nameof(Background), new SolidColorBrush(Colors.Transparent));
+        AvaloniaProperty.Register<TextAreaControl, IBrush>(nameof(Background), new SolidColorBrush(Colors.Transparent));
 
     public IBrush Background
     {
@@ -22,7 +22,7 @@ internal class TextArea : Control
     }
 
     public static readonly StyledProperty<IBrush> ForegroundProperty =
-        AvaloniaProperty.Register<TextArea, IBrush>(nameof(Foreground), new SolidColorBrush(Colors.Black));
+        AvaloniaProperty.Register<TextAreaControl, IBrush>(nameof(Foreground), new SolidColorBrush(Colors.Black));
 
     public IBrush Foreground
     {
@@ -34,7 +34,7 @@ internal class TextArea : Control
     public Color BackgroundColor => ((SolidColorBrush)Background).Color;
 
     public static readonly StyledProperty<double> FontSizeProperty =
-        AvaloniaProperty.Register<TextArea, double>(nameof(FontSize), 12);
+        AvaloniaProperty.Register<TextAreaControl, double>(nameof(FontSize), 12);
 
     public double FontSize
     {
@@ -43,7 +43,7 @@ internal class TextArea : Control
     }
 
     public static readonly StyledProperty<Thickness> PaddingProperty =
-        Decorator.PaddingProperty.AddOwner<TextArea>();
+        Decorator.PaddingProperty.AddOwner<TextAreaControl>();
 
     public Thickness Padding
     {
@@ -52,7 +52,7 @@ internal class TextArea : Control
     }
 
     public static readonly StyledProperty<FontFamily> FontFamilyProperty =
-        AvaloniaProperty.Register<TextArea, FontFamily>(nameof(FontFamily), FontFamily.Default);
+        AvaloniaProperty.Register<TextAreaControl, FontFamily>(nameof(FontFamily), FontFamily.Default);
 
     public FontFamily FontFamily
     {
@@ -78,13 +78,13 @@ internal class TextArea : Control
 
     public int NumberOfLinesThatCanFit => (int)Math.Ceiling(Bounds.Height / _lineHeight);
 
-    static TextArea()
+    static TextAreaControl()
     {
-        FontSizeProperty.Changed.AddClassHandler<TextArea>((o, _) => o.OnFontSizeChanged());
-        FontFamilyProperty.Changed.AddClassHandler<TextArea>((o, _) => o.OnFontFamilyChanged());
+        FontSizeProperty.Changed.AddClassHandler<TextAreaControl>((o, _) => o.OnFontSizeChanged());
+        FontFamilyProperty.Changed.AddClassHandler<TextAreaControl>((o, _) => o.OnFontFamilyChanged());
     }
 
-    public TextArea()
+    public TextAreaControl()
     {
         _lineHeight = GetInitialLineHeight(FontFamily, FontSize);
     }
@@ -122,7 +122,7 @@ internal class TextArea : Control
     /// <summary>
     /// Gets position of the character in the text pointed by <paramref name="position"/> (usually mouse cursor)
     /// </summary>
-    /// <param name="position">Position (X,Y) relative to <see cref="TextArea"/>.</param>
+    /// <param name="position">Position (X,Y) relative to <see cref="TextAreaControl"/>.</param>
     /// <returns>
     /// <para>A tuple containing the index of pointed line and index of pointer character in that line.</para>
     /// <para>If <paramref name="position"/> points above the first line, then <c>(0, 0)</c> is returned.</para>

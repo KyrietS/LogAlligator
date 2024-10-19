@@ -48,7 +48,7 @@ public partial class FileView : UserControl
         BookmarksView.JumpToBookmark += OnJumpToBookmark;
     }
 
-    public async void OnAddBookmark(object? sender, EndlessTextView.BookmarkEventArgs bookmarkEvent)
+    public async void OnAddBookmark(object? sender, TextAreaView.BookmarkEventArgs bookmarkEvent)
     {
         var bookmarkDialog = new BookmarkDialog();
         try

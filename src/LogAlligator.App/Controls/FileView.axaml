@@ -38,7 +38,7 @@
             <Border Grid.Column="2"
                     BorderBrush="{DynamicResource ThemeControlMidBrush}"
                     BorderThickness="1">
-                <controls:LogView Name="RootLogView" textView:EndlessTextView.AddBookmark="OnAddBookmark"/>
+                <controls:LogView Name="RootLogView" textView:TextAreaView.AddBookmark="OnAddBookmark"/>
             </Border>
         </Grid>
     </Border>
