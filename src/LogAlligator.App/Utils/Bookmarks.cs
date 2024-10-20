@@ -5,10 +5,10 @@ using Serilog;
 
 namespace LogAlligator.App.Utils
 {
-    public record struct Bookmark
+    public record class Bookmark
     {
         public int Id { get; init; }
-        public string Name { get; set; }
+        public required string Name { get; set; }
         public int LineNumber { get; set; }
     }
 

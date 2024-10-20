@@ -29,7 +29,7 @@ public partial class BookmarksView : UserControl
         _bookmarks.OnChange += (_, _) => Refresh();
     }
 
-    public void OnDelete()
+    public void OnRemove()
     {
         if (ListOfBookmarks.SelectedItems is null)
             return;
@@ -76,11 +76,35 @@ public partial class BookmarksView : UserControl
 
     private ContextMenu BuildContextMenu()
     {
-        var delete = new MenuItem { Header = "Remove" };
-        delete.Click += (_, _) => OnDelete();
+        var remove = new MenuItem { Header = "Remove" };
+        remove.Click += (_, _) => OnRemove();
+
+        var edit = new MenuItem { Header = "Edit" };
+        edit.Click += (_, _) => EditBookmark();
 
         var contextMenu = new ContextMenu();
-        contextMenu.Items.Add(delete);
+        contextMenu.Items.Add(edit);
+        contextMenu.Items.Add(remove);
         return contextMenu;
+    }
+
+    private async void EditBookmark()
+    {
+        try
+        {
+            if (ListOfBookmarks.SelectedItem is null)
+                return;
+
+            Bookmark selectedBookmark = (Bookmark)((ListBoxItem)ListOfBookmarks.SelectedItem).DataContext!;
+            EditBookmarkDialog? editBookmarkDialog = new EditBookmarkDialog();
+            editBookmarkDialog.Initialize(selectedBookmark);
+
+            await editBookmarkDialog.ShowDialog<string>((Window)this.VisualRoot!);
+            Refresh();
+        }
+        catch (Exception)
+        {
+            Log.Warning("Exception caught from edit bookmark dialog");
+        }
     }
 }

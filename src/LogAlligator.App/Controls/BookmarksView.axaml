@@ -6,7 +6,7 @@
              DataContext="{Binding RelativeSource={RelativeSource Self}}"
              x:Class="LogAlligator.App.Controls.BookmarksView">
     <UserControl.KeyBindings>
-        <KeyBinding Gesture="Delete" Command="{Binding OnDelete}" />
+        <KeyBinding Gesture="Delete" Command="{Binding OnRemove}" />
     </UserControl.KeyBindings>
     <ListBox Name="ListOfBookmarks" SelectionMode="Multiple" />
 </UserControl>
