@@ -59,6 +59,7 @@ class TextAreaLine : IDisposable
     private readonly OverlappingRanges<IBrush?> _highlights = new();
     private readonly OverlappingRanges<IPen?> _borders = new();
     private readonly OverlappingRanges<Typeface> _typefaces = new();
+    private readonly FontFamily _font;
     private readonly double _fontSize;
     private double _width = 0;
     private double _height = 0;
@@ -67,7 +68,7 @@ class TextAreaLine : IDisposable
     private (GlyphRun GlyphRun, SliceStyle Formatting)[]? _glyphRuns = null;
     public IBrush? Background { get; set; }
 
-    public double Width 
+    public double Width
     {
         get
         {
@@ -76,8 +77,8 @@ class TextAreaLine : IDisposable
         }
         private set => _width = value;
     }
-    public double Height 
-    { 
+    public double Height
+    {
         get
         {
             AssertShaped();
@@ -92,6 +93,7 @@ class TextAreaLine : IDisposable
         _highlights.AddRange(0, text.Length, null);
         _borders.AddRange(0, text.Length, null);
         _typefaces.AddRange(0, text.Length, new Typeface(font));
+        _font = font;
         _fontSize = fontSize;
     }
 
@@ -169,18 +171,21 @@ class TextAreaLine : IDisposable
             var shapedBuffer = FindShapedBuffer(begin, end);
             var textSlice = Text.Slice(begin, end - begin);
             var glyphRun = new GlyphRun(typeface.GlyphTypeface, _fontSize, textSlice, shapedBuffer);
-            var formatting = new SliceStyle 
+            var formatting = new SliceStyle
             {
-                Foreground = foreground, 
+                Foreground = foreground,
                 Background = highlight,
-                Border = border, 
-                Typeface = typeface 
+                Border = border,
+                Typeface = typeface
             };
             _glyphRuns[glyphRunIndex++] = (glyphRun, formatting);
         }
 
         Width = _glyphRuns.Sum(o => o.GlyphRun.Bounds.Width);
         Height = _glyphRuns.Length > 0 ? _glyphRuns.Max(o => o.GlyphRun.Bounds.Height) : 0;
+
+        if (Height == 0 || Text.Length == 0)
+            Height = CalculateEmptyLineHeight();
     }
 
     IReadOnlyList<GlyphInfo> FindShapedBuffer(int begin, int end)
@@ -238,6 +243,16 @@ class TextAreaLine : IDisposable
 
         _shapedBuffers = null;
         _glyphRuns = null;
+    }
+
+    private double CalculateEmptyLineHeight()
+    {
+        var typeface = new Typeface(_font);
+        var options = new TextShaperOptions(typeface.GlyphTypeface, _fontSize);
+        var textSample = ".".AsMemory();
+        var shapedBuffer = TextShaper.Current.ShapeText(textSample, options);
+        var glyphRun = new GlyphRun(typeface.GlyphTypeface, _fontSize, textSample, shapedBuffer);
+        return glyphRun.Bounds.Height;
     }
 
     private struct SliceStyle
