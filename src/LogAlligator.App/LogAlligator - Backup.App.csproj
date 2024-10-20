@@ -39,17 +39,6 @@
     </ItemGroup>
 
     <ItemGroup>
-      <Compile Update="Controls\Dialogs\BookmarkDialog.axaml.cs">
-        <DependentUpon>BookmarkDialog.axaml</DependentUpon>
-        <SubType>Code</SubType>
-      </Compile>
-      <Compile Update="Controls\Dialogs\LoadingDataDialog.axaml.cs">
-        <DependentUpon>LoadingDataDialog.axaml</DependentUpon>
-        <SubType>Code</SubType>
-      </Compile>
-      <Compile Update="Controls\Dialogs\GrepDialog.axaml.cs">
-        <DependentUpon>GrepDialog.axaml</DependentUpon>
-        <SubType>Code</SubType>
-      </Compile>
+      <Folder Include="Controls\Dialogs\" />
     </ItemGroup>
 </Project>
