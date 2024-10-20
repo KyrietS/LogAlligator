@@ -18,16 +18,16 @@ public class BufferedFileLineProvider(Uri path) : ILineProvider
     public async Task LoadData(Action<int> progressCallback, CancellationToken token)
     {
         await LoadLinesData(progressCallback, token);
-        
+
         const FileOptions fileOptions = FileOptions.RandomAccess; // profile if better: FileOptions.SequentialScan;
-        _stream = new FileStream(path.AbsolutePath, FileMode.Open, FileAccess.Read, FileShare.Read, 65536, fileOptions);
+        _stream = new FileStream(path.LocalPath, FileMode.Open, FileAccess.Read, FileShare.Read, 65536, fileOptions);
         _reader = new StreamReader(_stream, Encoding.UTF8, true, 300, true);
     }
 
     private async Task LoadLinesData(Action<int> progressCallback, CancellationToken token)
     {
         const FileOptions fileOptions = FileOptions.SequentialScan | FileOptions.Asynchronous;
-        await using var stream = new FileStream(path.AbsolutePath, FileMode.Open, FileAccess.Read, FileShare.Read, 65536, fileOptions);
+        await using var stream = new FileStream(path.LocalPath, FileMode.Open, FileAccess.Read, FileShare.Read, 65536, fileOptions);
         var reader = new StreamLineReader(stream, 65536);
         int lineNumber = 1;
 
@@ -36,13 +36,13 @@ public class BufferedFileLineProvider(Uri path) : ILineProvider
             _lines.Add((lineNumber, line.Begin, (int)line.Length));
             lineNumber++;
 
-            if (_lines.Count % 100 == 0) 
+            if (_lines.Count % 100 == 0)
                 progressCallback(_lines.Count);
         }
 
         progressCallback(_lines.Count);
     }
-    
+
     public int Count => _lines.Count;
 
     public string this[int index]
@@ -59,7 +59,7 @@ public class BufferedFileLineProvider(Uri path) : ILineProvider
     {
         if (index < 0 || index >= _lines.Count)
             throw new ArgumentOutOfRangeException(nameof(index));
-        
+
         return _lines[index].Length;
     }
 

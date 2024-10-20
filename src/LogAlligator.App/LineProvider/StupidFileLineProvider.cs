@@ -15,17 +15,17 @@ namespace LogAlligator.App.LineProvider;
 public class StupidFileLineProvider(Uri path) : ILineProvider
 {
     private string[] _lines = [];
-    
+
     public async Task LoadData(Action<int> progressCallback, CancellationToken token)
     {
         await Task.Delay(1000, token);
         progressCallback(100);
         await Task.Delay(1000, token);
         progressCallback(200);
-        
-        _lines = await File.ReadAllLinesAsync(path.AbsolutePath, token);
+
+        _lines = await File.ReadAllLinesAsync(path.LocalPath, token);
     }
-    
+
     public int Count => _lines.Length;
 
     public string this[int index]
@@ -40,7 +40,7 @@ public class StupidFileLineProvider(Uri path) : ILineProvider
     {
         if (index < 0 || index >= _lines.Length)
             throw new ArgumentOutOfRangeException(nameof(index));
-        
+
         return _lines[index].Length;
     }
 

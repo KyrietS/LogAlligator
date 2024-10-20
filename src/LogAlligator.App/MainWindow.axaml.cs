@@ -35,12 +35,12 @@ public partial class MainWindow : Window
         var file = GetFileFromDragEvent(e);
         if (file == null)
             return;
-        
+
         this.Activate(); // Bring window to front
         Log.Debug("Dropped file: {FileName}", file.Name);
         AddFileTab(file);
     }
-    
+
     private void OnDragOver(object? sender, DragEventArgs e)
     {
         e.DragEffects = GetFileFromDragEvent(e) != null ? DragDropEffects.Copy : DragDropEffects.None;
@@ -56,7 +56,7 @@ public partial class MainWindow : Window
 
         return files[0] as IStorageFile;
     }
-    
+
     public async void OnLoadData()
     {
         if (Design.IsDesignMode) return;
@@ -71,7 +71,7 @@ public partial class MainWindow : Window
         }
         AddFileTab(file);
     }
-    
+
     public void OnSwitchTheme()
     {
         Application.Current!.RequestedThemeVariant = Application.Current!.ActualThemeVariant == ThemeVariant.Light
@@ -83,7 +83,7 @@ public partial class MainWindow : Window
     {
         Close();
     }
-    
+
     private async void MenuBar_Open_OnClick(object? sender, RoutedEventArgs e)
     {
         var files = await this.StorageProvider.OpenFilePickerAsync(new FilePickerOpenOptions
@@ -107,11 +107,11 @@ public partial class MainWindow : Window
     {
         var fileView = new FileView { FilePath = file.Path };
         var fileTab = new TabItem { Header = file.Name, Content = fileView };
-        
+
         fileView.RemovalRequested += (_, _) => OnTabRequestedRemoval(fileTab);
         fileTab.ContextMenu = CreateFileTabContextMenu(fileTab);
 
-        ToolTip.SetTip(fileTab, file.Path.AbsolutePath);
+        ToolTip.SetTip(fileTab, file.Path.LocalPath);
         FileTabs.SelectedIndex = FileTabs.Items.Add(fileTab);
 
         fileView.Focus();
@@ -125,7 +125,7 @@ public partial class MainWindow : Window
         ctxMenu.Items.Add(closeMenuItem);
         return ctxMenu;
     }
-    
+
     private void OnTabRequestedRemoval(TabItem tab)
     {
         Log.Debug($"Removing tab {tab.Header}");
