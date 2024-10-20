@@ -18,6 +18,7 @@
     <ItemGroup>
         <!-- Avalonia -->
         <PackageReference Include="Avalonia" Version="11.2.0-beta1" />
+        <PackageReference Include="Avalonia.Controls.ColorPicker" Version="11.2.0-beta1" />
         <PackageReference Include="Avalonia.Desktop" Version="11.2.0-beta1" />
         <PackageReference Include="Avalonia.Themes.Fluent" Version="11.2.0-beta1" />
         <PackageReference Include="Avalonia.Themes.Simple" Version="11.2.0-beta1" />

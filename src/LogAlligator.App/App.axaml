@@ -9,11 +9,11 @@
         <!--<ResourceInclude Source="/ThemeCustomizations.axaml" />-->
       </ResourceDictionary.MergedDictionaries>
     </ResourceDictionary>
-  </Application.Resources> 
-  
+  </Application.Resources>
+
     <Application.Styles>
       <SimpleTheme />
-      
+
       <Styles>
         <Styles.Resources>
           <ResourceDictionary>
@@ -22,7 +22,7 @@
             </ResourceDictionary.MergedDictionaries>
           </ResourceDictionary>
         </Styles.Resources>
-          <StyleInclude Source="StyleCustomizations.axaml" />
+        <StyleInclude Source="StyleCustomizations.axaml" />
       </Styles>
     </Application.Styles>
 

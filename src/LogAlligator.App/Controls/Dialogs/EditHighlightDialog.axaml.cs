@@ -19,6 +19,7 @@ public partial class EditHighlightDialog : Window
     {
         _highlightToEdit = highlight;
         HighlightPatternTextBox.Text = highlight.Pattern.Pattern.ToString();
+        HighlightColorPicker.Color = highlight.Background;
     }
 
     public void OnEscape()
@@ -31,6 +32,7 @@ public partial class EditHighlightDialog : Window
         if (!string.IsNullOrEmpty(HighlightPatternTextBox.Text))
         {
             _highlightToEdit!.Pattern.Pattern = HighlightPatternTextBox.Text.AsMemory();
+            _highlightToEdit!.Background = HighlightColorPicker.Color;
         }
 
         Close();

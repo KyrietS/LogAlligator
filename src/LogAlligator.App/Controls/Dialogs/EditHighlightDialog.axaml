@@ -7,7 +7,7 @@
         DataContext="{Binding RelativeSource={RelativeSource Self}}"
         Title="Edit highlight"
         Width="300"
-        Height="95"
+        Height="500"
         CanResize="False"
         ShowInTaskbar="False"
         ExtendClientAreaChromeHints="NoChrome"
@@ -21,6 +21,15 @@
         <TextBlock FontSize="{DynamicResource FontSizeNormal}">Edit highlight</TextBlock>
         <Separator Background="Transparent"/>
         <TextBox Name="HighlightPatternTextBox" Focusable="True" Watermark="Highlight pattern"/>
+        <ColorView Name="HighlightColorPicker"
+            IsAccentColorsVisible="False"
+            IsAlphaEnabled="False"
+            IsColorModelVisible="False"
+            IsColorComponentsVisible="False"
+            IsColorPaletteVisible="False"
+            IsComponentSliderVisible="False"
+            IsColorSpectrumVisible="True"
+            IsColorPreviewVisible="True"/>
         <Separator Height="6" Background="Transparent"/>
         <StackPanel Orientation="Horizontal" Spacing="5" HorizontalAlignment="Center">
             <Button Command="{Binding OnOkClick}" Width="60" IsDefault="True">OK</Button>
