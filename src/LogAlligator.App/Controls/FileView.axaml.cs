@@ -131,7 +131,7 @@ public partial class FileView : UserControl
             ShowLoadingDialog();
             await LoadData();
         }
-        catch (TaskCanceledException)
+        catch (OperationCanceledException)
         {
             Log.Information("Loading data was canceled");
             RequestRemovalFromView();

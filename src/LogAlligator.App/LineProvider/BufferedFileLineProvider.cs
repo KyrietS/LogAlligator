@@ -5,6 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using Avalonia.Threading;
 
 namespace LogAlligator.App.LineProvider;
 
@@ -27,18 +28,24 @@ public class BufferedFileLineProvider(Uri path) : ILineProvider
     private async Task LoadLinesData(Action<int> progressCallback, CancellationToken token)
     {
         const FileOptions fileOptions = FileOptions.SequentialScan | FileOptions.Asynchronous;
-        await using var stream = new FileStream(path.LocalPath, FileMode.Open, FileAccess.Read, FileShare.Read, 65536, fileOptions);
+        using var stream = new FileStream(path.LocalPath, FileMode.Open, FileAccess.Read, FileShare.Read, 65536, fileOptions);
         var reader = new StreamLineReader(stream, 65536);
         int lineNumber = 1;
 
-        while (reader.ReadLine() is { } line) // TODO: Make Async
+        await Task.Run(() =>
         {
-            _lines.Add((lineNumber, line.Begin, (int)line.Length));
-            lineNumber++;
+            while (reader.ReadLine() is { } line)
+            {
+                _lines.Add((lineNumber, line.Begin, (int)line.Length));
+                lineNumber++;
 
-            if (_lines.Count % 100 == 0)
-                progressCallback(_lines.Count);
-        }
+                if (_lines.Count % 1000 == 0)
+                {
+                    token.ThrowIfCancellationRequested();
+                    Dispatcher.UIThread.Post(() => progressCallback(_lines.Count));
+                }
+            }
+        }, token);
 
         progressCallback(_lines.Count);
     }
