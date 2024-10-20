@@ -6,10 +6,10 @@ using Avalonia.Media;
 
 namespace LogAlligator.App.Utils;
 
-public record struct Highlight
+public record class Highlight
 {
     private const double MINIMAL_CONTRAST_RATIO = 7.5;
-    public SearchPattern Pattern { get; set; }
+    public required SearchPattern Pattern { get; set; }
     public Color Background { get; set; }
 
     public bool HasEnoughContrastWith(Color color) => ContrastRatio(Background, color) >= MINIMAL_CONTRAST_RATIO;
@@ -79,6 +79,12 @@ public class Highlights : IEnumerable<Highlight>
     public bool Contains(ReadOnlyMemory<char> pattern)
     {
         return _highlights.Any(h => h.Pattern.Equals(pattern));
+    }
+
+    // FIXME: Just use a proper data binding, please...
+    public void ForceRefresh()
+    {
+        OnChange?.Invoke(this, EventArgs.Empty);
     }
 
     public IEnumerator<Highlight> GetEnumerator()

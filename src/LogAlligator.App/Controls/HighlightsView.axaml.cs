@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using Avalonia.Controls;
 using LogAlligator.App.Utils;
+using Serilog;
 
 namespace LogAlligator.App.Controls;
 
@@ -62,7 +63,7 @@ public partial class HighlightsView : UserControl
 
         foreach (var highlight in _highlights ?? [])
         {
-            var item = new ListBoxItem { Content = highlight.ToString(), ContextMenu = BuildContextMenu() };
+            var item = new ListBoxItem { Content = highlight.ToString(), DataContext = highlight, ContextMenu = BuildContextMenu() };
             items.Add(item);
         }
 
@@ -74,8 +75,32 @@ public partial class HighlightsView : UserControl
         var delete = new MenuItem { Header = "Remove" };
         delete.Click += (_, _) => OnDelete();
 
+        var edit = new MenuItem { Header = "Edit" };
+        edit.Click += (_, _) => EditHighlight();
+
         var contextMenu = new ContextMenu();
+        contextMenu.Items.Add(edit);
         contextMenu.Items.Add(delete);
         return contextMenu;
+    }
+
+    private async void EditHighlight()
+    {
+        try
+        {
+            if (ListOfHighlights.SelectedItem is null)
+                return;
+
+            Highlight selectedHighlight = (Highlight)((ListBoxItem)ListOfHighlights.SelectedItem).DataContext!;
+            var dialog = new EditHighlightDialog();
+            dialog.Initialize(selectedHighlight);
+            await dialog.ShowDialog((Window)VisualRoot!);
+
+            _highlights?.ForceRefresh();
+        }
+        catch (Exception)
+        {
+            Log.Warning("Exception caught from edit highlight dialog");
+        }
     }
 }

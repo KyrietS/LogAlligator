@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using Avalonia.Controls;
 using LogAlligator.App.Utils;
+using Serilog;
 
 namespace LogAlligator.App.Controls;
 

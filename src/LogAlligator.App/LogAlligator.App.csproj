@@ -24,32 +24,18 @@
         <PackageReference Include="Avalonia.Fonts.Inter" Version="11.2.0-beta1" />
         <!--Condition below is needed to remove Avalonia.Diagnostics package from build output in Release configuration.-->
         <PackageReference Condition="'$(Configuration)' == 'Debug'" Include="Avalonia.Diagnostics" Version="11.2.0-beta1" />
-        
+
         <PackageReference Include="MessageBox.Avalonia" Version="3.1.6" />
         <PackageReference Include="Serilog" Version="4.0.1" />
         <PackageReference Include="Serilog.Sinks.Console" Version="6.0.0" />
     </ItemGroup>
 
     <ItemGroup>
-        <InternalsVisibleTo Include="LogAlligator.Tests"/>
+        <InternalsVisibleTo Include="LogAlligator.Tests" />
     </ItemGroup>
 
     <ItemGroup>
-        <AvaloniaResource Include="Assets\**"/>
+        <AvaloniaResource Include="Assets\**" />
     </ItemGroup>
 
-    <ItemGroup>
-      <Compile Update="Controls\Dialogs\BookmarkDialog.axaml.cs">
-        <DependentUpon>BookmarkDialog.axaml</DependentUpon>
-        <SubType>Code</SubType>
-      </Compile>
-      <Compile Update="Controls\Dialogs\LoadingDataDialog.axaml.cs">
-        <DependentUpon>LoadingDataDialog.axaml</DependentUpon>
-        <SubType>Code</SubType>
-      </Compile>
-      <Compile Update="Controls\Dialogs\GrepDialog.axaml.cs">
-        <DependentUpon>GrepDialog.axaml</DependentUpon>
-        <SubType>Code</SubType>
-      </Compile>
-    </ItemGroup>
 </Project>
