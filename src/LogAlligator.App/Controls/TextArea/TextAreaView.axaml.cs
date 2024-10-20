@@ -9,6 +9,7 @@ using Avalonia.Interactivity;
 using Avalonia.Markup.Xaml.MarkupExtensions;
 using Avalonia.Media;
 using Avalonia.Utilities;
+using LogAlligator.App.Context;
 using LogAlligator.App.LineProvider;
 using LogAlligator.App.Utils;
 using MsBox.Avalonia;
@@ -28,7 +29,7 @@ public partial class TextAreaView : UserControl
     private bool _selectionOngoing = false;
     private (int Line, int Char)? _caretPosition = null;
 
-    private Highlights? _highlights;
+    private FileViewContext? _context;
     private SearchPattern? _searchHighlight;
 
     private static readonly StyledProperty<IBrush> HighlightBackgroundProperty =
@@ -130,10 +131,10 @@ public partial class TextAreaView : UserControl
         }
     }
 
-    public void Initialize(ILineProvider lines, Highlights highlights)
+    public void Initialize(ILineProvider lines, FileViewContext context)
     {
         _lines = lines;
-        _highlights = highlights;
+        _context = context;
         _topLineIndex = 0;
         LoadData();
     }
@@ -290,7 +291,7 @@ public partial class TextAreaView : UserControl
 
     private void SetLineHighlight(int viewLineIndex, ReadOnlyMemory<char> line)
     {
-        foreach (var highlight in _highlights ?? [])
+        foreach (var highlight in _context!.Highlights ?? [])
         {
             var matches = highlight.Pattern.MatchAll(line);
             foreach (var (matchBegin, matchEnd) in matches)

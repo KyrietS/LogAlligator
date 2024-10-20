@@ -37,7 +37,7 @@ public partial class LogView : UserControl
     {
         _lineProvider = lineProvider;
         _fileViewContext = fileViewContext;
-        TextView.Initialize(lineProvider, _fileViewContext.Highlights);
+        TextView.Initialize(lineProvider, _fileViewContext);
     }
 
     internal void AddGrep(SearchPattern pattern, bool inverted = false)

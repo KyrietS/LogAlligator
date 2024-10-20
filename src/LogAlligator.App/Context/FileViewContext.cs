@@ -13,7 +13,7 @@ namespace LogAlligator.App.Context
     /// Note: DO NOT subscribe to events from properties in this class, because it may outlive your view.
     /// The only view that should be subscribed to events is the FileView itself.
     /// </summary>
-    class FileViewContext
+    public class FileViewContext
     {
         public Highlights Highlights { get; init; } = new();
         public Bookmarks Bookmarks { get; init; } = new();
