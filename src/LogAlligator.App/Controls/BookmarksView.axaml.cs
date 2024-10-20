@@ -52,6 +52,7 @@ public partial class BookmarksView : UserControl
 
     private void Refresh()
     {
+        // TODO: This needs data binding! It's so silly to update the UI like this.
         ListOfBookmarks.Items.Clear();
         foreach (var item in PrepareListOfBookmarks())
         {

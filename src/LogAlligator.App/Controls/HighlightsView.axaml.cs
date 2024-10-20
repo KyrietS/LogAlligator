@@ -48,6 +48,7 @@ public partial class HighlightsView : UserControl
 
     private void Refresh()
     {
+        // TODO: This needs data binding! It's so silly to update the UI like this.
         ListOfHighlights.Items.Clear();
         foreach (var item in PrepareListOfHighlights())
         {
