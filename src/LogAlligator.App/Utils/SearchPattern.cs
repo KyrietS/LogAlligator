@@ -13,6 +13,7 @@ namespace LogAlligator.App.Utils
     /// </summary>
     public class SearchPattern
     {
+        // FIXME: Why is this ReadOnlyMemory instead of a string? This class is not performance critical.
         public ReadOnlyMemory<char> Pattern { get; set; }
         public bool IsCaseSensitive { get; set; }
         public bool IsRegex { get; set; }

@@ -263,6 +263,7 @@ public partial class TextAreaView : UserControl
             TextArea[viewLineIndex] = line;
 
             SetBackgroundToLineWithCaret(viewLineIndex);
+            ApplyUserStyles(viewLineIndex, line);
             SetLineHighlight(viewLineIndex, line);
             SetLineSelection(viewLineIndex, line);
             SetLineSearchHighlight(viewLineIndex, line);
@@ -289,7 +290,26 @@ public partial class TextAreaView : UserControl
         }
     }
 
-    private void SetLineHighlight(int viewLineIndex, ReadOnlyMemory<char> line)
+    private void ApplyUserStyles(int viewLineIndex, ReadOnlyMemory<char> line)
+    {
+        if (_context?.TimestampPattern is null)
+            return;
+
+        var timestamp = _context.TimestampPattern.MatchAll(line);
+
+        if (timestamp.Count != 1)
+            return;
+
+        var (begin, end) = timestamp[0];
+        TextArea.ApplyStyleToLine(viewLineIndex, (begin..end),
+            new Style
+            {
+                Foreground = new SolidColorBrush(TextArea.ForegroundColor, opacity: 0.75),
+                Typeface = new Typeface(TextArea.SecondaryFontFamily)
+            });
+    }
+
+        private void SetLineHighlight(int viewLineIndex, ReadOnlyMemory<char> line)
     {
         foreach (var highlight in _context!.Highlights ?? [])
         {
