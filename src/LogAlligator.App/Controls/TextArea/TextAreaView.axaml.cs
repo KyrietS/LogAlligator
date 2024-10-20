@@ -202,8 +202,9 @@ public partial class TextAreaView : UserControl
         if (_caretPosition is null)
             return;
 
+        int currentLineIndex = _caretPosition.Value.Line;
         int currentLineNumber = _lines.GetLineNumber(_caretPosition.Value.Line);
-        string currentLineText = _lines[currentLineNumber];
+        string currentLineText = _lines[currentLineIndex];
         string? selectedText = GetSelectedText();
 
         RaiseEvent(new BookmarkEventArgs { 
