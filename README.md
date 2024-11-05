@@ -1,4 +1,4 @@
-# LogAlligator
+# LogAlligator 🐊
 
 [![tests](https://github.com/KyrietS/LogAlligator/actions/workflows/test.yml/badge.svg)](https://github.com/KyrietS/LogAlligator/actions/workflows/test.yml)
 
