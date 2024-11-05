@@ -4,7 +4,8 @@
 
 LogAlligator is a log viewer for extremely big files.
 
-![LogAlligator_demo_2024-optimized](https://github.com/user-attachments/assets/cfa2a596-07d5-4b56-8f1b-757f126b1d35)
+
+https://github.com/user-attachments/assets/1978d372-bef3-4943-9a4f-ca4709647fb5
 
 
 ## Features
