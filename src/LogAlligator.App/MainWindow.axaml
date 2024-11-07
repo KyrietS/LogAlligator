@@ -17,7 +17,6 @@
                 <Separator />
                 <MenuItem Header="_Exit" Command="{Binding OnExit}" />
             </MenuItem>
-            <MenuItem Header="Load data" Command="{Binding OnLoadData}" />
             <MenuItem Header="Switch theme" Command="{Binding OnSwitchTheme}" />
         </Menu>
 

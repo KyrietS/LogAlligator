@@ -27,6 +27,7 @@ public partial class MainWindow : Window
         FileTabs.AddHandler(DragDrop.DropEvent, OnDrop);
         DragDrop.SetAllowDrop(FileTabs, true);
 
+        AddLoadTestDataButton();
         _windowNotificationManager = new WindowNotificationManager(this); // Will be used in the future
     }
 
@@ -55,21 +56,6 @@ public partial class MainWindow : Window
         }
 
         return files[0] as IStorageFile;
-    }
-
-    public async void OnLoadData()
-    {
-        if (Design.IsDesignMode) return;
-
-        // Load wide.txt file (for testing)
-        Uri filePath = new Uri(Path.GetFullPath("wide.txt"));
-        var file = await StorageProvider.TryGetFileFromPathAsync(filePath);
-        if (file == null)
-        {
-            Log.Warning("File {FilePath} not found", filePath);
-            return;
-        }
-        AddFileTab(file);
     }
 
     public void OnSwitchTheme()
@@ -132,5 +118,30 @@ public partial class MainWindow : Window
 
         FileTabs.Items.Remove(tab);
         GC.Collect(GC.MaxGeneration);
+    }
+
+    private void AddLoadTestDataButton()
+    {
+#if DEBUG
+        MenuItem menuItem = new MenuItem { Header = "🛠️ Load test data" };
+        menuItem.Click += (_, _) => OnLoadTestData();
+        ToolTip.SetTip(menuItem, "This button is visible only in DEBUG mode");
+        MainMenuBar.Items.Add(menuItem);
+#endif
+    }
+
+    private async void OnLoadTestData()
+    {
+        if (Design.IsDesignMode) return;
+
+        // Load file with text (for testing)
+        Uri filePath = new Uri(Path.GetFullPath("wide.txt"));
+        var file = await StorageProvider.TryGetFileFromPathAsync(filePath);
+        if (file == null)
+        {
+            Log.Warning("File {FilePath} not found", filePath);
+            return;
+        }
+        AddFileTab(file);
     }
 }
