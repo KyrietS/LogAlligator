@@ -1,15 +1,19 @@
-# LogAlligator
+# LogAlligator 🐊
 
 [![tests](https://github.com/KyrietS/LogAlligator/actions/workflows/test.yml/badge.svg)](https://github.com/KyrietS/LogAlligator/actions/workflows/test.yml)
 
 LogAlligator is a log viewer for extremely big files.
 
+
+https://github.com/user-attachments/assets/1978d372-bef3-4943-9a4f-ca4709647fb5
+
+
 ## Features
 
 - Open extremely big files without loading them into RAM
 - Highlight selected phrases
-- Filtering lines by regex
-- Bookmmark specific lines
+- Filter lines by regex
+- Bookmark specific lines
 
 ## License
 
