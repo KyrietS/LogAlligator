@@ -59,7 +59,7 @@
                    ClipToBounds="True">
                 <textView:TextAreaControl Name="TextArea"
                                    Cursor="Ibeam"
-                                   FontFamily="Arial"
+                                   FontFamily="Arial" 
                                    FontSize="12"
                                    Padding="5 0 2 0"
                                    Background="{DynamicResource ThemeBackgroundBrush}"

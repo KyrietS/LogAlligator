@@ -207,7 +207,7 @@ public partial class TextAreaView : UserControl
         string currentLineText = _lines[currentLineIndex];
         string? selectedText = GetSelectedText();
 
-        RaiseEvent(new BookmarkEventArgs { 
+        RaiseEvent(new BookmarkEventArgs {
             LineNumber = currentLineNumber,
             LineText = currentLineText,
             SelectedText = selectedText
@@ -312,7 +312,7 @@ public partial class TextAreaView : UserControl
 
         private void SetLineHighlight(int viewLineIndex, ReadOnlyMemory<char> line)
     {
-        foreach (var highlight in _context!.Highlights ?? [])
+        foreach (var highlight in _context?.Highlights ?? [])
         {
             var matches = highlight.Pattern.MatchAll(line);
             foreach (var (matchBegin, matchEnd) in matches)
